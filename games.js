@@ -15,7 +15,11 @@ window.GAMES = [
       ["img/art-time-adventure1-monet.jpg", "게임 화면 · 모네를 만나는 장면"]
     ],
     url: "https://joyhanju.github.io/art-time-adventure1/share.html",
-    materials: [],
+    materials: [
+      ["활동지 · 학생용", "materials/art-time-adventure1/서양미술사_활동지_학생용.pdf", "학생용"],
+      ["활동지 · 교사용(정답)", "materials/art-time-adventure1/teacher-worksheet.enc", "교사용", "서양미술사_활동지_교사용(정답).pdf"],
+      ["수업 PPT", "materials/art-time-adventure1/teacher-ppt.enc", "교사용", "아트타임어드벤처1_수업PPT.pptx"]
+    ],
     color: "#2353A8",
     summary: "서양미술사의 의미 있는 화가 6명을 차례로 만나 문제를 풀고 미션을 해결하는 어드벤처 게임이에요. 이론 수업 뒤 형성평가로 쓰기 좋아요.",
     facts: [

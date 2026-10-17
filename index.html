@@ -271,7 +271,7 @@ ul.tips li{margin-bottom:6px}
       if(!dk){msg.className='err';msg.textContent='비밀번호가 맞지 않아요. 다시 입력해 주세요.';go.disabled=false;document.getElementById('pwIn').select();return;}
       var fk=await crypto.subtle.importKey('raw',dk,'AES-GCM',false,['decrypt']);
       var plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(off,off+12)},fk,buf.slice(off+12));
-      var url=URL.createObjectURL(new Blob([plain],{type:'application/pdf'})),a=document.createElement('a');
+      var url=URL.createObjectURL(new Blob([plain],{type:/\.pptx$/i.test(pwM[3]||'')?'application/vnd.openxmlformats-officedocument.presentationml.presentation':'application/pdf'})),a=document.createElement('a');
       a.href=url;a.download=pwM[3]||'교사용자료.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},4000);
       closePw();toast('내려받기를 시작했어요');
     }catch(x){msg.className='err';msg.textContent='파일을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.';}
