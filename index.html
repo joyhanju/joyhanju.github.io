@@ -66,6 +66,9 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .btn:focus-visible{outline:4px solid var(--warm-line);outline-offset:2px}
 .btn svg{width:22px;height:22px;flex:none}
 
+.soon{display:flex;gap:12px;align-items:flex-start;background:var(--warm);border:1.5px dashed var(--warm-line);border-radius:14px;padding:14px 18px;font-size:16px}
+.soon svg{width:26px;height:26px;flex:none;color:var(--gc,var(--title));margin-top:2px}
+.soon b{display:block;font-family:"Jua";font-weight:400;font-size:20px;color:var(--gc,var(--title))}
 .mats{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--line)}
 .mats .mt{font-family:"Jua";font-size:19px;color:var(--title);margin-bottom:8px}
 .ml{display:flex;flex-wrap:wrap;gap:8px}
@@ -188,7 +191,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610171645"></script>
+<script src="games.js?v=202610180200"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.release||'').localeCompare(String(a.release||''));});
@@ -199,11 +202,13 @@ ul.tips li{margin-bottom:6px}
     play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>',
     qr:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm11-2h2v2h-2zm-3 0h2v2h-2zm3 3h2v2h-2zm3-3h2v4h-2zm-6 3h2v2h-2zm3 3h5v2h-5zm-3 0h2v2h-2z"/></svg>',
     lock:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v3H5v12h14V10h-2V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3zm3 4a2 2 0 0 1 1 3.7V20h-2v-2.3A2 2 0 0 1 12 14z"/></svg>',
-    doc:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h9l5 5v15H6zm8 1.5V8h4.5zM8 12h8v2H8zm0 4h8v2H8z"/></svg>'
+    doc:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h9l5 5v15H6zm8 1.5V8h4.5zM8 12h8v2H8zm0 4h8v2H8z"/></svg>',
+    clock:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm-1 3v6l5 3 1-1.7-4-2.4V7z"/></svg>'
   };
   (function(){var d=new Date(document.lastModified);if(isNaN(d))return;var p=function(n){return String(n).padStart(2,'0');};
     document.getElementById('updated').textContent=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+p(d.getHours())+':'+p(d.getMinutes());})();
-  document.getElementById('count').textContent = games.length + '개';
+  var soonN = games.filter(function(g){return !g.url;}).length;
+  document.getElementById('count').textContent = (games.length-soonN) + '개' + (soonN?' · 준비 중 '+soonN+'개':'');
   document.getElementById('list').innerHTML = games.map(function(g,i){
     return '<article class="game" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
       +'<div class="shots">'+(g.images||[]).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="'+esc(g.title+' '+m[1])+'" loading="lazy"></div><figcaption>'+esc(m[1])+'</figcaption></figure>';}).join('')+'</div>'
@@ -214,21 +219,23 @@ ul.tips li{margin-bottom:6px}
         +'<p class="sum">'+esc(g.summary)+'</p>'
         +'<div class="facts">'+(g.facts||[]).map(function(f){return '<div><b>'+esc(f[0])+'</b><span>'+esc(f[1])+'</span></div>';}).join('')+'</div>'
         +'<ul class="tags" aria-label="배우는 내용">'+(g.learn||[]).map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>'
-        +'<div class="btns">'
-          +'<a class="btn main" href="'+esc(abs(g.url))+'" target="_blank" rel="noopener">'+ICO.play+'게임 시작</a>'
-          +'<button class="btn" type="button" data-qr="'+i+'">'+ICO.qr+'학생에게 QR 보여 주기</button>'
-        +'</div>'
+        +(g.url
+          ?'<div class="btns">'
+            +'<a class="btn main" href="'+esc(abs(g.url))+'" target="_blank" rel="noopener">'+ICO.play+'게임 시작</a>'
+            +'<button class="btn" type="button" data-qr="'+i+'">'+ICO.qr+'학생에게 QR 보여 주기</button>'
+          +'</div>'
+          :'<div class="soon">'+ICO.clock+'<div><b>공개 예정</b>'+esc(g.soon||'곧 올릴 예정이에요.')+'</div></div>')
         +((g.materials&&g.materials.length)?'<div class="mats"><div class="mt">수업 자료 받기</div><div class="ml">'+g.materials.map(function(m,k){
             var t=m[2]==='교사용';
             return t?'<button type="button" class="mat t" data-lock="'+i+'-'+k+'">'+ICO.lock+'<span>'+esc(m[0])+'</span><em>비밀번호</em></button>'
                     :'<a class="mat" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>PDF</em></a>';
           }).join('')+'</div></div>':'')
       +'</div>'
-      +'<details class="guide"><summary>수업 안내 보기</summary><div class="gbody">'
+      +((g.steps&&g.steps.length)?'<details class="guide"><summary>수업 안내 보기</summary><div class="gbody">'
         +'<div><h4>수업 진행 순서</h4><ol class="flow">'+(g.steps||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol></div>'
         +'<div><div class="result"><b>결과는 이렇게 받아요</b>'+esc(g.result)+'</div>'
           +'<h4>알아 두면 좋아요</h4><ul class="tips">'+(g.tips||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>'
-      +'</div></details>'
+      +'</div></details>':'')
     +'</article>';
   }).join('');
 
