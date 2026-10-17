@@ -65,6 +65,23 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .btn:focus-visible{outline:4px solid var(--warm-line);outline-offset:2px}
 .btn svg{width:22px;height:22px;flex:none}
 
+.mats{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--line)}
+.mats .mt{font-family:"Jua";font-size:19px;color:var(--title);margin-bottom:8px}
+.ml{display:flex;flex-wrap:wrap;gap:8px}
+.mat{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--ink);text-decoration:none;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.mat:hover{border-color:var(--title)}
+.mat svg{width:20px;height:20px;color:var(--title)}
+.mat em{font-style:normal;font-weight:500;font-size:12px;color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:0 5px;background:#fff}
+.mat.t{background:var(--warm);border-color:var(--warm-line)}
+.mat.t svg{color:#B5651D}
+#pw .qbox{max-width:460px;text-align:left}
+#pw h2{font-size:28px;text-align:center}
+#pw label{display:block;font-weight:700;margin:14px 0 6px}
+#pw input{width:100%;min-height:54px;border:2px solid var(--line);border-radius:12px;padding:0 14px;font:inherit;font-size:20px}
+#pw input:focus{outline:4px solid var(--warm-line);outline-offset:1px;border-color:var(--title)}
+#pwMsg{min-height:26px;margin:8px 0 12px;font-size:16px;font-weight:700}
+#pwMsg.err{color:#C0392B}
+#pw .btns{justify-content:center}
 /* 수업 안내 */
 details.guide{grid-column:1/-1;border-top:2px dashed var(--line);padding-top:14px}
 details.guide summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-family:"Jua";font-size:22px;color:var(--title)}
@@ -82,8 +99,8 @@ ul.tips{margin:0;padding-left:20px;font-size:16px;color:var(--mute)}
 ul.tips li{margin-bottom:6px}
 
 /* QR 크게 보기 */
-#qr{position:fixed;inset:0;z-index:50;background:rgba(36,54,79,.55);display:none;place-items:center;padding:20px}
-#qr.on{display:grid}
+#qr,#pw{position:fixed;inset:0;z-index:50;background:rgba(36,54,79,.55);display:none;place-items:center;padding:20px}
+#qr.on,#pw.on{display:grid}
 .qbox{background:#fff;border-radius:22px;border:2px solid var(--line);padding:26px 30px;text-align:center;max-width:640px;width:100%;max-height:96vh;overflow:auto}
 .qbox h2{margin:0;font-size:34px;color:var(--title)}
 .qbox p{margin:4px 0 14px;color:var(--mute)}
@@ -156,6 +173,16 @@ ul.tips li{margin-bottom:6px}
     </div>
   </div>
 </div>
+<div id="pw" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+  <form class="qbox" id="pwForm">
+    <h2 id="pwTitle">교사용 자료</h2>
+    <p id="pwName" style="text-align:center"></p>
+    <label for="pwIn">비밀번호</label>
+    <input id="pwIn" type="password" autocomplete="off" required>
+    <div id="pwMsg" role="status" aria-live="polite"></div>
+    <div class="btns"><button class="btn" type="button" id="pwClose">닫기</button><button class="btn main" type="submit" id="pwGo">내려받기</button></div>
+  </form>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
@@ -168,6 +195,7 @@ ul.tips li{margin-bottom:6px}
   var ICO = {
     play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>',
     qr:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm11-2h2v2h-2zm-3 0h2v2h-2zm3 3h2v2h-2zm3-3h2v4h-2zm-6 3h2v2h-2zm3 3h5v2h-5zm-3 0h2v2h-2z"/></svg>',
+    lock:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v3H5v12h14V10h-2V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3zm3 4a2 2 0 0 1 1 3.7V20h-2v-2.3A2 2 0 0 1 12 14z"/></svg>',
     doc:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h9l5 5v15H6zm8 1.5V8h4.5zM8 12h8v2H8zm0 4h8v2H8z"/></svg>'
   };
   document.getElementById('count').textContent = games.length + '개';
@@ -183,8 +211,12 @@ ul.tips li{margin-bottom:6px}
         +'<div class="btns">'
           +'<a class="btn main" href="'+esc(abs(g.url))+'" target="_blank" rel="noopener">'+ICO.play+'게임 시작</a>'
           +'<button class="btn" type="button" data-qr="'+i+'">'+ICO.qr+'학생에게 QR 보여 주기</button>'
-          +(g.worksheet?'<a class="btn" href="'+esc(abs(g.worksheet))+'" target="_blank" rel="noopener">'+ICO.doc+'활동지 받기</a>':'')
         +'</div>'
+        +((g.materials&&g.materials.length)?'<div class="mats"><div class="mt">수업 자료 받기</div><div class="ml">'+g.materials.map(function(m,k){
+            var t=m[2]==='교사용';
+            return t?'<button type="button" class="mat t" data-lock="'+i+'-'+k+'">'+ICO.lock+'<span>'+esc(m[0])+'</span><em>비밀번호</em></button>'
+                    :'<a class="mat" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>PDF</em></a>';
+          }).join('')+'</div></div>':'')
       +'</div>'
       +'<details class="guide"><summary>수업 안내 보기</summary><div class="gbody">'
         +'<div><h4>수업 진행 순서</h4><ol class="flow">'+(g.steps||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol></div>'
@@ -214,6 +246,33 @@ ul.tips li{margin-bottom:6px}
     if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(cur).then(done,function(){toast('주소를 길게 눌러 복사해 주세요');});}
     else{var t=document.createElement('textarea');t.value=cur;document.body.appendChild(t);t.select();try{document.execCommand('copy');done();}catch(e){toast('주소를 길게 눌러 복사해 주세요');}t.remove();}
   };
+  /* 교사용 자료: 비밀번호로 잠근 파일을 브라우저에서 풀어 내려받기 */
+  var pw=document.getElementById('pw'),pwM=null,pwFocus=null,msg=document.getElementById('pwMsg');
+  function openPw(m){pwM=m;pwFocus=document.activeElement;document.getElementById('pwName').textContent=m[0];document.getElementById('pwIn').value='';msg.textContent='';msg.className='';pw.classList.add('on');document.getElementById('pwIn').focus();}
+  function closePw(){pw.classList.remove('on');if(pwFocus)pwFocus.focus();}
+  document.addEventListener('click',function(e){var b=e.target.closest('[data-lock]');if(!b)return;var p=b.getAttribute('data-lock').split('-');openPw(games[+p[0]].materials[+p[1]]);});
+  document.getElementById('pwClose').onclick=closePw;
+  pw.addEventListener('click',function(e){if(e.target===pw)closePw();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&pw.classList.contains('on'))closePw();});
+  document.getElementById('pwForm').addEventListener('submit',async function(e){
+    e.preventDefault();
+    var go=document.getElementById('pwGo'),val=document.getElementById('pwIn').value.trim();
+    if(!window.crypto||!crypto.subtle){msg.className='err';msg.textContent='이 브라우저에서는 열 수 없어요. 크롬에서 다시 시도해 주세요.';return;}
+    go.disabled=true;msg.className='';msg.textContent='확인하는 중…';
+    try{
+      var r=await fetch(pwM[1],{cache:'no-store'});if(!r.ok)throw new Error('net');
+      var buf=new Uint8Array(await r.arrayBuffer()),salt=buf.slice(0,16),iv=buf.slice(16,28),data=buf.slice(28);
+      var base=await crypto.subtle.importKey('raw',new TextEncoder().encode(val),'PBKDF2',false,['deriveKey']);
+      var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+      var plain;
+      try{plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:iv},key,data);}
+      catch(x){msg.className='err';msg.textContent='비밀번호가 맞지 않아요. 다시 입력해 주세요.';go.disabled=false;document.getElementById('pwIn').select();return;}
+      var url=URL.createObjectURL(new Blob([plain],{type:'application/pdf'})),a=document.createElement('a');
+      a.href=url;a.download=pwM[3]||'교사용자료.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},4000);
+      closePw();toast('내려받기를 시작했어요');
+    }catch(x){msg.className='err';msg.textContent='파일을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.';}
+    go.disabled=false;
+  });
 })();
 </script>
 </body>

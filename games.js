@@ -2,7 +2,8 @@
   게임 목록 파일
   - 새 게임을 추가하려면 아래 { ... } 묶음을 하나 복사해서 내용만 바꾸면 됩니다.
   - 스크린샷은 images 칸에 ["그림 주소", "설명"] 형식으로 넣습니다.
-  - 활동지가 생기면 worksheet 칸에 주소를 넣으세요. 비워 두면 버튼이 보이지 않습니다.
+  - 활동지·PPT는 materials 칸에 ["버튼 이름", "파일 주소", "학생용"] 형식으로 넣습니다.
+    교사용은 비밀번호로 잠근 파일(.enc)과 내려받을 때 쓸 파일 이름을 넣습니다: ["버튼 이름", "잠근 파일 주소", "교사용", "파일 이름.pdf"]
 */
 window.GAMES = [
   {
@@ -14,13 +15,13 @@ window.GAMES = [
       ["img/art-time-adventure1-monet.jpg", "게임 화면 · 모네를 만나는 장면"]
     ],
     url: "https://joyhanju.github.io/art-time-adventure1/share.html",
-    worksheet: "",
+    materials: [],
     color: "#2353A8",
     summary: "서양미술사의 의미 있는 화가 6명을 차례로 만나 문제를 풀고 미션을 해결하는 어드벤처 게임이에요. 이론 수업 뒤 형성평가로 쓰기 좋아요.",
     facts: [
       ["대상", "중학생"],
       ["추천 시기", "서양미술사 수업 뒤"],
-      ["걸리는 시간", "20~30분"],
+      ["걸리는 시간", "15분 정도"],
       ["기기", "태블릿 가로 화면"]
     ],
     learn: ["르네상스 · 다 빈치", "바로크 · 렘브란트", "인상주의 · 모네", "후기인상주의 · 고흐", "입체주의 · 피카소", "다다 · 뒤샹"],
@@ -47,7 +48,10 @@ window.GAMES = [
       ["img/color-alchemist-play.jpg", "게임 화면 · 물감 섞기"]
     ],
     url: "color-alchemist/",
-    worksheet: "",
+    materials: [
+      ["활동지 · 학생용", "materials/color-alchemist/색채의연금술사_활동지_학생용.pdf", "학생용"],
+      ["활동지 · 교사용(정답)", "materials/color-alchemist/teacher-worksheet.enc", "교사용", "색채의연금술사_활동지_교사용(정답).pdf"]
+    ],
     color: "#B5651D",
     summary: "학생들이 어려워하는 색채 이론을 게임으로 자연스럽게 익혀요. 먼셀 색상환을 바탕으로 물감을 섞어 주문받은 색을 만들고, 스테인드글라스 창을 칠해요.",
     facts: [
