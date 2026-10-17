@@ -188,11 +188,11 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610171640"></script>
+<script src="games.js?v=202610171645"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.release||'').localeCompare(String(a.release||''));});
-  var relLabel = function(r){var m=/^(\d{4})-(\d{1,2})/.exec(r||'');return m?(+m[2])+'월 릴리즈':'';};
+  var relLabel = function(r){var m=/^(\d{4})-(\d{1,2})/.exec(r||'');var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m?mo[+m[2]-1]+' '+m[1]:'';};
   var esc = function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
   var abs = function(u){try{return new URL(u, location.href).href;}catch(e){return u;}};
   var ICO = {
