@@ -1,6 +1,7 @@
 /*
   게임 목록 파일
   - 새 게임을 추가하려면 아래 { ... } 묶음을 하나 복사해서 내용만 바꾸면 됩니다.
+  - 스크린샷은 images 칸에 ["그림 주소", "설명"] 형식으로 넣습니다.
   - 활동지가 생기면 worksheet 칸에 주소를 넣으세요. 비워 두면 버튼이 보이지 않습니다.
 */
 window.GAMES = [
@@ -8,7 +9,10 @@ window.GAMES = [
     id: "art-time-adventure1",
     title: "아트타임 어드벤처 1",
     subtitle: "사라진 잎을 찾아서: 시공간 미술 모험",
-    image: "img/art-time-adventure1.jpg",
+    images: [
+      ["img/art-time-adventure1-start.jpg", "시작 화면"],
+      ["img/art-time-adventure1-monet.jpg", "게임 화면 · 모네를 만나는 장면"]
+    ],
     url: "https://joyhanju.github.io/art-time-adventure1/share.html",
     worksheet: "",
     color: "#2353A8",
@@ -38,7 +42,10 @@ window.GAMES = [
     id: "color-alchemist",
     title: "색채의 연금술사",
     subtitle: "물감을 만들고 스테인드글라스를 칠하는 조색 게임",
-    image: "img/color-alchemist.jpg",
+    images: [
+      ["img/color-alchemist-start.jpg", "시작 화면"],
+      ["img/color-alchemist-play.jpg", "게임 화면 · 물감 섞기"]
+    ],
     url: "color-alchemist/",
     worksheet: "",
     color: "#B5651D",

@@ -43,8 +43,11 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 
 /* 게임 카드 */
 .game{display:grid;grid-template-columns:minmax(260px,400px) 1fr;gap:26px;border:1.5px solid var(--line);border-radius:18px;padding:22px;margin-bottom:26px;background:#fff}
-.shot{border-radius:12px;overflow:hidden;border:1.5px solid var(--line);background:var(--soft);aspect-ratio:16/10}
+.shots{display:grid;gap:12px;align-content:start;margin:0}
+.shot{margin:0}
+.shot .pic{border-radius:12px;overflow:hidden;border:1.5px solid var(--line);background:var(--soft);aspect-ratio:16/10}
 .shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot figcaption{font-size:14px;color:var(--mute);margin-top:4px}
 .gt{margin:0;font-size:32px;line-height:1.2;color:var(--gc,var(--title))}
 .gs{margin:2px 0 10px;color:var(--mute);font-size:17px}
 .sum{margin:0 0 14px}
@@ -96,6 +99,7 @@ ul.tips li{margin-bottom:6px}
 .foot b{color:var(--ink)}
 
 @media (max-width:860px){
+  .shots{grid-template-columns:1fr 1fr}
   .book{padding:24px 18px}
   .how{grid-template-columns:1fr}
   .game{grid-template-columns:1fr;padding:16px}
@@ -169,7 +173,7 @@ ul.tips li{margin-bottom:6px}
   document.getElementById('count').textContent = games.length + '개';
   document.getElementById('list').innerHTML = games.map(function(g,i){
     return '<article class="game" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
-      +'<div class="shot"><img src="'+esc(g.image)+'" alt="'+esc(g.title)+' 게임 화면" loading="lazy"></div>'
+      +'<div class="shots">'+(g.images||[]).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="'+esc(g.title+' '+m[1])+'" loading="lazy"></div><figcaption>'+esc(m[1])+'</figcaption></figure>';}).join('')+'</div>'
       +'<div>'
         +'<h3 class="gt" id="t'+i+'">'+esc(g.title)+'</h3>'
         +'<div class="gs">'+esc(g.subtitle)+'</div>'
