@@ -156,7 +156,8 @@ ul.tips li{margin-bottom:6px}
   <footer class="foot">
     <div><b>학생 정보 안내</b> · 이 게임들은 학생이 입력한 이름이나 결과를 어디에도 보내거나 저장하지 않아요. 결과는 학생 화면에만 나타나요.</div>
     <div><b>권장 환경</b> · 태블릿 가로 화면, 크롬 또는 삼성 인터넷</div>
-    <div>만든 곳 · 명지중학교 미술과 · 게임은 계속 고쳐지고 있어요. 이 주소로 들어오시면 늘 최신판이 열려요.</div>
+    <div>만든 곳 · 명지중학교 미술과 · <a href="mailto:joyhanju@myongji.sen.ms.kr">joyhanju@myongji.sen.ms.kr</a></div>
+    <div>계속 업데이트되고 있습니다. 이 주소로 들어오시면 늘 최신판이 열려요. · <b>마지막 업데이트</b> <span id="updated"></span></div>
   </footer>
 </main>
 </div>
@@ -186,7 +187,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js"></script>
+<script src="games.js?v=202610171518"></script>
 <script>
 (function(){
   var games = window.GAMES || [];
@@ -198,6 +199,8 @@ ul.tips li{margin-bottom:6px}
     lock:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v3H5v12h14V10h-2V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3zm3 4a2 2 0 0 1 1 3.7V20h-2v-2.3A2 2 0 0 1 12 14z"/></svg>',
     doc:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h9l5 5v15H6zm8 1.5V8h4.5zM8 12h8v2H8zm0 4h8v2H8z"/></svg>'
   };
+  (function(){var d=new Date(document.lastModified);if(isNaN(d))return;var p=function(n){return String(n).padStart(2,'0');};
+    document.getElementById('updated').textContent=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+p(d.getHours())+':'+p(d.getMinutes());})();
   document.getElementById('count').textContent = games.length + '개';
   document.getElementById('list').innerHTML = games.map(function(g,i){
     return '<article class="game" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
