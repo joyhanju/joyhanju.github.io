@@ -178,7 +178,7 @@ ul.tips li{margin-bottom:6px}
     <h2 id="pwTitle">교사용 자료</h2>
     <p id="pwName" style="text-align:center"></p>
     <label for="pwIn">비밀번호</label>
-    <input id="pwIn" type="password" autocomplete="off" required>
+    <input id="pwIn" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" required>
     <div id="pwMsg" role="status" aria-live="polite"></div>
     <div class="btns"><button class="btn" type="button" id="pwClose">닫기</button><button class="btn main" type="submit" id="pwGo">내려받기</button></div>
   </form>
@@ -261,12 +261,16 @@ ul.tips li{margin-bottom:6px}
     go.disabled=true;msg.className='';msg.textContent='확인하는 중…';
     try{
       var r=await fetch(pwM[1],{cache:'no-store'});if(!r.ok)throw new Error('net');
-      var buf=new Uint8Array(await r.arrayBuffer()),salt=buf.slice(0,16),iv=buf.slice(16,28),data=buf.slice(28);
+      var buf=new Uint8Array(await r.arrayBuffer()),n=buf[0],off=1,dk=null;
       var base=await crypto.subtle.importKey('raw',new TextEncoder().encode(val),'PBKDF2',false,['deriveKey']);
-      var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
-      var plain;
-      try{plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:iv},key,data);}
-      catch(x){msg.className='err';msg.textContent='비밀번호가 맞지 않아요. 다시 입력해 주세요.';go.disabled=false;document.getElementById('pwIn').select();return;}
+      for(var s=0;s<n&&!dk;s++,off+=76){   // 비밀번호마다 하나씩 있는 잠금 칸을 차례로 열어 봄
+        var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:buf.slice(off,off+16),iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+        try{dk=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(off+16,off+28)},key,buf.slice(off+28,off+76));}catch(x){}
+      }
+      off=1+n*76;
+      if(!dk){msg.className='err';msg.textContent='비밀번호가 맞지 않아요. 다시 입력해 주세요.';go.disabled=false;document.getElementById('pwIn').select();return;}
+      var fk=await crypto.subtle.importKey('raw',dk,'AES-GCM',false,['decrypt']);
+      var plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(off,off+12)},fk,buf.slice(off+12));
       var url=URL.createObjectURL(new Blob([plain],{type:'application/pdf'})),a=document.createElement('a');
       a.href=url;a.download=pwM[3]||'교사용자료.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},4000);
       closePw();toast('내려받기를 시작했어요');
