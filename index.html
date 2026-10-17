@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>미술 수업 게임 모음</title>
+<meta name="description" content="중학교 미술 수업에서 바로 쓰는 교육용 게임 모음 · 명지중학교 미술과">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#D3E3EC; --paper:#FFFFFF; --line:#8CC3E3; --soft:#EAF3F9; --ink:#24364F; --mute:#58708C;
+  --title:#2353A8; --accent:#5FAEDB; --warm:#FFF4D6; --warm-line:#F1C76B;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:18px;line-height:1.6}
+a{color:var(--title)}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 48px}
+.book{background:var(--paper);border:1.5px solid var(--line);border-radius:22px;padding:34px 40px}
+h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter-spacing:-.01em}
+
+/* 머리말 */
+.head{position:relative;text-align:center;padding:10px 0 26px;border-bottom:2px dashed var(--line);margin-bottom:28px;overflow:hidden}
+.head .school{font-size:16px;color:var(--accent);font-weight:700}
+.head h1{margin:6px 0 4px;font-size:clamp(34px,6vw,54px);color:var(--title);line-height:1.15}
+.head p{margin:0;color:var(--mute);font-size:18px}
+.deco{position:absolute;pointer-events:none}
+.deco.burst{right:10px;top:4px;width:70px;height:70px}
+.deco.oct{left:6px;top:14px;width:64px;height:64px}
+
+/* 사용 방법 */
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 34px}
+.how .s{background:var(--soft);border:1.5px solid var(--line);border-radius:16px;padding:18px 20px}
+.how .n{font-family:"Jua";font-size:30px;color:var(--accent);line-height:1}
+.how h3{margin:6px 0 4px;font-size:22px;color:var(--title)}
+.how p{margin:0;font-size:16px;color:var(--mute)}
+
+.sec-title{display:flex;align-items:baseline;gap:12px;margin:0 0 16px}
+.sec-title h2{margin:0;font-size:28px;color:var(--title)}
+.sec-title span{color:var(--mute);font-size:16px}
+
+/* 게임 카드 */
+.game{display:grid;grid-template-columns:minmax(260px,400px) 1fr;gap:26px;border:1.5px solid var(--line);border-radius:18px;padding:22px;margin-bottom:26px;background:#fff}
+.shot{border-radius:12px;overflow:hidden;border:1.5px solid var(--line);background:var(--soft);aspect-ratio:16/10}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.gt{margin:0;font-size:32px;line-height:1.2;color:var(--gc,var(--title))}
+.gs{margin:2px 0 10px;color:var(--mute);font-size:17px}
+.sum{margin:0 0 14px}
+.facts{display:grid;grid-template-columns:repeat(4,auto);gap:6px 18px;justify-content:start;margin:0 0 14px;padding:12px 16px;background:var(--soft);border-radius:12px;font-size:16px}
+.facts div{display:flex;flex-direction:column}
+.facts b{font-size:13px;color:var(--mute);font-weight:500}
+.facts span{font-weight:700}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px;padding:0;list-style:none}
+.tags li{border:1.5px solid var(--line);border-radius:999px;padding:2px 12px;font-size:15px;background:#fff}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 22px;border-radius:14px;border:2px solid var(--title);background:#fff;color:var(--title);font:inherit;font-size:18px;font-weight:700;text-decoration:none;cursor:pointer}
+.btn:hover{background:var(--soft)}
+.btn.main{background:var(--title);color:#fff}
+.btn.main:hover{background:#1B4590}
+.btn:focus-visible{outline:4px solid var(--warm-line);outline-offset:2px}
+.btn svg{width:22px;height:22px;flex:none}
+
+/* 수업 안내 */
+details.guide{grid-column:1/-1;border-top:2px dashed var(--line);padding-top:14px}
+details.guide summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-family:"Jua";font-size:22px;color:var(--title)}
+details.guide summary::-webkit-details-marker{display:none}
+details.guide summary::before{content:"▶";font-size:14px;transition:transform .15s}
+details.guide[open] summary::before{transform:rotate(90deg)}
+.gbody{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;margin-top:14px}
+.gbody h4{margin:0 0 8px;font-size:18px}
+ol.flow{margin:0;padding:0;list-style:none;counter-reset:f}
+ol.flow li{counter-increment:f;position:relative;padding:0 0 12px 46px}
+ol.flow li::before{content:counter(f);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--title);color:#fff;font-family:"Jua";font-size:18px;display:grid;place-items:center}
+.result{background:var(--warm);border:1.5px solid var(--warm-line);border-radius:12px;padding:14px 16px;margin:0 0 14px;font-size:16px}
+.result b{display:block;margin-bottom:2px}
+ul.tips{margin:0;padding-left:20px;font-size:16px;color:var(--mute)}
+ul.tips li{margin-bottom:6px}
+
+/* QR 크게 보기 */
+#qr{position:fixed;inset:0;z-index:50;background:rgba(36,54,79,.55);display:none;place-items:center;padding:20px}
+#qr.on{display:grid}
+.qbox{background:#fff;border-radius:22px;border:2px solid var(--line);padding:26px 30px;text-align:center;max-width:640px;width:100%;max-height:96vh;overflow:auto}
+.qbox h2{margin:0;font-size:34px;color:var(--title)}
+.qbox p{margin:4px 0 14px;color:var(--mute)}
+#qrImg{display:grid;place-items:center;margin:0 auto 12px;width:min(62vh,420px);aspect-ratio:1}
+#qrImg svg,#qrImg img{width:100%;height:100%}
+.qurl{font-size:16px;word-break:break-all;background:var(--soft);border-radius:10px;padding:8px 12px;margin:0 0 16px}
+.qbox .btns{justify-content:center}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:17px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+.toast.on{opacity:1}
+
+.foot{margin-top:30px;padding-top:20px;border-top:2px dashed var(--line);font-size:15px;color:var(--mute);display:grid;gap:4px}
+.foot b{color:var(--ink)}
+
+@media (max-width:860px){
+  .book{padding:24px 18px}
+  .how{grid-template-columns:1fr}
+  .game{grid-template-columns:1fr;padding:16px}
+  .facts{grid-template-columns:repeat(2,auto)}
+  .gbody{grid-template-columns:1fr}
+  .deco{display:none}
+}
+@media print{body{background:#fff}.btns,#qr,.toast{display:none!important}details.guide{display:block}.book{border:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<main class="book">
+
+  <header class="head">
+    <svg class="deco oct" viewBox="0 0 100 100" aria-hidden="true"><polygon points="30,2 70,2 98,30 98,70 70,98 30,98 2,70 2,30" fill="#EAF3F9"/><g stroke="#8CC3E3" stroke-width="2" stroke-dasharray="4 4"><line x1="38" y1="20" x2="80" y2="62"/><line x1="30" y1="30" x2="72" y2="72"/><line x1="22" y1="40" x2="64" y2="82"/></g></svg>
+    <svg class="deco burst" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="#EAF3F9" points="50,0 59,17 76,7 74,26 93,25 83,42 100,50 83,58 93,75 74,74 76,93 59,83 50,100 41,83 24,93 26,74 7,75 17,58 0,50 17,42 7,25 26,26 24,7 41,17"/></svg>
+    <div class="school">명지중학교 미술과</div>
+    <h1>미술 수업 게임 모음</h1>
+    <p>설치도, 회원가입도 필요 없어요. 주소만 열면 바로 수업할 수 있어요.</p>
+  </header>
+
+  <section aria-labelledby="howTitle">
+    <h2 id="howTitle" class="sr" style="position:absolute;left:-9999px">사용 방법</h2>
+    <div class="how">
+      <div class="s"><div class="n">1</div><h3>게임 고르기</h3><p>아래에서 수업에 맞는 게임을 골라 '수업 안내'를 먼저 읽어 보세요.</p></div>
+      <div class="s"><div class="n">2</div><h3>QR 보여 주기</h3><p>'학생에게 QR 보여 주기'를 눌러 TV에 띄우면 학생들이 태블릿으로 찍고 들어가요.</p></div>
+      <div class="s"><div class="n">3</div><h3>결과 캡처 받기</h3><p>학생들이 마지막 결과 화면을 캡처해서 클래스룸이나 패들렛에 올려요.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="gamesTitle">
+    <div class="sec-title"><h2 id="gamesTitle">게임 목록</h2><span id="count"></span></div>
+    <div id="list"></div>
+  </section>
+
+  <footer class="foot">
+    <div><b>학생 정보 안내</b> · 이 게임들은 학생이 입력한 이름이나 결과를 어디에도 보내거나 저장하지 않아요. 결과는 학생 화면에만 나타나요.</div>
+    <div><b>권장 환경</b> · 태블릿 가로 화면, 크롬 또는 삼성 인터넷</div>
+    <div>만든 곳 · 명지중학교 미술과 · 게임은 계속 고쳐지고 있어요. 이 주소로 들어오시면 늘 최신판이 열려요.</div>
+  </footer>
+</main>
+</div>
+
+<div id="qr" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+  <div class="qbox">
+    <h2 id="qrTitle"></h2>
+    <p>태블릿 카메라로 찍으면 게임이 열려요</p>
+    <div id="qrImg"></div>
+    <div class="qurl" id="qrUrl"></div>
+    <div class="btns">
+      <button class="btn" type="button" id="qrCopy">주소 복사</button>
+      <button class="btn main" type="button" id="qrClose">닫기</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="lib/qrcode.js"></script>
+<script src="games.js"></script>
+<script>
+(function(){
+  var games = window.GAMES || [];
+  var esc = function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+  var abs = function(u){try{return new URL(u, location.href).href;}catch(e){return u;}};
+  var ICO = {
+    play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>',
+    qr:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm11-2h2v2h-2zm-3 0h2v2h-2zm3 3h2v2h-2zm3-3h2v4h-2zm-6 3h2v2h-2zm3 3h5v2h-5zm-3 0h2v2h-2z"/></svg>',
+    doc:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h9l5 5v15H6zm8 1.5V8h4.5zM8 12h8v2H8zm0 4h8v2H8z"/></svg>'
+  };
+  document.getElementById('count').textContent = games.length + '개';
+  document.getElementById('list').innerHTML = games.map(function(g,i){
+    return '<article class="game" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
+      +'<div class="shot"><img src="'+esc(g.image)+'" alt="'+esc(g.title)+' 게임 화면" loading="lazy"></div>'
+      +'<div>'
+        +'<h3 class="gt" id="t'+i+'">'+esc(g.title)+'</h3>'
+        +'<div class="gs">'+esc(g.subtitle)+'</div>'
+        +'<p class="sum">'+esc(g.summary)+'</p>'
+        +'<div class="facts">'+(g.facts||[]).map(function(f){return '<div><b>'+esc(f[0])+'</b><span>'+esc(f[1])+'</span></div>';}).join('')+'</div>'
+        +'<ul class="tags" aria-label="배우는 내용">'+(g.learn||[]).map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>'
+        +'<div class="btns">'
+          +'<a class="btn main" href="'+esc(abs(g.url))+'" target="_blank" rel="noopener">'+ICO.play+'게임 시작</a>'
+          +'<button class="btn" type="button" data-qr="'+i+'">'+ICO.qr+'학생에게 QR 보여 주기</button>'
+          +(g.worksheet?'<a class="btn" href="'+esc(abs(g.worksheet))+'" target="_blank" rel="noopener">'+ICO.doc+'활동지 받기</a>':'')
+        +'</div>'
+      +'</div>'
+      +'<details class="guide"><summary>수업 안내 보기</summary><div class="gbody">'
+        +'<div><h4>수업 진행 순서</h4><ol class="flow">'+(g.steps||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol></div>'
+        +'<div><div class="result"><b>결과는 이렇게 받아요</b>'+esc(g.result)+'</div>'
+          +'<h4>알아 두면 좋아요</h4><ul class="tips">'+(g.tips||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>'
+      +'</div></details>'
+    +'</article>';
+  }).join('');
+
+  var box=document.getElementById('qr'), cur='', lastFocus=null;
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on');},2200);}
+  function openQR(g){
+    cur=abs(g.url); lastFocus=document.activeElement;
+    document.getElementById('qrTitle').textContent=g.title;
+    document.getElementById('qrUrl').textContent=cur;
+    try{var q=qrcode(0,'M');q.addData(cur);q.make();document.getElementById('qrImg').innerHTML=q.createSvgTag({cellSize:8,margin:2,scalable:true});}
+    catch(e){document.getElementById('qrImg').textContent='QR을 만들지 못했어요. 아래 주소를 알려 주세요.';}
+    box.classList.add('on'); document.getElementById('qrClose').focus();
+  }
+  function closeQR(){box.classList.remove('on');if(lastFocus)lastFocus.focus();}
+  document.addEventListener('click',function(e){var b=e.target.closest('[data-qr]');if(b)openQR(games[+b.getAttribute('data-qr')]);});
+  document.getElementById('qrClose').onclick=closeQR;
+  box.addEventListener('click',function(e){if(e.target===box)closeQR();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&box.classList.contains('on'))closeQR();});
+  document.getElementById('qrCopy').onclick=function(){
+    var done=function(){toast('주소를 복사했어요');};
+    if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(cur).then(done,function(){toast('주소를 길게 눌러 복사해 주세요');});}
+    else{var t=document.createElement('textarea');t.value=cur;document.body.appendChild(t);t.select();try{document.execCommand('copy');done();}catch(e){toast('주소를 길게 눌러 복사해 주세요');}t.remove();}
+  };
+})();
+</script>
+</body>
+</html>
