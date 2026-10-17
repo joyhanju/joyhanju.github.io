@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>미술 수업 게임 모음</title>
-<meta name="description" content="중학교 미술 수업에서 바로 쓰는 교육용 게임 모음 · 명지중학교 미술과">
+<title>미술 수업 자료 모음</title>
+<meta name="description" content="중학교 미술 수업에서 바로 쓰는 게임과 수업 자료 모음 · 명지중학교 미술과">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -31,7 +31,12 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .deco.oct{left:6px;top:14px;width:64px;height:64px}
 
 /* 사용 방법 */
-.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 34px}
+details.howbox{margin:0 0 30px;border:1.5px solid var(--line);border-radius:16px;padding:14px 20px;background:#fff}
+details.howbox summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-family:"Jua";font-size:22px;color:var(--title)}
+details.howbox summary::-webkit-details-marker{display:none}
+details.howbox summary::before{content:"▶";font-size:14px;transition:transform .15s}
+details.howbox[open] summary::before{transform:rotate(90deg)}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:14px 0 4px}
 .how .s{background:var(--soft);border:1.5px solid var(--line);border-radius:16px;padding:18px 20px}
 .how .n{font-family:"Jua";font-size:30px;color:var(--accent);line-height:1}
 .how h3{margin:6px 0 4px;font-size:22px;color:var(--title)}
@@ -139,21 +144,21 @@ ul.tips li{margin-bottom:6px}
     <svg class="deco oct" viewBox="0 0 100 100" aria-hidden="true"><polygon points="30,2 70,2 98,30 98,70 70,98 30,98 2,70 2,30" fill="#EAF3F9"/><g stroke="#8CC3E3" stroke-width="2" stroke-dasharray="4 4"><line x1="38" y1="20" x2="80" y2="62"/><line x1="30" y1="30" x2="72" y2="72"/><line x1="22" y1="40" x2="64" y2="82"/></g></svg>
     <svg class="deco burst" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="#EAF3F9" points="50,0 59,17 76,7 74,26 93,25 83,42 100,50 83,58 93,75 74,74 76,93 59,83 50,100 41,83 24,93 26,74 7,75 17,58 0,50 17,42 7,25 26,26 24,7 41,17"/></svg>
     <div class="school">명지중학교 미술과</div>
-    <h1>미술 수업 게임 모음</h1>
+    <h1>미술 수업 자료 모음</h1>
     <p>설치도, 회원가입도 필요 없어요. 주소만 열면 바로 수업할 수 있어요.</p>
   </header>
 
-  <section aria-labelledby="howTitle">
-    <h2 id="howTitle" class="sr" style="position:absolute;left:-9999px">사용 방법</h2>
+  <details class="howbox">
+    <summary>게임으로 수업하는 방법 보기</summary>
     <div class="how">
       <div class="s"><div class="n">1</div><h3>게임 고르기</h3><p>아래에서 수업에 맞는 게임을 골라 '수업 안내'를 먼저 읽어 보세요.</p></div>
       <div class="s"><div class="n">2</div><h3>QR 보여 주기</h3><p>'학생에게 QR 보여 주기'를 눌러 TV에 띄우면 학생들이 태블릿으로 찍고 들어가요.</p></div>
       <div class="s"><div class="n">3</div><h3>결과 캡처 받기</h3><p>학생들이 마지막 결과 화면을 캡처해서 클래스룸이나 패들렛에 올려요.</p></div>
     </div>
-  </section>
+  </details>
 
   <section aria-labelledby="gamesTitle">
-    <div class="sec-title"><h2 id="gamesTitle">게임 목록</h2><span id="count"></span></div>
+    <div class="sec-title"><h2 id="gamesTitle">자료 목록</h2><span id="count"></span></div>
     <div id="list"></div>
   </section>
 
