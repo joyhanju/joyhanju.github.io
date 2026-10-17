@@ -31,15 +31,10 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .deco.oct{left:6px;top:14px;width:64px;height:64px}
 
 /* 사용 방법 */
-details.howbox{margin:0 0 30px;border:1.5px solid var(--line);border-radius:16px;padding:14px 20px;background:#fff}
-details.howbox summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-family:"Jua";font-size:22px;color:var(--title)}
-details.howbox summary::-webkit-details-marker{display:none}
-details.howbox summary::before{content:"▶";font-size:14px;transition:transform .15s}
-details.howbox[open] summary::before{transform:rotate(90deg)}
-.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:14px 0 4px}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0;grid-column:1/-1}
 .how .s{background:var(--soft);border:1.5px solid var(--line);border-radius:16px;padding:18px 20px}
 .how .n{font-family:"Jua";font-size:30px;color:var(--accent);line-height:1}
-.how h3{margin:6px 0 4px;font-size:22px;color:var(--title)}
+.how h3{margin:6px 0 4px;font-size:20px;color:var(--title)}
 .how p{margin:0;font-size:16px;color:var(--mute)}
 
 .sec-title{display:flex;align-items:baseline;gap:12px;margin:0 0 16px}
@@ -145,17 +140,8 @@ ul.tips li{margin-bottom:6px}
     <svg class="deco burst" viewBox="0 0 100 100" aria-hidden="true"><polygon fill="#EAF3F9" points="50,0 59,17 76,7 74,26 93,25 83,42 100,50 83,58 93,75 74,74 76,93 59,83 50,100 41,83 24,93 26,74 7,75 17,58 0,50 17,42 7,25 26,26 24,7 41,17"/></svg>
     <div class="school">명지중학교 미술과</div>
     <h1>미술 수업 자료 모음</h1>
-    <p>설치도, 회원가입도 필요 없어요. 주소만 열면 바로 수업할 수 있어요.</p>
+    <p>게임의 경우 설치도, 회원가입도 필요 없어요. 주소만 열면 바로 수업할 수 있어요.</p>
   </header>
-
-  <details class="howbox">
-    <summary>게임으로 수업하는 방법 보기</summary>
-    <div class="how">
-      <div class="s"><div class="n">1</div><h3>게임 고르기</h3><p>아래에서 수업에 맞는 게임을 골라 '수업 안내'를 먼저 읽어 보세요.</p></div>
-      <div class="s"><div class="n">2</div><h3>QR 보여 주기</h3><p>'학생에게 QR 보여 주기'를 눌러 TV에 띄우면 학생들이 태블릿으로 찍고 들어가요.</p></div>
-      <div class="s"><div class="n">3</div><h3>결과 캡처 받기</h3><p>학생들이 마지막 결과 화면을 캡처해서 클래스룸이나 패들렛에 올려요.</p></div>
-    </div>
-  </details>
 
   <section aria-labelledby="gamesTitle">
     <div class="sec-title"><h2 id="gamesTitle">자료 목록</h2><span id="count"></span></div>
@@ -203,6 +189,11 @@ ul.tips li{margin-bottom:6px}
   var relLabel = function(r){var m=/^(\d{4})-(\d{1,2})/.exec(r||'');var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m?mo[+m[2]-1]+' '+m[1]:'';};
   var esc = function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
   var abs = function(u){try{return new URL(u, location.href).href;}catch(e){return u;}};
+  var HOW = '<div class="how">'
+    +'<div class="s"><div class="n">1</div><h3>수업 안내 읽기</h3><p>아래 수업 진행 순서와 알아 두면 좋은 점을 먼저 읽어 보세요.</p></div>'
+    +'<div class="s"><div class="n">2</div><h3>QR 보여 주기</h3><p>\'학생에게 QR 보여 주기\'를 눌러 TV에 띄우면 학생들이 태블릿으로 찍고 들어가요.</p></div>'
+    +'<div class="s"><div class="n">3</div><h3>결과 캡처 받기</h3><p>학생들이 마지막 결과 화면을 캡처해서 클래스룸이나 패들렛에 올려요.</p></div>'
+    +'</div>';
   var ICO = {
     play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>',
     qr:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm11-2h2v2h-2zm-3 0h2v2h-2zm3 3h2v2h-2zm3-3h2v4h-2zm-6 3h2v2h-2zm3 3h5v2h-5zm-3 0h2v2h-2z"/></svg>',
@@ -236,7 +227,7 @@ ul.tips li{margin-bottom:6px}
                     :'<a class="mat" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>PDF</em></a>';
           }).join('')+'</div></div>':'')
       +'</div>'
-      +((g.steps&&g.steps.length)?'<details class="guide"><summary>수업 안내 보기</summary><div class="gbody">'
+      +((g.steps&&g.steps.length)?'<details class="guide"><summary>수업 안내 보기</summary><div class="gbody">'+HOW
         +'<div><h4>수업 진행 순서</h4><ol class="flow">'+(g.steps||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol></div>'
         +'<div><div class="result"><b>결과는 이렇게 받아요</b>'+esc(g.result)+'</div>'
           +'<h4>알아 두면 좋아요</h4><ul class="tips">'+(g.tips||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>'
