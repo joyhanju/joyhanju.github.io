@@ -191,7 +191,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610180200"></script>
+<script src="games.js?v=202610180205"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.release||'').localeCompare(String(a.release||''));});
@@ -213,7 +213,7 @@ ul.tips li{margin-bottom:6px}
     return '<article class="game" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
       +'<div class="shots">'+(g.images||[]).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="'+esc(g.title+' '+m[1])+'" loading="lazy"></div><figcaption>'+esc(m[1])+'</figcaption></figure>';}).join('')+'</div>'
       +'<div>'
-        +(relLabel(g.release)?'<div class="rel">'+esc(relLabel(g.release))+'</div>':'')
+        +(relLabel(g.release)?'<div class="rel">'+esc(relLabel(g.release)+(g.url?'':' 예정'))+'</div>':'')
         +'<h3 class="gt" id="t'+i+'">'+esc(g.title)+'</h3>'
         +'<div class="gs">'+esc(g.subtitle)+'</div>'
         +'<p class="sum">'+esc(g.summary)+'</p>'
