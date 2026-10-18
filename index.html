@@ -135,6 +135,18 @@ ul.tips li{margin-bottom:6px}
 .foot{margin-top:30px;padding-top:20px;border-top:2px dashed var(--line);font-size:15px;color:var(--mute);display:grid;gap:4px}
 .foot b{color:var(--ink)}
 
+/* 목록 카드(간단히) */
+.game.compact{grid-template-columns:1fr;gap:14px}
+.game.compact .shots{grid-template-columns:1fr 1fr;text-decoration:none}
+.game.compact .gs{margin-bottom:14px}
+.game.compact .btn{width:100%}
+.game.compact .gt{font-size:28px}
+@media (max-width:480px){.game.compact .btn{font-size:16px;padding:0 14px}}
+/* 세부 페이지 */
+.in-detail .sec-title{display:none}
+.back{display:inline-flex;align-items:center;gap:4px;margin:0 0 14px;font-family:"Jua";font-size:20px;text-decoration:none;color:var(--title)}
+.back svg{width:22px;height:22px}
+.game.detail{margin-bottom:16px}
 /* 컴퓨터: 손 수업은 왼쪽, 게임은 오른쪽 두 줄 */
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
 .col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
@@ -218,7 +230,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610182035"></script>
+<script src="games.js?v=202610182040"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
@@ -236,14 +248,17 @@ ul.tips li{margin-bottom:6px}
     lock:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v3H5v12h14V10h-2V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3zm3 4a2 2 0 0 1 1 3.7V20h-2v-2.3A2 2 0 0 1 12 14z"/></svg>',
     doc:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h9l5 5v15H6zm8 1.5V8h4.5zM8 12h8v2H8zm0 4h8v2H8z"/></svg>',
     pen:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"/></svg>',
+    back:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.4 5.4 14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg>',
     clock:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm-1 3v6l5 3 1-1.7-4-2.4V7z"/></svg>'
   };
   (function(){var d=new Date(document.lastModified);if(isNaN(d))return;var p=function(n){return String(n).padStart(2,'0');};
     document.getElementById('updated').textContent=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+p(d.getHours())+':'+p(d.getMinutes());})();
   var soonN = games.filter(function(g){return !g.url && !g.offline;}).length;
   document.getElementById('count').textContent = (games.length-soonN) + '개' + (soonN?' · 준비 중 '+soonN+'개':'');
-  function card(g,i){
-    return '<article class="game" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
+  // 세부 페이지: 수업 안내와 자료 받기 전체
+  function detail(g,i){
+    return '<a class="back" href="#">'+ICO.back+'목록으로</a>'
+      +'<article class="game detail" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
       +'<div class="shots">'+(g.images||[]).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="'+esc(m[1]?g.title+' '+m[1]:g.title)+'" loading="lazy"></div>'+(m[1]?'<figcaption>'+esc(m[1])+'</figcaption>':'')+'</figure>';}).join('')+'</div>'
       +'<div>'
         +(relLabel(g.release)?'<div class="rel">'+esc(relLabel(g.release)+(g.url||g.offline?'':' 예정'))+'</div>':'')
@@ -273,17 +288,44 @@ ul.tips li{margin-bottom:6px}
               +(rest?'<div class="ml">'+rest+'</div>':'')+'</div>';
           })():'')
       +'</div>'
-      +((g.steps&&g.steps.length)?'<details class="guide"><summary>수업 안내 보기</summary><div class="gbody">'+(g.url?HOW:'')
+      +((g.steps&&g.steps.length)?'<details class="guide" open><summary>수업 안내</summary><div class="gbody">'+(g.url?HOW:'')
         +'<div><h4>수업 진행 순서</h4><ol class="flow">'+(g.steps||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol></div>'
         +'<div><div class="result"><b>결과는 이렇게 받아요</b>'+esc(g.result)+'</div>'
           +'<h4>알아 두면 좋아요</h4><ul class="tips">'+(g.tips||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>'
       +'</div></details>':'')
+    +'</article>'
+      +'<a class="back" href="#">'+ICO.back+'목록으로</a>';
+  }
+  // 목록 카드: 사진 2장, 제목, 한 줄 설명, 세부 페이지 버튼
+  function card(g,i){
+    return '<article class="game compact" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
+      +'<a class="shots" href="#/'+esc(g.id)+'" tabindex="-1" aria-hidden="true">'+(g.images||[]).slice(0,2).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="" loading="lazy"></div></figure>';}).join('')+'</a>'
+      +'<div>'
+        +(relLabel(g.release)?'<div class="rel">'+esc(relLabel(g.release)+(g.url||g.offline?'':' 예정'))+'</div>':'')
+        +'<h3 class="gt" id="t'+i+'">'+esc(g.title)+'</h3>'
+        +'<div class="gs">'+esc(g.subtitle)+'</div>'
+        +'<a class="btn main" href="#/'+esc(g.id)+'">'+ICO.doc+'수업 안내 및 자료 받기</a>'
+      +'</div>'
     +'</article>';
   }
   // 휴대폰: 한 줄로 이어서 · 컴퓨터: 손 수업(왼쪽) · 게임(오른쪽)
   var mq = window.matchMedia('(min-width:1100px)');
+  var listScroll = 0;
   function render(){
     var list = document.getElementById('list');
+    var sec = list.closest('section');
+    var m = /^#\/(.+)$/.exec(location.hash), gi = -1;
+    if(m){ var id = decodeURIComponent(m[1]); games.forEach(function(g,i){ if(g.id===id) gi=i; }); }
+    if(gi>=0){
+      document.querySelector('.wrap').classList.remove('wide');
+      sec.classList.add('in-detail');
+      list.innerHTML = detail(games[gi], gi);
+      document.title = games[gi].title + ' · 미술 수업 자료 모음';
+      sec.scrollIntoView({block:'start'});
+      return;
+    }
+    sec.classList.remove('in-detail');
+    document.title = baseTitle;
     document.querySelector('.wrap').classList.toggle('wide', mq.matches);
     if(mq.matches){
       var hand=[], play=[];
@@ -296,8 +338,14 @@ ul.tips li{margin-bottom:6px}
       list.innerHTML = games.map(card).join('');
     }
   }
+  var baseTitle = document.title;
   render();
   if(mq.addEventListener) mq.addEventListener('change', render); else if(mq.addListener) mq.addListener(render);
+  window.addEventListener('hashchange', function(){
+    var wasDetail = document.getElementById('list').closest('section').classList.contains('in-detail');
+    if(!/^#\/./.test(location.hash) && wasDetail){ render(); window.scrollTo(0, listScroll); }
+    else { if(!wasDetail) listScroll = window.scrollY; render(); }
+  });
 
   var box=document.getElementById('qr'), cur='', lastFocus=null;
   function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on');},2200);}
