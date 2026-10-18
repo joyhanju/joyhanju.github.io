@@ -146,7 +146,7 @@ window.GAMES = [
   },
   {
     id: "black-box-project",
-    release: "2026-08",
+    sort: "2026-08",
     title: "블랙박스 프로젝트",
     subtitle: "검은 사각형 4개로 단어의 느낌 표현하기",
     images: [
