@@ -131,6 +131,17 @@ ul.tips li{margin-bottom:6px}
 .foot{margin-top:30px;padding-top:20px;border-top:2px dashed var(--line);font-size:15px;color:var(--mute);display:grid;gap:4px}
 .foot b{color:var(--ink)}
 
+/* 컴퓨터: 손 수업은 왼쪽, 게임은 오른쪽 두 줄 */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+.col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
+.cols .game{grid-template-columns:1fr;gap:16px}
+.cols .shots{grid-template-columns:1fr 1fr}
+.cols .gt{font-size:28px}
+.cols .facts{grid-template-columns:repeat(2,auto)}
+.cols .gbody{grid-template-columns:1fr}
+.cols .how{grid-template-columns:1fr}
+@media (min-width:1100px){.wrap.wide{max-width:1400px}}
+
 @media (max-width:860px){
   .shots{grid-template-columns:1fr 1fr}
   .book{padding:24px 18px}
@@ -203,7 +214,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610181650"></script>
+<script src="games.js?v=202610181915"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
@@ -227,7 +238,7 @@ ul.tips li{margin-bottom:6px}
     document.getElementById('updated').textContent=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+p(d.getHours())+':'+p(d.getMinutes());})();
   var soonN = games.filter(function(g){return !g.url && !g.offline;}).length;
   document.getElementById('count').textContent = (games.length-soonN) + '개' + (soonN?' · 준비 중 '+soonN+'개':'');
-  document.getElementById('list').innerHTML = games.map(function(g,i){
+  function card(g,i){
     return '<article class="game" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
       +'<div class="shots">'+(g.images||[]).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="'+esc(m[1]?g.title+' '+m[1]:g.title)+'" loading="lazy"></div>'+(m[1]?'<figcaption>'+esc(m[1])+'</figcaption>':'')+'</figure>';}).join('')+'</div>'
       +'<div>'
@@ -256,7 +267,25 @@ ul.tips li{margin-bottom:6px}
           +'<h4>알아 두면 좋아요</h4><ul class="tips">'+(g.tips||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>'
       +'</div></details>':'')
     +'</article>';
-  }).join('');
+  }
+  // 휴대폰: 한 줄로 이어서 · 컴퓨터: 손 수업(왼쪽) · 게임(오른쪽)
+  var mq = window.matchMedia('(min-width:1100px)');
+  function render(){
+    var list = document.getElementById('list');
+    document.querySelector('.wrap').classList.toggle('wide', mq.matches);
+    if(mq.matches){
+      var hand=[], play=[];
+      games.forEach(function(g,i){ (g.offline?hand:play).push(card(g,i)); });
+      list.innerHTML = '<div class="cols">'
+        +'<div class="col"><h3 class="col-title">손으로 하는 수업</h3>'+hand.join('')+'</div>'
+        +'<div class="col"><h3 class="col-title">게임으로 하는 수업</h3>'+play.join('')+'</div>'
+        +'</div>';
+    } else {
+      list.innerHTML = games.map(card).join('');
+    }
+  }
+  render();
+  if(mq.addEventListener) mq.addEventListener('change', render); else if(mq.addListener) mq.addListener(render);
 
   var box=document.getElementById('qr'), cur='', lastFocus=null;
   function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on');},2200);}
