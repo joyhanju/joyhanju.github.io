@@ -84,6 +84,10 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .mats{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--line)}
 .mats .mt{font-family:"Jua";font-size:19px;color:var(--title);margin-bottom:8px}
 .ml{display:flex;flex-wrap:wrap;gap:8px}
+.mhead{display:flex;align-items:center;gap:8px 12px;margin-bottom:10px}
+.mhead .mt{margin-bottom:0;flex:none;white-space:nowrap}
+.mhead .mat{white-space:nowrap}
+@media (max-width:480px){.mhead{gap:8px}.mhead .mt{font-size:17px}.mhead .mat{padding:0 12px}.mhead .mat em{display:none}}
 .mat{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--ink);text-decoration:none;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
 .mat:hover{border-color:var(--title)}
 .mat svg{width:20px;height:20px;color:var(--title)}
@@ -214,7 +218,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610181915"></script>
+<script src="games.js?v=202610182035"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
@@ -255,11 +259,19 @@ ul.tips li{margin-bottom:6px}
           +'</div>'
           :g.offline?'<div class="soon">'+ICO.pen+'<div><b>'+esc(g.offline[0])+'</b>'+esc(g.offline[1])+'</div></div>'
           :'<div class="soon">'+ICO.clock+'<div><b>공개 예정</b>'+esc(g.soon||'곧 올릴 예정이에요.')+'</div></div>')
-        +((g.materials&&g.materials.length)?'<div class="mats"><div class="mt">수업 자료 받기</div><div class="ml">'+g.materials.map(function(m,k){
-            var t=m[2]==='교사용';
-            return t?'<button type="button" class="mat t" data-lock="'+i+'-'+k+'">'+ICO.lock+'<span>'+esc(m[0])+'</span><em>비밀번호</em></button>'
-                    :'<a class="mat" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>'+(/\.pptx?$/i.test(m[1])?'PPT':'PDF')+'</em></a>';
-          }).join('')+'</div></div>':'')
+        +((g.materials&&g.materials.length)?(function(){
+            // PPT는 '수업 자료 받기' 옆에, 활동지·전개도 같은 나머지는 아랫줄에
+            var isPpt=function(m){return /\.pptx?$/i.test(m[3]||m[1]);};
+            var btn=function(m,k){
+              var t=m[2]==='교사용';
+              return t?'<button type="button" class="mat t" data-lock="'+i+'-'+k+'">'+ICO.lock+'<span>'+esc(m[0])+'</span><em>비밀번호</em></button>'
+                      :'<a class="mat" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>'+(isPpt(m)?'PPT':'PDF')+'</em></a>';
+            };
+            var top='', rest='';
+            g.materials.forEach(function(m,k){ if(isPpt(m)) top+=btn(m,k); else rest+=btn(m,k); });
+            return '<div class="mats"><div class="mhead"><div class="mt">수업 자료 받기</div>'+top+'</div>'
+              +(rest?'<div class="ml">'+rest+'</div>':'')+'</div>';
+          })():'')
       +'</div>'
       +((g.steps&&g.steps.length)?'<details class="guide"><summary>수업 안내 보기</summary><div class="gbody">'+(g.url?HOW:'')
         +'<div><h4>수업 진행 순서</h4><ol class="flow">'+(g.steps||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol></div>'
