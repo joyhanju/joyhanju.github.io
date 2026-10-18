@@ -112,7 +112,7 @@ window.GAMES = [
     title: "블랙박스 프로젝트",
     subtitle: "검은 사각형 4개로 단어의 느낌 표현하기",
     images: [
-      ["img/black-box-project-start.jpg", ""],
+      ["img/black-box-project-title.jpg", ""],
       ["img/black-box-project-worksheet.jpg", "활동지 작성 예시"]
     ],
     offline: ["디벗 없이 하는 손 수업", "준비물은 활동지와 검정 컴퓨터 싸인펜뿐이에요. 사전에 육면체(상자) 그리는 방법을 알려 주면 학생들이 훨씬 잘 그려요."],
