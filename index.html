@@ -249,7 +249,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610182045"></script>
+<script src="games.js?v=202610182150"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
@@ -364,7 +364,7 @@ ul.tips li{margin-bottom:6px}
     }
   }
   // 목록 카드에 마우스를 올리면 PPT 장면이 차례로 넘어가요 (떼면 첫 사진으로)
-  var FLIP_MS = 1400;
+  var FLIP_MS = 1000;
   document.getElementById('list').addEventListener('mouseover', function(e){
     var card = e.target.closest && e.target.closest('.game.compact');
     if(!card || card.contains(e.relatedTarget)) return;
