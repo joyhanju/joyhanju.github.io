@@ -16,7 +16,7 @@ window.GAMES = [
     title: "Where Lines Meet",
     subtitle: "잃어버린 소실점을 찾아서",
     images: [
-      ["img/where-lines-meet-start.jpg", "시작 화면"],
+      ["img/where-lines-meet-start.jpg", ""],
       ["img/where-lines-meet-play.jpg", "게임 화면 · 가로수길에서 소실점과 지평선 찾기"]
     ],
     url: "",
@@ -37,7 +37,7 @@ window.GAMES = [
     title: "아트타임 어드벤처 1",
     subtitle: "사라진 잎을 찾아서: 시공간 미술 모험",
     images: [
-      ["img/art-time-adventure1-start.jpg", "시작 화면"],
+      ["img/art-time-adventure1-start.jpg", ""],
       ["img/art-time-adventure1-monet.jpg", "게임 화면 · 모네를 만나는 장면"]
     ],
     url: "https://joyhanju.github.io/art-time-adventure1/share.html",
@@ -75,7 +75,7 @@ window.GAMES = [
     title: "색채의 연금술사",
     subtitle: "물감을 만들고 스테인드글라스를 칠하는 조색 게임",
     images: [
-      ["img/color-alchemist-start.jpg", "시작 화면"],
+      ["img/color-alchemist-start.jpg", ""],
       ["img/color-alchemist-play.jpg", "게임 화면 · 물감 섞기"]
     ],
     url: "color-alchemist/",
@@ -112,7 +112,7 @@ window.GAMES = [
     title: "블랙박스 프로젝트",
     subtitle: "검은 사각형 4개로 단어의 느낌 표현하기",
     images: [
-      ["img/black-box-project-start.jpg", "수업 PPT 첫 화면"],
+      ["img/black-box-project-start.jpg", ""],
       ["img/black-box-project-worksheet.jpg", "활동지 작성 예시"]
     ],
     offline: ["디벗 없이 하는 손 수업", "준비물은 활동지와 검정 컴퓨터 싸인펜뿐이에요. 사전에 육면체(상자) 그리는 방법을 알려 주면 학생들이 훨씬 잘 그려요."],
