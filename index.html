@@ -30,6 +30,18 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .deco.burst{right:10px;top:4px;width:70px;height:70px}
 .deco.oct{left:6px;top:14px;width:64px;height:64px}
 
+/* 이용 안내 */
+.notice{position:relative;display:flex;gap:16px;align-items:flex-start;margin:0 0 30px;padding:20px 24px;border-radius:18px;background:var(--warm);border:2px solid var(--warm-line);overflow:hidden}
+.notice::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.75) 50%,transparent 65%);transform:translateX(-100%);animation:shine 4.5s ease-in-out infinite;pointer-events:none}
+.notice .spark{flex:none;width:40px;height:40px;color:#E0A21B;animation:twinkle 1.8s ease-in-out infinite}
+.notice h2{margin:0 0 4px;font-size:24px;background:linear-gradient(90deg,#B5651D,#E0A21B,#2353A8,#E0A21B,#B5651D);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 6s linear infinite}
+.notice p{margin:0;font-size:17px;word-break:keep-all}
+.notice .cc{display:inline-block;margin-left:4px;padding:0 8px;border-radius:6px;background:#fff;border:1px solid var(--warm-line);font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}
+@keyframes shine{0%,55%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0);opacity:1}50%{transform:scale(.8) rotate(20deg);opacity:.6}}
+@keyframes flow{to{background-position:300% 0}}
+@media (prefers-reduced-motion:reduce){.notice::after,.notice .spark,.notice h2{animation:none}}
+
 /* 사용 방법 */
 .how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0;grid-column:1/-1}
 .how .s{background:var(--soft);border:1.5px solid var(--line);border-radius:16px;padding:18px 20px}
@@ -143,13 +155,21 @@ ul.tips li{margin-bottom:6px}
     <p>게임의 경우 설치도, 회원가입도 필요 없어요. 주소만 열면 바로 수업할 수 있어요.</p>
   </header>
 
+  <aside class="notice" aria-labelledby="noticeTitle">
+    <svg class="spark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 1l2.6 7.4L22 11l-7.4 2.6L12 21l-2.6-7.4L2 11l7.4-2.6z"/><path fill="currentColor" d="M20 16l.9 2.1L23 19l-2.1.9L20 22l-.9-2.1L17 19l2.1-.9z" opacity=".7"/></svg>
+    <div>
+      <h2 id="noticeTitle">이용 안내</h2>
+      <p>모든 게임과 수업 자료는 직접 만들었어요. 수업에는 자유롭게 쓰시고 고쳐 쓰셔도 좋아요. 다른 곳에 공유하실 때는 출처(joyhanju.github.io)를 밝혀 주시고, 판매·유료 강의·유료 플랫폼 업로드 같은 상업적 용도로는 사용하지 말아 주세요. <a class="cc" href="https://creativecommons.org/licenses/by-nc/4.0/deed.ko" target="_blank" rel="noopener license">CC BY-NC 4.0</a></p>
+    </div>
+  </aside>
+
   <section aria-labelledby="gamesTitle">
     <div class="sec-title"><h2 id="gamesTitle">자료 목록</h2><span id="count"></span></div>
     <div id="list"></div>
   </section>
 
   <footer class="foot">
-    <div><b>이용 안내</b> · 여기 있는 게임과 수업 자료는 제가 직접 만든 것이에요. 수업에는 자유롭게 사용하셔도 되지만, 판매 등 상업적 용도로는 사용하지 말아 주세요.</div>
+    <div><b>이용 안내</b> · 출처를 밝히면 수업에 자유롭게 쓰고 고쳐 쓸 수 있어요. 상업적 이용은 안 돼요. (<a href="https://creativecommons.org/licenses/by-nc/4.0/deed.ko" target="_blank" rel="noopener license">CC BY-NC 4.0</a>)</div>
     <div><b>학생 정보 안내</b> · 이 게임들은 학생이 입력한 이름이나 결과를 어디에도 보내거나 저장하지 않아요. 결과는 학생 화면에만 나타나요.</div>
     <div><b>권장 환경</b> · 태블릿 가로 화면, 크롬 또는 삼성 인터넷</div>
     <div>만든 곳 · 명지중학교 미술과 · <a href="mailto:joyhanju@myongji.sen.ms.kr">joyhanju@myongji.sen.ms.kr</a></div>
