@@ -155,7 +155,6 @@ ul.tips li{margin-bottom:6px}
 .back{display:inline-flex;align-items:center;gap:4px;margin:0 0 14px;font-family:"Jua";font-size:20px;text-decoration:none;color:var(--title)}
 .back svg{width:22px;height:22px}
 .game.detail{margin-bottom:16px}
-.game.detail .shots{grid-template-columns:1fr}
 /* 마우스를 올리면 넘어가는 PPT 장면 */
 .pic.flip{position:relative}
 .pic.flip img{position:absolute;inset:0;transition:opacity .45s}
@@ -278,7 +277,7 @@ ul.tips li{margin-bottom:6px}
   function detail(g,i){
     return '<a class="back" href="#">'+ICO.back+'목록으로</a>'
       +'<article class="game detail" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
-      +'<div class="shots">'+(g.images||[]).slice(0,1).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="'+esc(m[1]?g.title+' '+m[1]:g.title)+'" loading="lazy"></div>'+(m[1]?'<figcaption>'+esc(m[1])+'</figcaption>':'')+'</figure>';}).join('')+'</div>'
+      +'<div class="shots">'+(g.images||[]).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="'+esc(m[1]?g.title+' '+m[1]:g.title)+'" loading="lazy"></div>'+(m[1]?'<figcaption>'+esc(m[1])+'</figcaption>':'')+'</figure>';}).join('')+'</div>'
       +'<div>'
         +(relLabel(g.release)?'<div class="rel">'+esc(relLabel(g.release)+(g.url||g.offline?'':' 예정'))+'</div>':'')
         +'<h3 class="gt" id="t'+i+'">'+esc(g.title)+'</h3>'
@@ -315,7 +314,7 @@ ul.tips li{margin-bottom:6px}
     +'</article>'
       +'<a class="back" href="#">'+ICO.back+'목록으로</a>';
   }
-  // 목록 카드: 사진 1장(세부 페이지도 1장), 제목, 한 줄 설명, 세부 페이지 버튼
+  // 목록 카드: 사진 1장(세부 페이지에서는 전부), 제목, 한 줄 설명, 세부 페이지 버튼
   function card(g,i){
     return '<article class="game compact" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
       +'<a class="shots" href="#/'+esc(g.id)+'" tabindex="-1" aria-hidden="true">'+(g.images||[]).slice(0,1).map(function(m){
