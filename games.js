@@ -15,7 +15,7 @@ window.GAMES = [
     title: "Where Lines Meet",
     subtitle: "잃어버린 소실점을 찾아서",
     images: [
-      ["img/where-lines-meet-start.jpg", "시작 화면 · 소실점 사냥꾼을 쫓는 소녀"],
+      ["img/where-lines-meet-start.jpg", "시작 화면"],
       ["img/where-lines-meet-play.jpg", "게임 화면 · 가로수길에서 소실점과 지평선 찾기"]
     ],
     url: "",
