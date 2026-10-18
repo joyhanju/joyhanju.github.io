@@ -54,7 +54,7 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .sec-title span{color:var(--mute);font-size:16px}
 
 /* 게임 카드 */
-.game{display:grid;grid-template-columns:minmax(260px,400px) 1fr;gap:26px;border:1.5px solid var(--line);border-radius:18px;padding:22px;margin-bottom:26px;background:#fff}
+.game{display:grid;grid-template-columns:minmax(260px,400px) 1fr;gap:26px;border:3px solid var(--line);border-radius:18px;padding:22px;margin-bottom:26px;background:#fff}
 .shots{display:grid;gap:12px;align-content:start;margin:0}
 .shot{margin:0}
 .shot .pic{border-radius:12px;overflow:hidden;border:1.5px solid var(--line);background:var(--soft);aspect-ratio:16/10}
@@ -203,7 +203,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610181322"></script>
+<script src="games.js?v=202610181325"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.release||'').localeCompare(String(a.release||''));});

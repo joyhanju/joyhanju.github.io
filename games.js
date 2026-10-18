@@ -17,7 +17,7 @@ window.GAMES = [
     subtitle: "잃어버린 소실점을 찾아서",
     images: [
       ["img/where-lines-meet-start.jpg", ""],
-      ["img/where-lines-meet-play.jpg?v=2", "게임 화면 · 가로수길에서 소실점과 지평선 찾기"]
+      ["img/where-lines-meet-game.jpg", "게임 화면 · 가로수길에서 소실점과 지평선 찾기"]
     ],
     url: "",
     soon: "2026년 11월에 올릴 예정이에요.",
