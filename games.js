@@ -4,6 +4,7 @@
   - 날짜를 표시하지 않으려면 release 대신 sort 칸에 순서용 값만 넣으세요. (예: "2026-08-5"는 Aug 2026 바로 위)
   - 새 게임을 추가하려면 아래 { ... } 묶음을 하나 복사해서 내용만 바꾸면 됩니다.
   - 스크린샷은 images 칸에 ["그림 주소", "설명"] 형식으로 넣습니다.
+  - slides 칸에 그림 주소를 넣으면 목록 카드에 마우스를 올렸을 때 첫 사진 다음으로 차례로 넘어가요.
   - 활동지·PPT는 materials 칸에 ["버튼 이름", "파일 주소", "학생용"] 형식으로 넣습니다.
     교사용은 비밀번호로 잠근 파일(.enc)과 내려받을 때 쓸 파일 이름을 넣습니다: ["버튼 이름", "잠근 파일 주소", "교사용", "파일 이름.pdf"]
   - 아직 공개 전인 게임은 url 칸을 비우고 soon 칸에 안내 문구를 넣으면, 버튼 대신 '공개 예정' 안내가 나와요.
@@ -116,6 +117,13 @@ window.GAMES = [
       ["img/green-box-project-title.jpg", ""],
       ["img/green-box-project-works.jpg", "작품 예시"]
     ],
+    // 목록 카드에 마우스를 올리면 차례로 넘어가는 PPT 장면
+    slides: [
+      "img/slides/green-box-project-1.jpg",
+      "img/slides/green-box-project-2.jpg",
+      "img/slides/green-box-project-3.jpg",
+      "img/slides/green-box-project-4.jpg"
+    ],
     offline: ["직접 만드는 손 수업", "준비물은 모둠마다 똑같은 초록 상자 하나와 활동지예요. 재료는 종이, 지점토, 버려진 물건 등 모둠이 자유롭게 골라요."],
     materials: [
       ["활동지", "materials/green-box-project/그린박스프로젝트_활동지.pdf", "학생용"],
@@ -155,6 +163,13 @@ window.GAMES = [
       ["img/pink-box-project-title.jpg", ""],
       ["img/pink-box-project-works.jpg", "완성 작품 예시"]
     ],
+    // 목록 카드에 마우스를 올리면 차례로 넘어가는 PPT 장면
+    slides: [
+      "img/slides/pink-box-project-1.jpg",
+      "img/slides/pink-box-project-2.jpg",
+      "img/slides/pink-box-project-3.jpg",
+      "img/slides/pink-box-project-4.jpg"
+    ],
     offline: ["직접 만드는 손 수업", "준비물은 모두 똑같은 핑크색 상자와 활동지, 아크릴 물감·지점토·콜라주 재료예요. 모둠별로 1개 또는 개인별로 1개를 만들 수 있어요."],
     materials: [
       ["활동지", "materials/pink-box-project/핑크박스프로젝트_활동지.pdf", "학생용"],
@@ -191,6 +206,13 @@ window.GAMES = [
     images: [
       ["img/black-box-project-title.jpg", ""],
       ["img/black-box-project-worksheet.jpg", "활동지 작성 예시"]
+    ],
+    // 목록 카드에 마우스를 올리면 차례로 넘어가는 PPT 장면
+    slides: [
+      "img/slides/black-box-project-1.jpg",
+      "img/slides/black-box-project-2.jpg",
+      "img/slides/black-box-project-3.jpg",
+      "img/slides/black-box-project-4.jpg"
     ],
     offline: ["디벗 없이 하는 손 수업", "준비물은 활동지와 검정 컴퓨터 싸인펜뿐이에요. 사전에 육면체(상자) 그리는 방법을 알려 주면 학생들이 훨씬 잘 그려요."],
     materials: [

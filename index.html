@@ -156,6 +156,16 @@ ul.tips li{margin-bottom:6px}
 .back svg{width:22px;height:22px}
 .game.detail{margin-bottom:16px}
 .game.detail .shots{grid-template-columns:1fr}
+/* 마우스를 올리면 넘어가는 PPT 장면 */
+.pic.flip{position:relative}
+.pic.flip img{position:absolute;inset:0;transition:opacity .45s}
+.pic.flip img+img{opacity:0}
+.pic.flip img.on{opacity:1}
+.pic.flip .dots{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:6px;opacity:0;transition:opacity .2s;pointer-events:none}
+.pic.flip.play .dots{opacity:1}
+.pic.flip .dots i{width:7px;height:7px;border-radius:50%;background:rgba(0,0,0,.25);box-shadow:0 0 0 1.5px rgba(255,255,255,.8)}
+.pic.flip .dots i.on{background:var(--gc,var(--title))}
+@media (prefers-reduced-motion:reduce){.pic.flip img{transition:none}}
 /* 컴퓨터: 손 수업은 왼쪽, 게임은 오른쪽 두 줄 */
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
 .col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
@@ -308,7 +318,13 @@ ul.tips li{margin-bottom:6px}
   // 목록 카드: 사진 1장(세부 페이지도 1장), 제목, 한 줄 설명, 세부 페이지 버튼
   function card(g,i){
     return '<article class="game compact" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
-      +'<a class="shots" href="#/'+esc(g.id)+'" tabindex="-1" aria-hidden="true">'+(g.images||[]).slice(0,1).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="" loading="lazy"></div></figure>';}).join('')+'</a>'
+      +'<a class="shots" href="#/'+esc(g.id)+'" tabindex="-1" aria-hidden="true">'+(g.images||[]).slice(0,1).map(function(m){
+        var sl=g.slides||[];
+        if(!sl.length) return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="" loading="lazy"></div></figure>';
+        return '<figure class="shot"><div class="pic flip"><img src="'+esc(m[0])+'" alt="" loading="lazy">'
+          +sl.map(function(u){return '<img data-src="'+esc(u)+'" alt="">';}).join('')
+          +'<span class="dots"><i class="on"></i>'+sl.map(function(){return '<i></i>';}).join('')+'</span></div></figure>';
+      }).join('')+'</a>'
       +'<div class="cbody">'
         +'<h3 class="gt" id="t'+i+'"><span class="tt">'+esc(g.title)+'</span>'
           +(relLabel(g.release)?'<span class="rel">'+esc(relLabel(g.release)+(g.url||g.offline?'':' 예정'))+'</span>':'')+'</h3>'
@@ -347,6 +363,23 @@ ul.tips li{margin-bottom:6px}
       list.innerHTML = games.map(card).join('');
     }
   }
+  // 목록 카드에 마우스를 올리면 PPT 장면이 차례로 넘어가요 (떼면 첫 사진으로)
+  var FLIP_MS = 1400;
+  document.getElementById('list').addEventListener('mouseover', function(e){
+    var card = e.target.closest && e.target.closest('.game.compact');
+    if(!card || card.contains(e.relatedTarget)) return;
+    var pic = card.querySelector('.pic.flip'); if(!pic || pic._t) return;
+    var imgs = pic.querySelectorAll('img'), dots = pic.querySelectorAll('.dots i'), k = 0;
+    imgs.forEach(function(im){ if(im.dataset.src){ im.src = im.dataset.src; im.removeAttribute('data-src'); } });
+    var show = function(n){ imgs.forEach(function(im,j){ im.classList.toggle('on', j===n); }); dots.forEach(function(d,j){ d.classList.toggle('on', j===n); }); };
+    pic.classList.add('play');
+    pic._t = setInterval(function(){ k = (k+1) % imgs.length; show(k); }, FLIP_MS);
+    card._stop = function(){ clearInterval(pic._t); pic._t = null; pic.classList.remove('play'); show(0); };
+  });
+  document.getElementById('list').addEventListener('mouseout', function(e){
+    var card = e.target.closest && e.target.closest('.game.compact');
+    if(card && card._stop && !card.contains(e.relatedTarget)) card._stop();
+  });
   var baseTitle = document.title;
   render();
   if(mq.addEventListener) mq.addEventListener('change', render); else if(mq.addListener) mq.addListener(render);
