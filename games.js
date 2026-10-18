@@ -15,7 +15,7 @@ window.GAMES = [
     id: "where-lines-meet",
     release: "2026-11",
     title: "Where Lines Meet",
-    subtitle: "잃어버린 소실점을 찾아서",
+    subtitle: "소실점의 개념을 배우고 1점 · 2점 투시 드로잉을 연습하는 게임",
     images: [
       ["img/where-lines-meet-start.jpg", ""],
       ["img/where-lines-meet-game.jpg", "게임 화면 · 가로수길에서 소실점과 지평선 찾기"]
@@ -36,7 +36,7 @@ window.GAMES = [
     id: "art-time-adventure1",
     release: "2026-09",
     title: "아트타임 어드벤처 1",
-    subtitle: "사라진 잎을 찾아서: 시공간 미술 모험",
+    subtitle: "시대별로 6명의 중요한 화가를 만나 문제를 푸는 서양 미술사 게임",
     images: [
       ["img/art-time-adventure1-start.jpg", ""],
       ["img/art-time-adventure1-monet.jpg", "게임 화면 · 모네를 만나는 장면"]
@@ -111,7 +111,7 @@ window.GAMES = [
     id: "green-box-project",
     sort: "2026-08-6",
     title: "그린박스 프로젝트",
-    subtitle: "2100년, 마지막 것들의 박물관",
+    subtitle: "2100년, 더 이상 세상에 없는 물건을 전시하는 박물관 만들기",
     images: [
       ["img/green-box-project-title.jpg", ""],
       ["img/green-box-project-works.jpg", "작품 예시"]
