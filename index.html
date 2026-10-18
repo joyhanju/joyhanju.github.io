@@ -140,8 +140,14 @@ ul.tips li{margin-bottom:6px}
 .game.compact .shots{grid-template-columns:1fr 1fr;text-decoration:none}
 .game.compact .gs{margin-bottom:14px}
 .game.compact .btn{width:100%}
-.game.compact .gt{font-size:28px}
-@media (max-width:480px){.game.compact .btn{font-size:16px;padding:0 14px}}
+.game.compact{display:flex;flex-direction:column}
+.game.compact .cbody{display:flex;flex-direction:column;flex:1}
+.game.compact .gt{font-size:28px;display:flex;align-items:center;gap:10px;min-width:0}
+.game.compact .gt .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.game.compact .gt .rel{margin:0;flex:none;font-family:"Noto Sans KR",sans-serif;font-size:13px;line-height:1.5}
+.game.compact .gs{min-height:3.2em;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px}
+.game.compact .btn{margin-top:auto}
+@media (max-width:480px){.game.compact .btn{font-size:16px;padding:0 14px}.game.compact .gt{font-size:20px;gap:6px}.game.compact .gt .rel{font-size:11px;padding:1px 7px}}
 /* 세부 페이지 */
 .in-detail .sec-title{display:none}
 .back{display:inline-flex;align-items:center;gap:4px;margin:0 0 14px;font-family:"Jua";font-size:20px;text-decoration:none;color:var(--title)}
@@ -300,9 +306,9 @@ ul.tips li{margin-bottom:6px}
   function card(g,i){
     return '<article class="game compact" style="--gc:'+esc(g.color||'')+'" aria-labelledby="t'+i+'">'
       +'<a class="shots" href="#/'+esc(g.id)+'" tabindex="-1" aria-hidden="true">'+(g.images||[]).slice(0,2).map(function(m){return '<figure class="shot"><div class="pic"><img src="'+esc(m[0])+'" alt="" loading="lazy"></div></figure>';}).join('')+'</a>'
-      +'<div>'
-        +(relLabel(g.release)?'<div class="rel">'+esc(relLabel(g.release)+(g.url||g.offline?'':' 예정'))+'</div>':'')
-        +'<h3 class="gt" id="t'+i+'">'+esc(g.title)+'</h3>'
+      +'<div class="cbody">'
+        +'<h3 class="gt" id="t'+i+'"><span class="tt">'+esc(g.title)+'</span>'
+          +(relLabel(g.release)?'<span class="rel">'+esc(relLabel(g.release)+(g.url||g.offline?'':' 예정'))+'</span>':'')+'</h3>'
         +'<div class="gs">'+esc(g.subtitle)+'</div>'
         +'<a class="btn main" href="#/'+esc(g.id)+'">'+ICO.doc+'수업 안내 및 자료 받기</a>'
       +'</div>'
