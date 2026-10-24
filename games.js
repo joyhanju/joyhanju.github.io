@@ -25,7 +25,7 @@ window.GAMES = [
     materials: [
       ["활동지 · 학생용", "materials/where-lines-meet/소실점을찾는눈_활동지_학생용.pdf", "학생용"],
       ["활동지 · 교사용(정답)", "materials/where-lines-meet/teacher-worksheet.enc", "교사용", "소실점을찾는눈_활동지_교사용(정답).pdf"],
-      ["수업 PPT", "materials/where-lines-meet/소실점을찾는눈_수업PPT.pptx?v=2", "학생용"]
+      ["수업 PPT", "materials/where-lines-meet/소실점을찾는눈_수업PPT.pptx?v=3", "학생용"]
     ],
     color: "#9C4A32",
     summary: "소실점 사냥꾼이 소실점을 훔쳐 가자 세상이 종이처럼 납작해졌어요. 주인공이 가족을 입체로 되돌리기 위해 잃어버린 소실점을 찾아 나서요. 1부에서는 명화 속에서 소실점과 지평선을 찾고, 소실점 사냥꾼과 대결해 소실점을 되찾은 뒤, 2부에서 태블릿 펜으로 1점·2점 투시를 직접 그려 세상을 되살려요.",
