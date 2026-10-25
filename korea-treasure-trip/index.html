@@ -1036,7 +1036,7 @@ function buildBoard(){
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!dr.hidden&&!modalOpen)setDr(false)});
   const lab=()=>{$('#btn3d').textContent=T3.active()?'3D 끄기':'3D 켜기';$('#btn3d').hidden=!T3.available();$('#btnSnd').textContent=prefSound?'소리 끄기':'소리 켜기';$('#btnZoom').textContent=zoomOn?'확대 끄기':'확대 켜기'};
   $('#btn3d').onclick=()=>{if(state.phase==='busy')return;pref3d=!T3.active();try{localStorage.setItem('am-3d',pref3d?'1':'0')}catch(e){}T3.setEnabled(pref3d);render();lab()};
-  $('#btnZoom').onclick=()=>{zoomOn=!zoomOn;try{localStorage.setItem('am-zoom',zoomOn?'1':'0')}catch(e){}if(!zoomOn)camReset();lab()};
+  $('#btnZoom').onclick=()=>{zoomOn=!zoomOn;try{localStorage.setItem('am-zoom2',zoomOn?'1':'0')}catch(e){}if(!zoomOn)camReset();lab()};
   $('#btnSnd').onclick=()=>{prefSound=!prefSound;try{localStorage.setItem('am-snd',prefSound?'1':'0')}catch(e){}lab()};
   setTimeout(lab,0);
 }
@@ -1334,7 +1334,7 @@ function flushMoney(){const q=moneyQ.splice(0);q.forEach(([f,t,a,w],k)=>setTimeo
 setInterval(()=>{if(!state)return;state.teams.forEach((t,i)=>{if(!coinFly[i]&&coinShown[i]!==t.coins)tweenCoins(i)})},1200);
 
 /* 말을 따라가는 확대 */
-let zoomOn=true;try{zoomOn=localStorage.getItem('am-zoom')!=='0'}catch(e){}
+let zoomOn=false;try{zoomOn=localStorage.getItem('am-zoom2')==='1'}catch(e){}
 const ZOOM=1.7;
 function camTo(pos){
   const z=$('#zoomer'),el=$('#c'+pos);if(!z||!el)return;
