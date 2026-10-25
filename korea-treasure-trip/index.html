@@ -1688,7 +1688,8 @@ function openSetup(){
   </div>`;
   el.hidden=false;
   /* 깃허브 등 학생 기기 연결이 안 되는 곳: '전자칠판으로만 진행'만 보여 줌 */
-  if(!(window.claude&&window.claude.use)){setup.play='board';const sp=el.querySelector('#sPlay');if(sp){const f=sp.closest('.field');if(f)f.remove()}}
+  /* 학생 기기 QR 입장 방식은 쓰지 않음: 항상 전자칠판으로만 진행 */
+  {setup.play='board';const sp=el.querySelector('#sPlay');if(sp){const f=sp.closest('.field');if(f)f.remove()}}
   el.querySelectorAll('#sPlay button').forEach(b=>b.onclick=()=>{el.querySelectorAll('#sPlay button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');setup.play=b.dataset.v});
   const bindSeg=(id,fn)=>el.querySelectorAll(`#${id} button`).forEach(b=>b.onclick=()=>{el.querySelectorAll(`#${id} button`).forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');fn(b.dataset.v)});
   bindSeg('sNaming',v=>{setup.naming=v;setup.teams.forEach(t=>{if(v==='class'||isDefaultName(t.name,t.piece))t.name=defaultName(v,t.piece)});drawTeams();const fl=el.querySelector('#sTeamsLbl');if(fl)fl.textContent=v==='group'?'이름과 말 (색은 말에 맞춰 정해져요)':'모둠과 말 (모둠 이름은 말 이름으로 정해져요)'});
@@ -1724,13 +1725,13 @@ function newGame(){
   cleanSlate();
   state={teams:setup.teams.slice(0,setup.n).map((t,i)=>({id:i,name:(setup.naming==='group'&&(t.name||'').trim())||defaultName(setup.naming,t.piece),color:PIECE_COLOR[t.piece||PIECES[i%8].id]||t.color,piece:t.piece||PIECES[i%8].id,pos:0,coins:setup.coins,jail:0,travel:false,pass:0,out:false})),
     owner:{},fund:0,cur:0,round:1,maxRounds:setup.rounds,quiz:setup.quiz,phase:'roll',dbl:0,extra:false,dice:[1,1],msg:'',log:[],seq:0,
-    play:setup.play,room:String(1000+Math.floor(Math.random()*9000)),qrHidden:false};
+    play:'board',room:String(1000+Math.floor(Math.random()*9000)),qrHidden:false};
   log(state.play==='devices'?`새 게임 시작 · 방 번호 ${state.room}`:'새 게임 시작');
   startTurn();connectRoom();
 }
 function resume(s){
   cleanSlate();
-  state=s;state.play=state.play||'board';state.room=state.room||String(1000+Math.floor(Math.random()*9000));state.seq=state.seq||0;state.teams.forEach((t,i)=>{if(!t.piece)t.piece=PIECES[i%8].id;if(!COLORS.some(c=>c.id===t.color))t.color=PIECE_COLOR[t.piece]||COLORS[i%8].id});
+  state=s;state.play='board';state.room=state.room||String(1000+Math.floor(Math.random()*9000));state.seq=state.seq||0;state.teams.forEach((t,i)=>{if(!t.piece)t.piece=PIECES[i%8].id;if(!COLORS.some(c=>c.id===t.color))t.color=PIECE_COLOR[t.piece]||COLORS[i%8].id});
   $('#overlay').hidden=true;modalOpen=false;curModal=null;
   if(state.phase==='busy')endTurn();else if(state.phase==='over')render();else startTurn();
   connectRoom();
