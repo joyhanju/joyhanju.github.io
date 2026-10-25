@@ -48,7 +48,7 @@ window.GAMES = [
   },
   {
     id: "where-lines-meet",
-    release: "2026-10",
+    release: "2026-09",
     title: "Where Lines Meet",
     subtitle: "소실점을 찾아 깊이 · 지평선 · 1점 · 2점 · 3점 투시를 배우는 원근법 게임",
     images: [
@@ -87,7 +87,7 @@ window.GAMES = [
   },
   {
     id: "art-time-adventure1",
-    release: "2026-09",
+    release: "2026-07",
     title: "아트타임 어드벤처 1",
     subtitle: "시대별로 6명의 중요한 화가를 만나 문제를 푸는 서양 미술사 게임",
     images: [
@@ -125,7 +125,7 @@ window.GAMES = [
   },
   {
     id: "color-alchemist",
-    release: "2026-10",
+    release: "2026-08",
     title: "색채의 연금술사",
     subtitle: "물감을 만들고 스테인드글라스를 칠하는 조색 게임",
     images: [
