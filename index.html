@@ -134,6 +134,9 @@ ul.tips li{margin-bottom:6px}
 
 .foot{margin-top:30px;padding-top:20px;border-top:2px dashed var(--line);font-size:15px;color:var(--mute);display:grid;gap:4px}
 .foot b{color:var(--ink)}
+.gear{display:inline-flex;vertical-align:middle;margin-left:6px;padding:3px;border:0;background:none;color:var(--mute);opacity:.55;cursor:pointer;border-radius:6px}
+.gear:hover,.gear:focus-visible{opacity:1;color:var(--ink)}
+.gear svg{width:15px;height:15px}
 
 /* 목록 카드(간단히) */
 .game.compact{grid-template-columns:1fr;gap:14px}
@@ -218,7 +221,7 @@ ul.tips li{margin-bottom:6px}
     <div><b>학생 정보 안내</b> · 이 게임들은 학생이 입력한 이름이나 결과를 어디에도 보내거나 저장하지 않아요. 결과는 학생 화면에만 나타나요.</div>
     <div><b>권장 환경</b> · 태블릿 가로 화면, 크롬 또는 삼성 인터넷</div>
     <div>만든 곳 · 명지중학교 미술과 · <a href="mailto:joyhanju@myongji.sen.ms.kr">joyhanju@myongji.sen.ms.kr</a></div>
-    <div>계속 업데이트되고 있습니다. 이 주소로 들어오시면 늘 최신판이 열려요. · <b>마지막 업데이트</b> <span id="updated"></span></div>
+    <div>계속 업데이트되고 있습니다. 이 주소로 들어오시면 늘 최신판이 열려요. · <b>마지막 업데이트</b> <span id="updated"></span><button type="button" class="gear" id="gear" aria-label="관리" title="관리"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
   </footer>
 </main>
 </div>
@@ -413,15 +416,19 @@ ul.tips li{margin-bottom:6px}
   document.addEventListener('click',function(e){var a=e.target.closest('[data-dl]');if(!a)return;var p=a.getAttribute('data-dl').split('-');countDl(games[+p[0]],games[+p[0]].materials[+p[1]]);});
   /* 교사용 자료: 비밀번호로 잠근 파일을 브라우저에서 풀어 내려받기 */
   var pw=document.getElementById('pw'),pwM=null,pwG=null,pwFocus=null,msg=document.getElementById('pwMsg');
-  function openPw(m){pwM=m;pwFocus=document.activeElement;document.getElementById('pwName').textContent=m[0];document.getElementById('pwIn').value='';msg.textContent='';msg.className='';pw.classList.add('on');document.getElementById('pwIn').focus();}
+  function openPw(m){pwM=m;pwFocus=document.activeElement;document.getElementById('pwTitle').textContent=m.stats?'관리':'교사용 자료';document.getElementById('pwGo').textContent=m.stats?'열기':'내려받기';document.getElementById('pwName').textContent=m[0];document.getElementById('pwIn').value='';msg.textContent='';msg.className='';pw.classList.add('on');document.getElementById('pwIn').focus();}
   function closePw(){pw.classList.remove('on');if(pwFocus)pwFocus.focus();}
   document.addEventListener('click',function(e){var b=e.target.closest('[data-lock]');if(!b)return;var p=b.getAttribute('data-lock').split('-');pwG=games[+p[0]];openPw(games[+p[0]].materials[+p[1]]);});
+  /* 관리: 톱니바퀴 → 관리 번호 입력 → 방문 통계(GoatCounter) 열기 */
+  document.getElementById('gear').onclick=function(){pwG=null;openPw({stats:true,0:'방문 통계 보기'});};
+  function chk(s){var x=2166136261;for(var i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)>>>0;}return x.toString(36);}
   document.getElementById('pwClose').onclick=closePw;
   pw.addEventListener('click',function(e){if(e.target===pw)closePw();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&pw.classList.contains('on'))closePw();});
   document.getElementById('pwForm').addEventListener('submit',async function(e){
     e.preventDefault();
     var go=document.getElementById('pwGo'),val=document.getElementById('pwIn').value.trim();
+    if(pwM&&pwM.stats){if(chk(val)==='dxg7ha'){closePw();window.open('https://joyhanju.goatcounter.com/','_blank','noopener');}else{msg.className='err';msg.textContent='번호가 맞지 않아요. 다시 입력해 주세요.';document.getElementById('pwIn').select();}return;}
     if(!window.crypto||!crypto.subtle){msg.className='err';msg.textContent='이 브라우저에서는 열 수 없어요. 크롬에서 다시 시도해 주세요.';return;}
     go.disabled=true;msg.className='';msg.textContent='확인하는 중…';
     try{
