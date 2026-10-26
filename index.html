@@ -298,7 +298,7 @@ ul.tips li{margin-bottom:6px}
             var btn=function(m,k){
               var t=m[2]==='교사용';
               return t?'<button type="button" class="mat t" data-lock="'+i+'-'+k+'">'+ICO.lock+'<span>'+esc(m[0])+'</span><em>비밀번호</em></button>'
-                      :'<a class="mat" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>'+(isPpt(m)?'PPT':'PDF')+'</em></a>';
+                      :'<a class="mat" data-dl="'+i+'-'+k+'" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>'+(isPpt(m)?'PPT':'PDF')+'</em></a>';
             };
             var top='', rest='';
             g.materials.forEach(function(m,k){ if(isPpt(m)) top+=btn(m,k); else rest+=btn(m,k); });
@@ -408,11 +408,14 @@ ul.tips li{margin-bottom:6px}
     if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(cur).then(done,function(){toast('주소를 길게 눌러 복사해 주세요');});}
     else{var t=document.createElement('textarea');t.value=cur;document.body.appendChild(t);t.select();try{document.execCommand('copy');done();}catch(e){toast('주소를 길게 눌러 복사해 주세요');}t.remove();}
   };
+  /* 방문 통계(GoatCounter): 수업 자료를 내려받으면 '자료/게임 이름 - 자료 이름'으로 기록 */
+  function countDl(g,m){try{var n=g.title+' - '+m[0];if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'자료/'+n,title:n,event:true});}catch(x){}}
+  document.addEventListener('click',function(e){var a=e.target.closest('[data-dl]');if(!a)return;var p=a.getAttribute('data-dl').split('-');countDl(games[+p[0]],games[+p[0]].materials[+p[1]]);});
   /* 교사용 자료: 비밀번호로 잠근 파일을 브라우저에서 풀어 내려받기 */
-  var pw=document.getElementById('pw'),pwM=null,pwFocus=null,msg=document.getElementById('pwMsg');
+  var pw=document.getElementById('pw'),pwM=null,pwG=null,pwFocus=null,msg=document.getElementById('pwMsg');
   function openPw(m){pwM=m;pwFocus=document.activeElement;document.getElementById('pwName').textContent=m[0];document.getElementById('pwIn').value='';msg.textContent='';msg.className='';pw.classList.add('on');document.getElementById('pwIn').focus();}
   function closePw(){pw.classList.remove('on');if(pwFocus)pwFocus.focus();}
-  document.addEventListener('click',function(e){var b=e.target.closest('[data-lock]');if(!b)return;var p=b.getAttribute('data-lock').split('-');openPw(games[+p[0]].materials[+p[1]]);});
+  document.addEventListener('click',function(e){var b=e.target.closest('[data-lock]');if(!b)return;var p=b.getAttribute('data-lock').split('-');pwG=games[+p[0]];openPw(games[+p[0]].materials[+p[1]]);});
   document.getElementById('pwClose').onclick=closePw;
   pw.addEventListener('click',function(e){if(e.target===pw)closePw();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&pw.classList.contains('on'))closePw();});
@@ -435,11 +438,12 @@ ul.tips li{margin-bottom:6px}
       var plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(off,off+12)},fk,buf.slice(off+12));
       var url=URL.createObjectURL(new Blob([plain],{type:/\.pptx$/i.test(pwM[3]||'')?'application/vnd.openxmlformats-officedocument.presentationml.presentation':'application/pdf'})),a=document.createElement('a');
       a.href=url;a.download=pwM[3]||'교사용자료.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},4000);
-      closePw();toast('내려받기를 시작했어요');
+      if(pwG)countDl(pwG,pwM);closePw();toast('내려받기를 시작했어요');
     }catch(x){msg.className='err';msg.textContent='파일을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.';}
     go.disabled=false;
   });
 })();
 </script>
+<script data-goatcounter="https://joyhanju.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
