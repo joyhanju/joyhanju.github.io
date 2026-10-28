@@ -16,7 +16,6 @@ window.GAMES = [
   {
     id: "one-painting-one-hour",
     type: "question",
-    release: "2026-10",
     sort: "2026-10-9",
     title: "그림 한 장을 한 시간 본다고?",
     subtitle: "김홍도 〈씨름〉 한 점을 45분 동안 깊이 보며 숨은 이야기를 찾는 감상 수업",
