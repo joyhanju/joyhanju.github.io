@@ -83,7 +83,7 @@ window.GAMES = [
     materials: [
       ["수업 PPT", "materials/this-is-art/이것도미술이에요_수업PPT.pptx", "학생용"],
       ["활동지 · 학생용", "materials/this-is-art/이것도미술이에요_활동지_학생용.pdf", "학생용"],
-      ["선생님용 PPT", "materials/this-is-art/teacher-ppt.enc", "예정", "11월 공개"],
+      ["선생님용 PPT", "materials/this-is-art/teacher-ppt.enc", "교사용", "이것도미술이에요_선생님용PPT.pptx"],
       ["교사용 안내서(수업 전에 읽어 두면 좋은 글)", "materials/this-is-art/이것도미술이에요_교사용안내서.pdf", "학생용"]
     ],
     color: "#7C5CC4",
