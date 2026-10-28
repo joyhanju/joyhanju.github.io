@@ -278,7 +278,8 @@ window.GAMES = [
     url: "color-alchemist/",
     materials: [
       ["활동지 · 학생용", "materials/color-alchemist/색채의연금술사_활동지_학생용.pdf", "학생용"],
-      ["활동지 · 교사용(정답)", "materials/color-alchemist/teacher-worksheet.enc", "교사용", "색채의연금술사_활동지_교사용(정답).pdf"]
+      ["활동지 · 교사용(정답)", "materials/color-alchemist/teacher-worksheet.enc", "교사용", "색채의연금술사_활동지_교사용(정답).pdf"],
+      ["수업 PPT", "materials/color-alchemist/색채의연금술사_수업PPT.pptx", "학생용"]
     ],
     color: "#B5651D",
     summary: "학생들이 어려워하는 색채 이론을 게임으로 자연스럽게 익혀요. 먼셀 색상환을 바탕으로 물감을 섞어 주문받은 색을 만들고, 스테인드글라스 창을 칠해요.",
