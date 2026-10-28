@@ -93,6 +93,7 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .mat svg{width:20px;height:20px;color:var(--title)}
 .mat em{font-style:normal;font-weight:500;font-size:12px;color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:0 5px;background:#fff}
 .mat.t{background:var(--warm);border-color:var(--warm-line)}
+.mat.s{cursor:default;background:#f4f4f6;border-style:dashed;color:var(--mute)}.mat.s:hover{border-color:var(--line)}.mat.s svg{color:var(--mute)}
 .mat.t svg{color:#B5651D}
 #pw .qbox{max-width:460px;text-align:left}
 #pw h2{font-size:28px;text-align:center}
@@ -305,6 +306,7 @@ ul.tips li{margin-bottom:6px}
             var isTop=function(m){return isPpt(m)||/PPT/.test(m[0]);};
             var btn=function(m,k){
               var t=m[2]==='교사용';
+              if(m[2]==='예정') return '<span class="mat s" aria-disabled="true">'+ICO.clock+'<span>'+esc(m[0])+'</span><em>'+esc(m[3]||'공개 예정')+'</em></span>';
               return t?'<button type="button" class="mat t" data-lock="'+i+'-'+k+'">'+ICO.lock+'<span>'+esc(m[0])+'</span><em>비밀번호</em></button>'
                       :'<a class="mat" data-dl="'+i+'-'+k+'" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>'+(isPpt(m)?'PPT':'PDF')+'</em></a>';
             };
