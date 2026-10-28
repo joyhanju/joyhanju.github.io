@@ -397,7 +397,7 @@ ul.tips li{margin-bottom:6px}
     cur=abs(g.url); lastFocus=document.activeElement;
     document.getElementById('qrTitle').textContent=g.title;
     document.getElementById('qrUrl').textContent=cur;
-    try{var q=qrcode(0,'M');q.addData(cur);q.make();document.getElementById('qrImg').innerHTML=q.createSvgTag({cellSize:8,margin:2,scalable:true});}
+    try{var q=qrcode(0,'M');q.addData(cur+(cur.indexOf('?')<0?'?qr':'&qr'));q.make();document.getElementById('qrImg').innerHTML=q.createSvgTag({cellSize:8,margin:2,scalable:true});}
     catch(e){document.getElementById('qrImg').textContent='QR을 만들지 못했어요. 아래 주소를 알려 주세요.';}
     box.classList.add('on'); document.getElementById('qrClose').focus();
   }

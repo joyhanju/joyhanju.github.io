@@ -1811,5 +1811,10 @@ if(window.claude&&window.claude.hot&&window.claude.hot.ready)window.claude.hot.r
 })();
 </script>
 
+<script>window.goatcounter={path:function(){return location.pathname;}};</script>
 <script data-goatcounter="https://joyhanju.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>/* QR로 들어온 학생 수 세기: 같은 기기는 새로고침해도 한 번만 */
+(function(){if(!/[?&]qr(=|&|$)/.test(location.search))return;var k='gc-qr:'+location.pathname;try{if(sessionStorage.getItem(k))return;}catch(e){}
+var n=0,iv=setInterval(function(){var g=window.goatcounter;if(g&&g.count){clearInterval(iv);g.count({path:'QR 입장/'+document.title,title:document.title,event:true});try{sessionStorage.setItem(k,'1');}catch(e){}}else if(++n>60)clearInterval(iv);},250);})();
+</script>
 </html>
