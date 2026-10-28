@@ -168,16 +168,20 @@ ul.tips li{margin-bottom:6px}
 .pic.flip .dots i{width:7px;height:7px;border-radius:50%;background:rgba(0,0,0,.25);box-shadow:0 0 0 1.5px rgba(255,255,255,.8)}
 .pic.flip .dots i.on{background:var(--gc,var(--title))}
 @media (prefers-reduced-motion:reduce){.pic.flip img{transition:none}}
-/* 컴퓨터: 손 수업은 왼쪽, 게임은 오른쪽 두 줄 */
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+/* 컴퓨터: 손으로 하는 수업 · 게임으로 하는 수업 · 질문하는 수업 세 줄 */
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start}
 .col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
 .cols .game{grid-template-columns:1fr;gap:16px}
 .cols .shots{grid-template-columns:1fr 1fr}
 .cols .gt{font-size:28px}
+.cols .game.compact .gt{font-size:24px;align-items:flex-start}
+.cols .game.compact .gt .tt{white-space:normal;word-break:keep-all}
+.cols .game.compact .gt .rel{margin-top:4px}
+.cols .game.compact .btn{font-size:16px;padding:0 14px}
 .cols .facts{grid-template-columns:repeat(2,auto)}
 .cols .gbody{grid-template-columns:1fr}
 .cols .how{grid-template-columns:1fr}
-@media (min-width:1100px){.wrap.wide{max-width:1400px}}
+@media (min-width:1240px){.wrap.wide{max-width:1440px}}
 
 @media (max-width:860px){
   .shots{grid-template-columns:1fr 1fr}
@@ -251,7 +255,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202610252135"></script>
+<script src="games.js?v=202610281530"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
@@ -298,13 +302,14 @@ ul.tips li{margin-bottom:6px}
         +((g.materials&&g.materials.length)?(function(){
             // PPT는 '수업 자료 받기' 옆에, 활동지·전개도 같은 나머지는 아랫줄에
             var isPpt=function(m){return /\.pptx?$/i.test(m[3]||m[1]);};
+            var isTop=function(m){return isPpt(m)||/PPT/.test(m[0]);};
             var btn=function(m,k){
               var t=m[2]==='교사용';
               return t?'<button type="button" class="mat t" data-lock="'+i+'-'+k+'">'+ICO.lock+'<span>'+esc(m[0])+'</span><em>비밀번호</em></button>'
                       :'<a class="mat" data-dl="'+i+'-'+k+'" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>'+(isPpt(m)?'PPT':'PDF')+'</em></a>';
             };
             var top='', rest='';
-            g.materials.forEach(function(m,k){ if(isPpt(m)) top+=btn(m,k); else rest+=btn(m,k); });
+            g.materials.forEach(function(m,k){ if(isTop(m)) top+=btn(m,k); else rest+=btn(m,k); });
             return '<div class="mats"><div class="mhead"><div class="mt">수업 자료 받기</div>'+top+'</div>'
               +(rest?'<div class="ml">'+rest+'</div>':'')+'</div>';
           })():'')
@@ -335,8 +340,8 @@ ul.tips li{margin-bottom:6px}
       +'</div>'
     +'</article>';
   }
-  // 휴대폰: 한 줄로 이어서 · 컴퓨터: 손 수업(왼쪽) · 게임(오른쪽)
-  var mq = window.matchMedia('(min-width:1100px)');
+  // 휴대폰: 한 줄로 이어서 · 컴퓨터: 손 수업 · 게임 · 질문 수업 세 줄
+  var mq = window.matchMedia('(min-width:1240px)');
   var listScroll = 0;
   function render(){
     var list = document.getElementById('list');
@@ -355,11 +360,12 @@ ul.tips li{margin-bottom:6px}
     document.title = baseTitle;
     document.querySelector('.wrap').classList.toggle('wide', mq.matches);
     if(mq.matches){
-      var hand=[], play=[];
-      games.forEach(function(g,i){ (g.offline?hand:play).push(card(g,i)); });
+      var hand=[], play=[], ask=[];
+      games.forEach(function(g,i){ (g.type==='question'?ask:g.offline?hand:play).push(card(g,i)); });
       list.innerHTML = '<div class="cols">'
         +'<div class="col"><h3 class="col-title">손으로 하는 수업</h3>'+hand.join('')+'</div>'
         +'<div class="col"><h3 class="col-title">게임으로 하는 수업</h3>'+play.join('')+'</div>'
+        +'<div class="col"><h3 class="col-title">질문하는 수업</h3>'+ask.join('')+'</div>'
         +'</div>';
     } else {
       list.innerHTML = games.map(card).join('');
