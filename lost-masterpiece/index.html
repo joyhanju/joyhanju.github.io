@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="사라진 클림트와 몽유도원도를 찾는 미술 추리 게임 · 수업 없이 학생 혼자서 할 수 있어요">
+<title>사라진 걸작을 찾아라</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Song+Myung&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bar"></div>
+<main class="wrap" id="app"></main>
+<div id="overlay"></div>
+<script src="data.js"></script>
+<script src="game.js"></script>
+<script>window.goatcounter={path:function(){return location.pathname;}};</script>
+<script data-goatcounter="https://joyhanju.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>/* QR로 들어온 학생 수 세기: 같은 기기는 새로고침해도 한 번만 */
+(function(){if(!/[?&]qr(=|&|$)/.test(location.search))return;var k='gc-qr:'+location.pathname;try{if(sessionStorage.getItem(k))return;}catch(e){}
+var n=0,iv=setInterval(function(){var g=window.goatcounter;if(g&&g.count){clearInterval(iv);g.count({path:'QR 입장/'+document.title,title:document.title,event:true});try{sessionStorage.setItem(k,'1');}catch(e){}}else if(++n>60)clearInterval(iv);},250);})();
+</script>
+</body>
+</html>
