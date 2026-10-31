@@ -175,7 +175,7 @@ ul.tips li{margin-bottom:6px}
 .pic.flip .dots i{width:7px;height:7px;border-radius:50%;background:rgba(0,0,0,.25);box-shadow:0 0 0 1.5px rgba(255,255,255,.8)}
 .pic.flip .dots i.on{background:var(--gc,var(--title))}
 @media (prefers-reduced-motion:reduce){.pic.flip img{transition:none}}
-/* 컴퓨터: 손으로 하는 수업 · 게임으로 하는 수업 · 스스로 하는 수업 · 생각하는 수업 네 줄 */
+/* 컴퓨터: 손으로 하는 수업 · 게임으로 하는 수업 · 스스로 하는 게임 수업 · 생각하는 수업 네 줄 */
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;align-items:start}
 .col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
 .cols .game{grid-template-columns:1fr;gap:16px}
@@ -373,7 +373,7 @@ ul.tips li{margin-bottom:6px}
       list.innerHTML = '<div class="cols">'
         +'<div class="col"><h3 class="col-title">손으로 하는 수업</h3>'+hand.join('')+'</div>'
         +'<div class="col"><h3 class="col-title">게임으로 하는 수업</h3>'+play.join('')+'</div>'
-        +'<div class="col"><h3 class="col-title">스스로 하는 수업</h3>'+self.join('')+'</div>'
+        +'<div class="col"><h3 class="col-title">스스로 하는 게임 수업</h3>'+self.join('')+'</div>'
         +'<div class="col"><h3 class="col-title">생각하는 수업</h3>'+ask.join('')+'</div>'
         +'</div>';
     } else {
