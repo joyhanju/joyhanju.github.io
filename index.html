@@ -178,6 +178,7 @@ ul.tips li{margin-bottom:6px}
 /* 컴퓨터: 손으로 하는 수업 · 선생님이 여는 게임 · 학생이 여는 게임 · 생각하는 수업 네 줄 */
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;align-items:start}
 .col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
+.col-title small{display:block;margin-top:2px;font-size:15px;font-weight:400;color:var(--mute)}
 .cols .game{grid-template-columns:1fr;gap:16px}
 .cols .shots{grid-template-columns:1fr 1fr}
 .cols .gt{font-size:28px}
@@ -371,10 +372,10 @@ ul.tips li{margin-bottom:6px}
       var hand=[], play=[], self=[], ask=[];
       games.forEach(function(g,i){ (g.type==='question'?ask:g.type==='self'?self:g.offline?hand:play).push(card(g,i)); });
       list.innerHTML = '<div class="cols">'
-        +'<div class="col"><h3 class="col-title">손으로 하는 수업</h3>'+hand.join('')+'</div>'
-        +'<div class="col"><h3 class="col-title">선생님이 여는 게임</h3>'+play.join('')+'</div>'
-        +'<div class="col"><h3 class="col-title">학생이 여는 게임</h3>'+self.join('')+'</div>'
-        +'<div class="col"><h3 class="col-title">생각하는 수업</h3>'+ask.join('')+'</div>'
+        +'<div class="col"><h3 class="col-title">손으로 하는 수업<small>직접 만들며 배우는 수업</small></h3>'+hand.join('')+'</div>'
+        +'<div class="col"><h3 class="col-title">선생님이 여는 게임<small>수업 속에서 함께 하는 게임</small></h3>'+play.join('')+'</div>'
+        +'<div class="col"><h3 class="col-title">학생이 여는 게임<small>선생님 도움 없이 바로 시작해요</small></h3>'+self.join('')+'</div>'
+        +'<div class="col"><h3 class="col-title">생각하는 수업<small>질문하고 이야기 나누는 수업</small></h3>'+ask.join('')+'</div>'
         +'</div>';
     } else {
       list.innerHTML = games.map(card).join('');
