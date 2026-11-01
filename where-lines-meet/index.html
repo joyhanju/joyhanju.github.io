@@ -1537,13 +1537,15 @@ const RUN={startBtn:()=>{chrome(true);renderUI();},startFight:()=>{if(fightMode=
 let pick='startBtn';
 Object.keys(RUN).forEach(id=>{$(id).onclick=()=>{pick=id;$('fightSub').hidden=id!=='startFight';Object.keys(RUN).forEach(k=>{$(k).classList.toggle('on',k===id);$(k).setAttribute('aria-pressed',k===id);});};});
 document.querySelectorAll('#fightSub button').forEach(b=>b.onclick=()=>{fightMode=b.dataset.fm;document.querySelectorAll('#fightSub button').forEach(x=>x.classList.toggle('on',x===b));});
-/* admin: jump anywhere (password 0614) */
+/* admin: jump anywhere */
+/* 관리자 비밀번호는 원문 대신 해시로만 비교 (소스를 봐도 비밀번호가 보이지 않음) */
+function pinOk(v){try{const e=new TextEncoder();return crypto.subtle.importKey('raw',e.encode(String(v||'').trim()),'PBKDF2',false,['deriveBits']).then(k=>crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode('joyhanju-admin-v1'),iterations:200000,hash:'SHA-256'},k,256)).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')==='fa5b21dcecc9a397084c2f7404b949f8ae85554359a29695909a23c5b0b0d3f4').catch(()=>false)}catch(x){return Promise.resolve(false)}}
 // on the entry screen the gear sits in the box's top-right corner; elsewhere it floats bottom-left
 function placeGear(){const g=$('gearBtn'),f=$('entryForm'),on=!$('startOv').hidden;if(on&&g.parentElement!==f)f.prepend(g);else if(!on&&g.parentElement===f)document.body.appendChild(g);}
 new MutationObserver(placeGear).observe($('startOv'),{attributes:true,attributeFilter:['hidden']});placeGear();
 $('gearBtn').onclick=()=>{$('adminBox').hidden=false;$('adLock').hidden=false;$('adPanel').hidden=true;$('adPw').value='';setTimeout(()=>$('adPw').focus(),30);};
 const adClose=()=>{$('adminBox').hidden=true;};$('adClose').onclick=$('adClose2').onclick=adClose;
-const adTry=()=>{if($('adPw').value==='0614'){$('adLock').hidden=true;$('adPanel').hidden=false;}else{$('adPw').value='';$('adPw').placeholder='다시 입력';}};
+const adTry=async()=>{if(await pinOk($('adPw').value)){$('adLock').hidden=true;$('adPanel').hidden=false;}else{$('adPw').value='';$('adPw').placeholder='다시 입력';}};
 $('adGo').onclick=adTry;$('adPw').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();adTry();}};
 $('adSteps').innerHTML=STEPS.map((x,i)=>'<button type="button" data-step="'+i+'">'+(i+1)+'. '+x.chip+'</button>').join('');
 function adEnter(){if(!STU)STU={g:'t',c:'',n:'',nm:''};guest=false;$('adminBox').hidden=true;
