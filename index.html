@@ -176,10 +176,9 @@ ul.tips li{margin-bottom:6px}
 .pic.flip .dots i.on{background:var(--gc,var(--title))}
 @media (prefers-reduced-motion:reduce){.pic.flip img{transition:none}}
 .shot .pic{position:relative}
-.new{position:absolute;top:10px;right:10px;z-index:3;display:inline-flex;align-items:center;gap:6px;overflow:hidden;padding:4px 18px 4px 14px;pointer-events:none;border-radius:999px;background:linear-gradient(135deg,#ff4d6d,#ffb703);color:#fff;font-family:"Noto Sans KR",sans-serif;font-size:24px;font-weight:900;letter-spacing:.06em;line-height:1.5;box-shadow:0 3px 12px rgba(255,77,109,.45)}
-.new::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);transform:translateX(-100%);animation:shine 2.4s ease-in-out infinite}
-.new i{font-style:normal;display:inline-block;animation:twinkle 1.6s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.new::after,.new i{animation:none}}
+.new{position:absolute;top:10px;right:10px;z-index:3;display:inline-flex;align-items:center;padding:3px 14px;pointer-events:none;border-radius:999px;background:linear-gradient(135deg,#ff4d6d,#ffb703);color:#fff;font-family:"Noto Sans KR",sans-serif;font-size:19px;font-weight:900;letter-spacing:.06em;line-height:1.5;box-shadow:0 3px 12px rgba(255,77,109,.45);animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.new{animation:none}}
 /* 컴퓨터: 손으로 하는 수업 · 선생님이 여는 게임 · 학생이 여는 게임 · 생각하는 수업 네 줄 */
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;align-items:start}
 .col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
@@ -295,7 +294,7 @@ ul.tips li{margin-bottom:6px}
   var soonN = games.filter(function(g){return !g.url && !g.offline;}).length;
   document.getElementById('count').textContent = (games.length-soonN) + '개' + (soonN?' · 준비 중 '+soonN+'개':'');
   // 새로 업데이트한 자료(isNew: true)는 첫 사진 오른쪽 위에 반짝이는 NEW 표시
-  function NEWB(g){return g.isNew?'<span class="new" aria-label="새로 업데이트"><i aria-hidden="true">✦</i>NEW</span>':'';}
+  function NEWB(g){return g.isNew?'<span class="new" aria-label="새로 업데이트">NEW</span>':'';}
   // 세부 페이지: 수업 안내와 자료 받기 전체
   function detail(g,i){
     return '<a class="back" href="#">'+ICO.back+'목록으로</a>'
