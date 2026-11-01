@@ -35,9 +35,9 @@ const HCHART=(()=>{let g='';for(let k=1;k<12;k++){const y=k*75,cm=185-k*5,big=cm
   if(big)g+=`<text x="28" y="${y-10}" font-size="30" font-family="sans-serif" font-weight="700" fill="#fbe9cf" fill-opacity=".7">${cm}</text><text x="1572" y="${y-10}" text-anchor="end" font-size="30" font-family="sans-serif" font-weight="700" fill="#fbe9cf" fill-opacity=".7">${cm}</text>`}
   return "url('data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="none">${g}</svg>`)+"')"})();
 /* 용의자별 좌우 위치 미세 조정(%): 얼굴이 겹치지 않게 */
-const LX={k:{4:-2.4},m:{3:2.4,4:1.2}};
+const LX={k:{4:-2.4},m:{3:2.4,4:1.2},d:{3:2.4,4:1.2},s:{4:-2.4}};
 /* 용의자 줄에 서는 순서 (데이터 순서는 그대로): 몽유도원도는 강한주와 윤채리 자리를 바꿈 */
-const DORD={m:[0,1,5,3,4,2]};
+const DORD={m:[0,1,5,3,4,2],d:[0,1,5,3,4,2]};
 /* 얼굴이 칸 한가운데 오도록 그림을 옆으로 밀어 줌 (카메라·셀카봉 때문에 그림 가운데와 얼굴이 어긋나는 경우) */
 function faceAlign(im){const f=faceOf(im);im.style.translate=((.5-f.fx)*100).toFixed(1)+'% 0'}
 /* 용의자 그림에서 얼굴 중심 찾기: 머리 꼭대기 아래쪽 불투명 영역의 가운데 (그림마다 한 번만 계산) */
@@ -56,7 +56,7 @@ function stage(bg,pose,opt={}){
   const lens=opt.lens||(pose?'roam':'');
   const who=pose?`<span class="detwrap"><img class="det bust" id="detImg" src="${imgUrl(det(pose))}" alt="" onerror="this.remove()"></span>`:'';
   let line='';
-  if(opt.lineup){const sus=C().suspects,ord=DORD[S.caseId]||sus.map((_,k)=>k);line=`<div class="lineup">${ord.map((i,k)=>[sus[i],i,k]).map(([x,i,k])=>`<div class="lfig ${S.crossed.includes(i)?'x':''}" data-i="${i}" style="left:${25.5+k*13.4+((LX[S.caseId]||{})[i]||0)}%${S.caseId==='m'?`;z-index:${10-k}`:''}"><img src="${imgUrl(x.img)}" alt="${x.name}" onload="faceAlign(this)" onerror="this.remove()"><span class="lname">${x.name}</span><span class="verd ${S.crossed.includes(i)?'no':''}">${S.crossed.includes(i)?'아니야!':''}</span></div>`).join('')}</div>`}
+  if(opt.lineup){const sus=C().suspects,ord=DORD[S.caseId]||sus.map((_,k)=>k);line=`<div class="lineup">${ord.map((i,k)=>[sus[i],i,k]).map(([x,i,k])=>`<div class="lfig ${S.crossed.includes(i)?'x':''}" data-i="${i}" style="left:${25.5+k*13.4+((LX[S.caseId]||{})[i]||0)}%${CASE_THEME[S.caseId]==='m'?`;z-index:${10-k}`:''}"><img src="${imgUrl(x.img)}" alt="${x.name}" onload="faceAlign(this)" onerror="this.remove()"><span class="lname">${x.name}</span><span class="verd ${S.crossed.includes(i)?'no':''}">${S.crossed.includes(i)?'아니야!':''}</span></div>`).join('')}</div>`}
   return `<div class="stagebox ${opt.cls||''} ${opt.lineup?'has-lineup':''}" data-lens="${lens}" data-pose="${pose||''}" style="background-image:${opt.lineup?`${HCHART},url('${imgUrl('title/wall-rose.webp')}')`:`url('${imgUrl(bg)}')`}">${line}${who}${opt.extra||''}</div>`}
 let lensRun=0;
 function initStages(){const run=++lensRun;document.querySelectorAll('.stagebox[data-lens]:not([data-lens=""])').forEach(b=>runLens(b,run))}
@@ -121,7 +121,7 @@ function setPose(p){const d=$('#detImg');if(!d)return;const src=imgUrl(det(p));i
 function drawCover(ctx,im,W,H){const s=Math.max(W/im.width,H/im.height),w=im.width*s,h=im.height*s;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h)}
 function applyScale(){document.documentElement.style.setProperty('--scale',getPref().big?1.25:1);document.documentElement.dataset.theme=getPref().dark?'dark':'light'}
 applyScale();
-function memoFig(q){const f=q.fig;return f?`<figure class="mroute"><div class="mr-in"><img src="${imgUrl(f.img)}" alt="몽유도원도: 현실 세계, 기암절벽, 복숭아밭 순서로 이어지는 경로"><svg viewBox="0 0 1062 386" aria-hidden="true">${f.svg}</svg></div><figcaption>${f.cap}</figcaption></figure>`:''}
+function memoFig(q){const f=q.fig;return f?`<figure class="mroute ${f.cls||''}"><div class="mr-in"><img src="${imgUrl(f.img)}" alt="${f.alt||'몽유도원도: 현실 세계, 기암절벽, 복숭아밭 순서로 이어지는 경로'}">${f.svg?`<svg viewBox="0 0 1062 386" aria-hidden="true">${f.svg}</svg>`:''}</div><figcaption>${f.cap}</figcaption></figure>`:''}
 function memoHtml(q){let k=0;return `<div class="memo-h">${q.title}</div>${memoFig(q)}`+q.memo.map((p,pi)=>`<p><b>(${PARA[pi]})</b>${p.map(s=>`<span data-s="${k++}">${s}</span>`).join(' ')}</p>`).join('')}
 
 /* ============ 추리 순서 ============
@@ -165,7 +165,7 @@ function go(screen,extra){
   if(S){S.screen=screen;if(extra!=null)S.room=extra;if(!S.dets)S.dets=makeDets();
     const key=['room','clue'].includes(screen)?'r'+S.room:screen;curSex=S.dets[key]||'f';
     if(screen==='map')curSex=S.dets.map=Math.random()<.5?'f':'m';save();}
-  document.body.dataset.case=S?S.caseId:'';
+  document.body.dataset.case=S?CASE_THEME[S.caseId]:'';
   PUZ=null;ov.innerHTML='';
   window.scrollTo(0,0);
   ({prologue:vPrologue,map:vMap,room:vRoom,clue:vClue,vault:vVault,result:vResult})[screen]();
@@ -178,7 +178,7 @@ function renderBar(){
     <span class="chip" title="걸린 시간">시간 <b id="tm">${fmt(S.elapsed)}</b></span>
     <span class="chip">힌트 ${S.hints}</span>
     <span class="chip">증거 ${S.solved.filter(Boolean).length}/5</span>
-    <button class="btn" id="bNb">탐정 수첩</button>
+    <button class="btn nbbtn" id="bNb"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="4" y="2.5" width="15" height="19" rx="2" fill="currentColor" opacity=".25"/><rect x="4" y="2.5" width="15" height="19" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 7.5h7M8 11h7M8 14.5h4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.5 2.5v19" stroke="currentColor" stroke-width="2.4"/></svg>탐정 수첩</button>
     <button class="btn ghost gearb" id="bT" aria-label="관리자 메뉴" title="관리자 메뉴">${GEAR_SVG}</button>
   </div></div>`;
   $('#bNb').onclick=openNotebook;$('#bT').onclick=openAdmin;
@@ -211,7 +211,7 @@ function vTitle(){
   </section>
   <h2 style="font-size:1.6rem">탐정님, 어떤 사건을 먼저 해결하시겠습니까?</h2>
   <div class="cases">
-    ${['k','m'].map(id=>`<button class="case-card plate" data-c="${id}"><div class="cc"><span class="eyebrow">사건 ${id==='k'?'1':'2'} · ${id==='k'?'클림트':'안견'}</span><h3>${CASES[id].title}</h3><span class="csub">${CASES[id].sub}</span>${done[id]?`<span class="done-tag">해결 완료 · ${done[id]}</span>`:''}</div></button>`).join('')}
+    ${CASE_ORDER.map((id,n)=>`<button class="case-card plate" data-c="${id}"><div class="cc"><span class="eyebrow">사건 ${n+1} · ${CASE_LABEL[id]} · 난이도 ${'★'.repeat(CASE_LEVEL[id])}${'☆'.repeat(4-CASE_LEVEL[id])}</span><h3>${CASES[id].title}</h3><span class="csub">${CASES[id].sub}</span>${done[id]?`<span class="done-tag">해결 완료 · ${done[id]}</span>`:''}</div></button>`).join('')}
   </div>
   <div class="row" style="margin-top:28px"><button class="btn ghost" id="bBig">${pref.big?'글자 보통으로':'글자 크게 (전자칠판)'}</button><button class="btn ghost" id="bDark">${pref.dark?'밝은 화면으로':'어두운 화면으로'}</button><button class="btn ghost" id="bT2">선생님 안내</button></div>
   </div>`;
@@ -234,7 +234,7 @@ function vPrologue(){
     <h2 style="font-size:clamp(2rem,5vw,3rem)">${c.title}</h2>
     ${stage(IMAGES[S.caseId].scene,'think')}
     ${c.intro.map(l=>`<p class="${l.startsWith('「')?'quote':''}">${l}</p>`).join('')}
-    <p><b>${S.cls?S.cls+' ':''}${S.name}</b> 탐정님의 임무: 전시실 다섯 곳을 조사해 증거를 모으고, 마지막에 수장고에서 <b>범인 · 수법 · 그림을 숨긴 곳</b>을 지목하세요.</p>
+    <p><b>${S.cls?S.cls+' ':''}${S.name}</b> 탐정님의 임무: 전시실 다섯 곳을 조사해 증거를 모으고, 마지막에 수장고에서 <b>범인 · 수법 · ${josa(c.thing||'그림','을','를')} 숨긴 곳</b>을 지목하세요.</p>
     <p class="muted">탐정 수첩에는 용의자들의 알리바이 진술이 적혀 있습니다. ${S.mode==='hard'?'다른 특징도 진술로만 적혀 있으니 꼼꼼히 읽고 판단하세요.':'다른 특징은 O/X로 정리되어 있습니다.'} 증거와 맞지 않는 사람을 지워 나가세요. 범인은 마지막 전시실의 증거까지 모아야 확실히 드러납니다.</p>
   </div>
   <h3 style="margin:26px 0 12px;font-size:1.4rem">용의자 파일</h3>
@@ -265,16 +265,16 @@ function vMap(){
 const GEAR_SVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3h-4l-.4 2.9a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1L11 21h4l.4-2.9a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5A3.5 3.5 0 1 1 13 8.5a3.5 3.5 0 0 1 0 7z"/></svg>';
 const ADMIN_PIN='0614';
 function vRoom(){
-  const c=C(),i=S.room,r=c.rooms[i],maxH=M().hints,admin=['tiles','spot'].includes(r.type);
+  const c=C(),i=S.room,r=c.rooms[i],maxH=M().hints,admin=['tiles','spot','seal','cctv','escape','laser'].includes(r.type);
   app.innerHTML=`<div class="room-head"><p class="eyebrow">전시실 ${i+1}</p><h2>${r.name}</h2></div>
-  ${stage(IMAGES[S.caseId].rooms[i],'search')}
+  ${r.type==='escape'?'':stage(IMAGES[S.caseId].rooms[i],'search')}
   <div class="scene" style="margin-top:14px">${r.lines.map(l=>`<p class="${l.includes('「')?'quote':''}">${l}</p>`).join('')}</div>
   <section class="puz">${admin?`<button class="gear" id="bGear" aria-label="교사용 관리자 모드" title="교사용">${GEAR_SVG}</button><div class="adm" id="adm" hidden><b>교사용 관리자 모드</b><span class="muted">비밀번호를 넣으면 이 퍼즐이 모두 풀립니다.</span><div class="row"><input id="admPin" type="password" inputmode="numeric" maxlength="8" placeholder="비밀번호" aria-label="관리자 비밀번호"><button class="btn" id="admOk">모두 풀기</button><button class="btn ghost" id="admX">닫기</button></div><p class="msg" id="admMsg"></p></div>`:''}<div id="pz"></div>
     <div id="hb"></div>
     <div class="puz-foot"><button class="btn ghost" id="bBack">지도로 돌아가기</button><button class="btn" id="bHint"><img class="bi" src="${imgUrl(IMAGES.common.hint)}" alt="">힌트 보기 (<span id="hl">${maxH}</span>번 남음)</button></div>
   </section>`;
   let used=0,fin=false;
-  const done=()=>{if(fin)return;fin=true;S.solved[i]=true;S.justSolved=i;save();setPose('happy');stampFx((c.stamps||[])[i]||['해결!','증거를 찾았습니다']);setTimeout(()=>{if(S&&S.screen==='room'&&S.room===i)go('clue',i)},2300)};
+  const done=()=>{if(fin)return;fin=true;S.solved[i]=true;S.justSolved=i;save();setPose('happy');stampFx((c.stamps||[])[i]||['해결!','증거를 찾았습니다']);const s0=S;setTimeout(()=>{if(S&&S===s0&&S.screen==='room'&&S.room===i)go('clue',i)},2300)};
   PUZ=PUZZLES[r.type]($('#pz'),done);
   $('#bBack').onclick=()=>go('map');
   $('#bHint').onclick=()=>{if(used>=maxH)return;used++;S.hints++;save();renderBar();
@@ -287,12 +287,13 @@ function vRoom(){
       m.className='msg ok';m.textContent='퍼즐을 모두 풀었습니다.';if(PUZ&&PUZ.solve)PUZ.solve();setTimeout(()=>{if(document.body.contains(adm))adm.hidden=true},900)};
     $('#admOk').onclick=tryPin;$('#admPin').onkeydown=e=>{if(e.key==='Enter')tryPin()};}
   /* 몽유도원도 안내 데스크: 해설 메모를 기억하라는 안내 */
-  if(S.caseId==='m'&&r.type==='quiz'&&!S.memoAck){
+  const mn=S.caseId==='m'?{room:'두루마리 복도',para:'(나) 문단에 나오는 안평대군의 꿈 이야기 순서'}:c.memoNotice;
+  if(mn&&r.type==='quiz'&&!S.memoAck){
     ov.innerHTML=`<div class="tch"><div class="tch-in memo-pop" role="dialog" aria-label="꼭 읽어 주세요">
       <div class="mtext"><p class="eyebrow">잠깐! 꼭 읽어 주세요</p>
       <h2 style="font-size:1.5rem">이 해설 메모는 뒤에서 다시 나와요</h2>
-      <p>안내 데스크의 해설 메모 내용은 나중에 <b>‘두루마리 복도’</b> 전시실 문제에서도 다시 쓰입니다.</p>
-      <p>특히 <b>(나) 문단에 나오는 안평대군의 꿈 이야기 순서</b>를 꼼꼼하게 읽고 기억해 두세요.</p>
+      <p>안내 데스크의 해설 메모 내용은 나중에 <b>‘${mn.room}’</b> 전시실 문제에서도 다시 쓰입니다.</p>
+      <p>특히 <b>${mn.para}</b>를 꼼꼼하게 읽고 기억해 두세요.</p>
       <div class="row"><button class="btn primary" id="bAck">확인했습니다</button></div></div>
       <span class="mdet"><img src="${imgUrl(det('think'))}" alt="" onerror="this.parentNode.remove()"></span></div></div>`;
     $('#bAck').onclick=()=>{S.memoAck=true;save();ov.innerHTML=''};}
@@ -312,24 +313,36 @@ function vClue(){
 function openNotebook(){
   const c=C(),el=elimSet(),hard=S.mode==='hard';
   const clues=[];S.solved.forEach((s,i)=>{if(s)clueFor(i).forEach(e=>clues.push(e))});
-  const card=(s,i)=>`<button class="note ${S.crossed.includes(i)?'x':''}" data-s="${i}"><span class="nhead"><span class="nthumb">${imgTag(s.img,'',s.name)}</span><b>${s.name}<small>${s.role}</small></b></span>
+  const card=(s,i)=>`<button class="note nbcard ${S.crossed.includes(i)?'x':''}" data-s="${i}" aria-pressed="${S.crossed.includes(i)}"><div class="ntext"><span class="nport"><img src="${imgUrl(s.img)}" alt="${s.name}" onload="faceAlign(this)" onerror="this.remove()"></span><b>${s.name}<small>${s.role}</small></b>
     <p class="alibi"><em>알리바이</em>${s.notes[0]}</p>
-    ${hard?`<ul>${s.notes.slice(1).map(n=>`<li>${n}</li>`).join('')}</ul>`:`<div class="tchips">${[1,2,3].map(t=>`<span>${c.traitShort[t]}<b>${s.t[t]?'O':'X'}</b></span>`).join('')}</div>`}</button>`;
-  const draw=()=>{const el=elimSet();ov.innerHTML=`<div class="nb" id="nbBg"><div class="nb-in" role="dialog" aria-label="탐정 수첩">
-    <div class="row" style="justify-content:space-between"><h2>탐정 수첩</h2><button class="btn" id="nbX">닫기</button></div>
-    <section><h3>모은 증거 (${clues.length})</h3>${clues.length?`<ul class="cl" style="margin-top:8px">${clues.map(e=>`<li><b>${e.lbl}</b> · ${e.text}</li>`).join('')}</ul>`:'<p style="margin-top:8px">아직 증거가 없습니다. 전시실을 조사하세요.</p>'}</section>
-    <section><h3>용의자 조사 기록</h3><p style="font-size:.88rem;margin:6px 0 10px">알리바이와 특징을 증거와 맞춰 보고, 맞지 않는 사람을 눌러 지우세요. 다시 누르면 되살아납니다.</p>
-      <div class="notes">${c.suspects.map(card).join('')}</div></section>
-    ${hard?'<p style="font-size:.88rem;margin:-6px 0 0">하드 모드: 단서를 읽고 아닌 수법과 숨긴 곳을 직접 눌러 지우세요. 다시 누르면 되살아납니다.</p>':''}
-    <section><h3>수법 후보</h3><ul class="ml" style="margin-top:8px">${c.methods.map((m,i)=>hard?`<li><button class="mlb ${el.m.has(i)?'x':''}" data-k="xm" data-i="${i}">${m.name}</button></li>`:`<li class="${el.m.has(i)?'x':''}">${m.name}</li>`).join('')}</ul></section>
-    <section><h3>그림을 숨긴 곳 후보</h3><ul class="ml" style="margin-top:8px">${c.places.map((m,i)=>hard?`<li><button class="mlb ${el.p.has(i)?'x':''}" data-k="xp" data-i="${i}">${m.name}</button></li>`:`<li class="${el.p.has(i)?'x':''}">${m.name}</li>`).join('')}</ul></section>
-    <section><h3>자료실</h3><details style="margin-top:8px"><summary>${c.quiz.title}</summary><div class="memo">${memoHtml(c.quiz)}</div></details></section>
-  </div></div>`;
-  $('#nbX').onclick=()=>ov.innerHTML='';
-  $('#nbBg').onclick=e=>{if(e.target.id==='nbBg')ov.innerHTML=''};
-  document.querySelectorAll('.mlb').forEach(b=>b.onclick=()=>{const k=b.dataset.k,i=+b.dataset.i;S[k]=S[k]||[];S[k]=S[k].includes(i)?S[k].filter(x=>x!==i):[...S[k],i];save();const sc=$('.nb-in').scrollTop;draw();$('.nb-in').scrollTop=sc});
-  document.querySelectorAll('.note[data-s]').forEach(tr=>tr.onclick=()=>{const i=+tr.dataset.s;S.crossed=S.crossed.includes(i)?S.crossed.filter(x=>x!==i):[...S.crossed,i];save();const sc=$('.nb-in').scrollTop;draw();$('.nb-in').scrollTop=sc});
-  };draw();
+    ${hard?`<ul>${s.notes.slice(1).map(n=>`<li>${n}</li>`).join('')}</ul>`:`<div class="tchips">${[1,2,3].map(t=>`<span>${c.traitShort[t]}<b>${s.t[t]?'O':'X'}</b></span>`).join('')}</div>`}</div>
+    <span class="nstrike" aria-hidden="true"><i></i><b>제외</b></span></button>`;
+  const tab=()=>S.nbTab||'clue';
+  const TABS=[['clue',`증거 <b>${clues.length}</b>`],['sus','용의자'],['mp','수법 · 숨긴 곳'],['lib','자료실']];
+  let shown=false;
+  const close=()=>{const n=$('#nbBg');if(!n||n.classList.contains('out'))return;n.classList.add('out');document.removeEventListener('keydown',esc);setTimeout(()=>{if($('#nbBg')===n)ov.innerHTML=''},280)};
+  const esc=e=>{if(e.key==='Escape')close()};
+  const draw=()=>{const el=elimSet(),t=tab();
+    const body=t==='clue'?(clues.length?`<ol class="cl nbcl">${clues.map(e=>`<li><span class="lbl">${e.lbl}</span>${e.text}</li>`).join('')}</ol>`:'<p class="nbempty">아직 증거가 없습니다. 전시실을 조사하세요.</p>')
+      :t==='sus'?`<p class="nbtip">알리바이와 특징을 증거와 맞춰 보고, 맞지 않는 사람을 눌러 지우세요. 다시 누르면 되살아납니다.</p><div class="notes nbgrid">${c.suspects.map(card).join('')}</div>`
+      :t==='mp'?`${hard?'<p class="nbtip">단서를 읽고 아닌 수법과 숨긴 곳을 직접 눌러 지우세요. 다시 누르면 되살아납니다.</p>':''}<div class="nbmp"><section><h3>수법 후보</h3><ul class="ml">${c.methods.map((m,i)=>hard?`<li><button class="mlb ${el.m.has(i)?'x':''}" data-k="xm" data-i="${i}">${m.name}</button></li>`:`<li class="${el.m.has(i)?'x':''}">${m.name}</li>`).join('')}</ul></section>
+        <section><h3>${josa(c.thing||'그림','을','를')} 숨긴 곳 후보</h3><ul class="ml">${c.places.map((m,i)=>hard?`<li><button class="mlb ${el.p.has(i)?'x':''}" data-k="xp" data-i="${i}">${m.name}</button></li>`:`<li class="${el.p.has(i)?'x':''}">${m.name}</li>`).join('')}</ul></section></div>`
+      :`<div class="memo nbmemo">${memoHtml(c.quiz)}</div>`;
+    ov.innerHTML=`<div class="nb2 ${shown?'':'in'}" id="nbBg"><div class="nbook" role="dialog" aria-label="탐정 수첩">
+      <div class="nbcover" id="nbGrip"><span class="nbstrap"></span><h2>탐정 수첩</h2><span class="nbcase">${c.title}</span><button class="btn nbx" id="nbX" aria-label="수첩 넣기">수첩 넣기 ▼</button></div>
+      <div class="nbtabs" role="tablist">${TABS.map(([k,l])=>`<button role="tab" class="nbtab ${t===k?'on':''}" aria-selected="${t===k}" data-t="${k}">${l}</button>`).join('')}</div>
+      <div class="nbpage" id="nbPage">${body}</div></div></div>`;
+    shown=true;
+    $('#nbX').onclick=close;
+    $('#nbBg').onclick=e=>{if(e.target.id==='nbBg')close()};
+    document.querySelectorAll('.nbtab').forEach(b=>b.onclick=()=>{S.nbTab=b.dataset.t;save();draw()});
+    /* 수첩 윗부분을 아래로 밀면 넣기 */
+    const grip=$('#nbGrip');let y0=null;grip.onpointerdown=e=>{if(e.target.closest('button'))return;y0=e.clientY};grip.onpointerup=e=>{if(y0!=null&&e.clientY-y0>60)close();y0=null};
+    const keep=()=>{const p=$('#nbPage');return p?p.scrollTop:0},restore=v=>{const p=$('#nbPage');if(p)p.scrollTop=v};
+    document.querySelectorAll('.mlb').forEach(b=>b.onclick=()=>{const k=b.dataset.k,i=+b.dataset.i;S[k]=S[k]||[];S[k]=S[k].includes(i)?S[k].filter(x=>x!==i):[...S[k],i];save();const sc=keep();draw();restore(sc)});
+    document.querySelectorAll('.note[data-s]').forEach(tr=>tr.onclick=()=>{const i=+tr.dataset.s;S.crossed=S.crossed.includes(i)?S.crossed.filter(x=>x!==i):[...S.crossed,i];save();const sc=keep();draw();restore(sc)});
+  };
+  S.nbTab='sus';document.addEventListener('keydown',esc);draw();
 }
 
 /* ============ 수장고 ============ */
@@ -340,7 +353,7 @@ function vVault(){
   <div class="scene" style="margin-top:14px">${c.vault.map((l,i)=>`<p class="${i?'quote':''}">${l}</p>`).join('')}</div>
   <div class="pick"><h3 style="font-size:1.25rem;margin-top:16px">범인</h3><div class="pgrid" id="gS">${c.suspects.map((s,i)=>`<button class="pbtn ${S.crossed.includes(i)?'dim':''}" data-v="${i}"><span class="pthumb">${imgTag(s.img,'',s.name)}</span><span>${s.name}<small>${s.role}</small></span></button>`).join('')}</div></div>
   <div class="pick"><h3 style="font-size:1.25rem;margin-top:10px">수법</h3><div class="pgrid" id="gM">${c.methods.map((m,i)=>`<button class="pbtn ${el.m.has(i)?'dim':''}" data-v="${i}">${m.name}</button>`).join('')}</div></div>
-  <div class="pick"><h3 style="font-size:1.25rem;margin-top:10px">그림을 숨긴 곳</h3><div class="pgrid" id="gP">${c.places.map((m,i)=>`<button class="pbtn ${el.p.has(i)?'dim':''}" data-v="${i}">${m.name}</button>`).join('')}</div></div>
+  <div class="pick"><h3 style="font-size:1.25rem;margin-top:10px">${josa(c.thing||'그림','을','를')} 숨긴 곳</h3><div class="pgrid" id="gP">${c.places.map((m,i)=>`<button class="pbtn ${el.p.has(i)?'dim':''}" data-v="${i}">${m.name}</button>`).join('')}</div></div>
   <p class="msg" id="vm" style="margin-top:16px"></p>
   <div class="row" style="margin-top:8px"><button class="btn primary" id="bAcc" disabled>지목하기</button><button class="btn" id="bNb3">탐정 수첩 확인</button></div>`;
   const bind=(id,k)=>document.querySelectorAll(`#${id} .pbtn`).forEach(b=>b.onclick=()=>{document.querySelectorAll(`#${id} .pbtn`).forEach(x=>x.classList.remove('on'));b.classList.add('on');pick[k]=+b.dataset.v;$('#bAcc').disabled=pick.s==null||pick.m==null||pick.p==null});
@@ -361,31 +374,36 @@ function vResult(){
   const mins=Math.round(S.elapsed/60);
   const score=mins+S.hints*2+S.wrong*5;
   const rank=score<=md.gold?'골드':score<=md.silver?'실버':'브론즈';
-  const code=`${S.caseId==='k'?'K':'M'}${S.mode==='hard'?'H':'N'}${rank==='골드'?'G':rank==='실버'?'S':'B'}-${String(mins).padStart(2,'0')}${S.hints}${S.wrong}-${((S.elapsed*7+S.hints*13+S.culprit*31)%900+100)}`;
-  const pref=getPref();pref.done=pref.done||{};pref.done[S.caseId]=`${md.label} ${rank} 탐정`;setPref({done:pref.done});
-  const other=S.caseId==='k'?'m':'k';
+  const code=`${S.caseId.toUpperCase()}${S.mode==='hard'?'H':'N'}${rank==='골드'?'G':rank==='실버'?'S':'B'}-${String(mins).padStart(2,'0')}${S.hints}${S.wrong}-${((S.elapsed*7+S.hints*13+S.culprit*31)%900+100)}`;
+  const pref=getPref();pref.done=pref.done||{};pref.done[S.caseId]=`${md.label} ${rank} 탐정`;
+  const rec=(pref.recovered||[]).filter(x=>CASES[x]);if(!rec.includes(S.caseId))rec.push(S.caseId);setPref({done:pref.done,recovered:rec});
+  const nth=rec.indexOf(S.caseId)+1,left=CASE_ORDER.filter(x=>!rec.includes(x)),all=!left.length;
+  const NTH=['첫','두','세','네'][nth-1]||nth;
   const artName=c.art.replace(/」$/,''),artJ=c.art+pt(artName,'을','를');
   const d=new Date(),today=`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
-  app.innerHTML=`<div class="stagebox win" style="background-image:url('${imgUrl(IMAGES[S.caseId].win)}')"><div class="winname"><small>찾았어요!</small><b>${S.cls?S.cls+' ':''}${S.name} 탐정</b><span>${today} · ${c.title} 해결</span></div></div>
+  app.innerHTML=`${all?`<div class="complete"><b>미션 완벽 컴플리트!</b><span>사라진 걸작 네 점을 모두 되찾았습니다. 정말 훌륭한 탐정이에요!</span></div>`:`<div class="nthbar"><b>${NTH} 번째 걸작을 되찾았습니다!</b><span>남은 사건 ${left.length}개</span></div>`}
+  <div class="stagebox win" style="background-image:url('${imgUrl(IMAGES[S.caseId].win)}')"><div class="winname"><small>찾았어요!</small><b>${S.cls?S.cls+' ':''}${S.name} 탐정</b><span>${today} · ${c.title} 해결</span></div></div>
   <div class="confess has-img"><img class="cimg2" src="${imgUrl(s.confess||s.img)}" alt="${s.name}" onerror="this.src='${imgUrl(s.img)}'"><div class="ctext">
     <p class="eyebrow">사건 해결</p>
     <p class="big">범인은 ${s.role} ${s.name}!</p>
     <p class="quote" style="font-size:1.15rem">${s.motive}</p>
-    <p>${josa(s.name,'은','는')} <b>${c.methods[S.method].name}</b> 방법으로 그림을 빼돌려 <b>${c.places[S.place].name}</b>에 숨겼습니다. ${c.art}${S.caseId==='k'?'은':'는'} 무사히 제자리로 돌아왔습니다.</p>
+    <p>${josa(s.name,'은','는')} <b>${c.methods[S.method].name}</b> 방법으로 ${josa(c.thing||'그림','을','를')} 빼돌려 <b>${c.places[S.place].name}</b>에 숨겼습니다. ${c.art}${pt(artName,'은','는')} 무사히 제자리로 돌아왔습니다.</p>
   </div></div>
   <div class="cert2" style="background-image:url('${imgUrl(IMAGES.common.cert)}')"><div class="cin">
     <p class="ct">감 사 장</p>
     ${S.cls?`<p class="ccls">${S.cls}</p>`:''}<p class="cname">${S.name} <small>탐정</small></p>
-    <p class="cbody">위 탐정은 「${c.title}」 사건을 날카로운 관찰력과 끈기 있는 추리로 해결하여 ${artJ} 무사히 되찾아 주었습니다. 이에 그 공을 기리며 감사의 마음을 담아 이 감사장을 드립니다.</p>
-    <p class="crank">${md.label} · ${rank} 탐정</p>
+    <p class="cbody">위 탐정은 「${c.title}」 사건을 날카로운 관찰력과 끈기 있는 추리로 해결하여 ${artJ} 무사히 되찾아 주었습니다. ${all?'이로써 사라진 걸작 네 점을 모두 되찾았습니다.':`이로써 ${NTH} 번째 걸작을 되찾았습니다.`} 그 공을 기리며 이 감사장을 드립니다.</p>
+    <div class="cgal">${rec.map(x=>`<figure class="${x===S.caseId?'now':''}"><img src="${imgUrl(CASE_ART[x].img)}" alt="${CASE_ART[x].name}"><figcaption>${CASE_ART[x].name}</figcaption></figure>`).join('')}${left.map(()=>'<figure class="empty"><span>?</span><figcaption>아직 못 찾음</figcaption></figure>').join('')}</div>
+    <p class="crank">${all?'미션 완벽 컴플리트 · 명예 탐정':`${md.label} · ${rank} 탐정`}</p>
     <p class="cdate">${today}</p>
     <p class="csign">${c.venue}장<span class="seal">${c.venue.slice(0,2)}<br>${c.venue.slice(2,4)}</span></p>
   </div></div>
   <div class="certinfo"><dl><dt>걸린 시간</dt><dd>${fmt(S.elapsed)}</dd><dt>사용한 힌트</dt><dd>${S.hints}번</dd><dt>잘못 지목</dt><dd>${S.wrong}번</dd></dl>
     <div><p style="font-size:.85rem">선생님께 보여 드릴 완료 코드</p><div class="code">${code}</div></div></div>
   <section class="real" style="margin-top:26px"><p class="eyebrow">진짜 이야기</p><h3 style="font-size:1.5rem">${c.real.title}</h3>${imgTag(IMAGES[S.caseId].real,"realimg",c.real.title)}${c.real.text.map(t=>`<p>${t}</p>`).join('')}</section>
-  <div class="row" style="margin-top:26px"><button class="btn primary" id="bOther">다음 사건: ${CASES[other].title}</button><button class="btn" id="bHome">처음 화면으로</button></div>`;
-  $('#bOther').onclick=()=>newGame(other,S.name,'hard',S.cls);
+  <section class="nextpick">${all?`<h3>모든 사건을 해결했습니다</h3><p class="muted">처음 화면에서 다시 도전하면 범인과 문제가 새로 바뀌어요.</p>`:`<h3>다음으론 어떤 사건을 해결하시겠어요?</h3><div class="cases">${left.map(id=>`<button class="case-card plate" data-c="${id}"><div class="cc"><span class="eyebrow">사건 ${CASE_ORDER.indexOf(id)+1} · ${CASE_LABEL[id]} · 난이도 ${'★'.repeat(CASE_LEVEL[id])}${'☆'.repeat(4-CASE_LEVEL[id])}</span><h3>${CASES[id].title}</h3><span class="csub">${CASES[id].sub}</span></div></button>`).join('')}</div>`}
+  <div class="row" style="margin-top:18px"><button class="btn" id="bHome">처음 화면으로</button></div></section>`;
+  document.querySelectorAll('.nextpick .case-card').forEach(b=>b.onclick=()=>newGame(b.dataset.c,S.name,'hard',S.cls));
   $('#bHome').onclick=vTitle;
 }
 
@@ -438,13 +456,13 @@ function openAdmin(){
       <p class="muted adm-note">수장고로 가면 다섯 전시실의 증거를 모두 받은 상태가 됩니다.</p>
       <h3 class="adm-h">이번 게임의 정답</h3>
       <div class="ans"><p><b>범인</b> ${c.suspects[S.culprit].role} ${c.suspects[S.culprit].name}</p><p><b>수법</b> ${c.methods[S.method].name}</p><p><b>숨긴 곳</b> ${c.places[S.place].name}</p></div>
-      <div class="row" style="margin-top:10px">${cur==='room'&&!S.solved[rm]?'<button class="btn" id="aSkip">이 방 풀린 것으로 하기</button>':''}<button class="btn ghost" id="aReset">게임 지우고 처음으로</button></div>`;
+      <div class="row" style="margin-top:10px">${cur==='room'&&!S.solved[rm]?'<button class="btn" id="aSkip">이 방 풀린 것으로 하기</button>':''}<button class="btn ghost" id="aReset">게임과 되찾은 걸작 기록 모두 지우기</button></div>`;
     document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const [scr,i]=b.dataset.go.split(':');close();
       if(scr==='room')go('room',+i);
       else if(scr==='vault'){S.solved=S.solved.map(()=>true);save();go('vault')}
       else go(scr)});
     const sk=$('#aSkip');if(sk)sk.onclick=()=>{S.solved[rm]=true;save();close();go('clue',rm)};
-    $('#aReset').onclick=()=>{try{localStorage.removeItem(SAVE)}catch(e){}close();vTitle()};
+    $('#aReset').onclick=()=>{try{localStorage.removeItem(SAVE)}catch(e){}setPref({recovered:[],done:{}});close();vTitle()};
   };
 }
 
@@ -585,16 +603,16 @@ quiz(el,done){
     return `${qi+1}번 문제의 근거는 메모에서 노란색으로 표시한 문장에 있어요. 선택지를 하나씩 그 문장과 비교해 보세요.`}};
 },
 tiles(el,done){
-  const N=M().tiles,T=N*N;
+  const [NC,NR]=TILE_GRID[S.caseId]||[M().tiles,M().tiles],T=NC*NR;
   const cv=document.createElement('canvas');cv.width=cv.height=600;
   if(S.caseId==='k')drawKlimt(cv.getContext('2d'),600,600,7);else drawMongPuzzle(cv.getContext('2d'),600,600,11);
   let url=cv.toDataURL('image/jpeg',.85);
   let order;do{order=shuffle([...Array(T).keys()])}while(order.filter((v,i)=>v===i).length>1);
   let sel=null,fin=false;
-  el.innerHTML=`<div class="row" style="justify-content:space-between"><p class="tip">두 조각을 차례로 누르면 서로 자리가 바뀝니다. ${T}조각을 모두 제자리에 맞추세요.</p><span class="chip" id="tc"></span></div><div class="boardwrap" style="--board:url('${imgUrl(IMAGES[S.caseId].board)}')"><div class="tiles" id="tg" style="grid-template-columns:repeat(${N},1fr)"></div></div><div id="pv"></div>`;
+  el.innerHTML=`<div class="row" style="justify-content:space-between"><p class="tip">두 조각을 차례로 누르면 서로 자리가 바뀝니다. ${T}조각을 모두 제자리에 맞추세요.</p><span class="chip" id="tc"></span></div><div class="boardwrap" style="--board:url('${imgUrl(IMAGES[S.caseId].board)}')"><div class="tiles" id="tg" style="grid-template-columns:repeat(${NC},1fr);grid-template-rows:repeat(${NR},1fr)"></div></div><div id="pv"></div>`;
   const tg=$('#tg');tg.innerHTML='<p class="tip" style="grid-column:1/-1;align-self:center;text-align:center">그림 조각을 준비하는 중…</p>';
   const paint=()=>{const ok=order.filter((v,i)=>v===i).length;$('#tc').textContent=`제자리 ${ok}/${T}`;
-    tg.innerHTML=order.map((p,i)=>`<button class="tile ${sel===i?'sel':''}" data-i="${i}" aria-label="조각 ${i+1}" style="background-image:url(${url});background-size:${N*100}% ${N*100}%;background-position:${(p%N)/(N-1)*100}% ${Math.floor(p/N)/(N-1)*100}%"></button>`).join('');
+    tg.innerHTML=order.map((p,i)=>`<button class="tile ${sel===i?'sel':''}" data-i="${i}" aria-label="조각 ${i+1}" style="background-image:url(${url});background-size:${NC*100}% ${NR*100}%;background-position:${(p%NC)/(NC-1)*100}% ${Math.floor(p/NC)/(NR-1)*100}%"></button>`).join('');
     tg.querySelectorAll('.tile').forEach(t=>t.onclick=()=>{if(fin)return;const i=+t.dataset.i;if(sel==null){sel=i}else if(sel===i){sel=null}else{[order[sel],order[i]]=[order[i],order[sel]];sel=null;
       if(order.every((v,k)=>v===k)){fin=true;tg.classList.add('solved');paint();done();return}}paint()})};
   loadImg(IMAGES[S.caseId].puzzle).then(im=>{if(im){const c2=document.createElement('canvas');c2.width=c2.height=600;drawCover(c2.getContext('2d'),im,600,600);url=c2.toDataURL('image/jpeg',.85)}if(document.body.contains(tg))paint()});
