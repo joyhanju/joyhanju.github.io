@@ -1146,3 +1146,19 @@ body.splash .keyart{width:min(100%,calc((100vh - 24px)*16/9));margin:0 auto;max-
 .nbbtn:hover{background:#8d5630!important;transform:translateY(-1px)}
 .nbbtn:active{transform:translateY(2px);box-shadow:0 1px 0 #4a2a12,0 0 0 2px #7b4a28}
 .nbbtn svg{flex:0 0 auto}
+
+/* 감사장: 되찾은 작품 줄이 들어가도 글자가 액자 안에 들어오도록 크기·간격을 줄임 */
+.cin{inset:11% 15% 10%;gap:.75cqw}
+.ct{font-size:4.6cqw}
+.ccls{font-size:2.1cqw;margin:0}
+.cname{font-size:3.8cqw;padding:0 3cqw .4cqw}
+.cname small{font-size:2.2cqw}
+.cbody{font-size:1.95cqw;line-height:1.55;max-width:62cqw}
+.cgal{gap:1.4cqw;margin:.2cqw 0}
+.cgal img{height:6.6cqw}
+.cgal .empty span{height:6.6cqw;width:5.4cqw;font-size:2.4cqw}
+.cgal figcaption{font-size:1.15cqw}
+.crank{font-size:2.8cqw}
+.cdate{font-size:1.8cqw}
+.csign{font-size:2.4cqw}
+.seal{width:5.6cqw;height:5.6cqw;font-size:1.6cqw}
