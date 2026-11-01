@@ -14,6 +14,8 @@
   - 게임이 아닌 손으로 하는 수업은 url 대신 offline 칸에 ["제목", "안내 문구"]를 넣으면 준비물 안내 상자가 나와요.
   - 질문하고 이야기 나누는 수업(물음표 시리즈)은 type: "question"을 넣으면 컴퓨터 화면에서 '생각하는 수업' 줄에 나와요.
   - 수업 없이 학생들이 혼자서 바로 할 수 있는 게임은 type: "self"를 넣으면 '학생이 여는 게임' 줄에 나와요.
+  - hook 칸에는 목록 카드에 보일 '질문 한 줄'을 넣어요. 무슨 수업인지 궁금해지게 쓰면 좋아요. 비워 두면 subtitle이 대신 나와요.
+  - 목록의 '중학교 · 고등학교' 거르기는 facts의 '대상' 칸을 보고 정해져요. (중 → 중학교, 고 → 고등학교)
 */
 window.GAMES = [
   {
@@ -22,6 +24,7 @@ window.GAMES = [
     sort: "2026-10-99",
     title: "너도 앨리스라고?",
     subtitle: "『이상한 나라의 앨리스』를 읽고, 당연하게 여기던 앨리스를 나만의 해석으로 다시 그리는 일러스트 수업",
+    hook: "아무도 말해 준 적 없는데, 왜 모두 같은 앨리스를 떠올릴까요?",
     images: [
       ["img/you-too-alice-title.jpg", ""],
       ["img/you-too-alice-works.jpg", "학생 예시 작품 · 모두 다른 앨리스"]
@@ -69,6 +72,7 @@ window.GAMES = [
     sort: "2026-10-95",
     title: "이것도 미술이에요?",
     subtitle: "현대미술 작가 여덟 명의 작품을 여덟 개의 질문으로 만나는 감상 수업",
+    hook: "“샘, 이것도 미술이에요?” 학생들의 그 질문에서 시작해요.",
     images: [
       ["img/this-is-art-title.jpg", ""],
       ["img/this-is-art-detail.jpg", "수업 PPT · 이건 무엇으로 만들었을까요?"]
@@ -116,6 +120,7 @@ window.GAMES = [
     sort: "2026-10-9",
     title: "그림 한 장을 한 시간 본다고?",
     subtitle: "김홍도 〈씨름〉 한 점을 45분 동안 깊이 보며 숨은 이야기를 찾는 감상 수업",
+    hook: "김홍도 〈씨름〉에서 손이 바뀐 사람은 실수일까요, 장난일까요?",
     images: [
       ["img/ssireum-title.jpg", ""],
       ["img/ssireum-detail.jpg", "수업 PPT · 두 선수는 어떤 사람일까?"]
@@ -162,6 +167,7 @@ window.GAMES = [
     release: "2026-11",
     title: "사라진 걸작을 찾아라",
     subtitle: "사라진 작품을 찾아 전시실 다섯 곳의 수수께끼를 푸는 미술 추리 게임",
+    hook: "용의자 여섯 명 가운데 작품을 훔친 사람은 누구일까요?",
     images: [
       ["img/lost-masterpiece-start.jpg", ""],
       ["img/lost-masterpiece-game.jpg", "게임 화면 · 용의자 여섯 명과 미술관 평면도"]
@@ -201,6 +207,7 @@ window.GAMES = [
     release: "2026-10",
     title: "Korea Treasure Trip",
     subtitle: "우리 미술 문화유산을 사 모으며 한국 미술사를 익히는 부루마블 보드게임",
+    hook: "갓, 첨성대, 달항아리 말을 굴려 우리 문화유산 25점을 모아요.",
     images: [
       ["img/korea-treasure-trip-start.jpg", ""],
       ["img/korea-treasure-trip-game.jpg", "게임 화면 · 호랑이 보자기가 부채로 차례를 알려 줘요"]
@@ -235,6 +242,7 @@ window.GAMES = [
     release: "2026-09",
     title: "Where Lines Meet",
     subtitle: "소실점을 찾아 깊이 · 지평선 · 1점 · 2점 · 3점 투시를 배우는 원근법 게임",
+    hook: "소실점을 도둑맞자 세상이 종이처럼 납작해졌어요.",
     images: [
       ["img/where-lines-meet-start.jpg", ""],
       ["img/where-lines-meet-game.jpg", "게임 화면 · 가로수길에서 소실점과 지평선 찾기"]
@@ -274,6 +282,7 @@ window.GAMES = [
     release: "2026-07",
     title: "아트타임 어드벤처 1",
     subtitle: "시대별로 6명의 중요한 화가를 만나 문제를 푸는 서양 미술사 게임",
+    hook: "미술실 액자를 지나 다 빈치부터 뒤샹까지 여섯 화가를 만나요.",
     images: [
       ["img/art-time-adventure1-start.jpg", ""],
       ["img/art-time-adventure1-monet.jpg", "게임 화면 · 모네를 만나는 장면"]
@@ -312,6 +321,7 @@ window.GAMES = [
     release: "2026-08",
     title: "색채의 연금술사",
     subtitle: "물감을 만들고 스테인드글라스를 칠하는 조색 게임",
+    hook: "주문받은 색, 물감을 섞어서 정확히 만들어 낼 수 있을까요?",
     images: [
       ["img/color-alchemist-start.jpg", ""],
       ["img/color-alchemist-play.jpg", "게임 화면 · 물감 섞기"]
@@ -350,6 +360,7 @@ window.GAMES = [
     sort: "2026-08-6",
     title: "그린박스 프로젝트",
     subtitle: "2100년, 더 이상 세상에 없는 물건을 전시하는 박물관 만들기",
+    hook: "2100년 사람들이 매미 소리를 한 번도 들어 본 적이 없다면?",
     images: [
       ["img/green-box-project-title.jpg", ""],
       ["img/green-box-project-works.jpg", "작품 예시"]
@@ -396,6 +407,7 @@ window.GAMES = [
     sort: "2026-08-5",
     title: "핑크박스 프로젝트",
     subtitle: "같은 핑크 상자에 상상의 물건을 담는 패키지 디자인",
+    hook: "지식을 주사하는 주사기는 어떤 상자에 담겨 팔릴까요?",
     images: [
       ["img/pink-box-project-title.jpg", ""],
       ["img/pink-box-project-works.jpg", "완성 작품 예시"]
@@ -440,6 +452,7 @@ window.GAMES = [
     sort: "2026-08",
     title: "블랙박스 프로젝트",
     subtitle: "검은 사각형 4개로 단어의 느낌 표현하기",
+    hook: "검은 사각형 4개만으로 ‘긴장’을 그릴 수 있을까요?",
     images: [
       ["img/black-box-project-title.jpg", ""],
       ["img/black-box-project-worksheet.jpg", "활동지 작성 예시"]
