@@ -2570,7 +2570,8 @@ function startWindow(i){
   if(WINDOWS[i].id==='4-1'&&!S.blackDemoDone){setTimeout(blackDemoAuto,700);}
   if(WINDOWS[i].id==='6-1'&&!S.goldGift){setTimeout(goldGiftAuto,700);}
 }
-var TEACHER_PW='0614';
+/* 관리자 비밀번호는 원문 대신 해시로만 비교 */
+function pinOk(v){try{var e=new TextEncoder();return crypto.subtle.importKey('raw',e.encode(String(v||'').trim()),'PBKDF2',false,['deriveBits']).then(function(k){return crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode('joyhanju-admin-v1'),iterations:200000,hash:'SHA-256'},k,256)}).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return ('0'+x.toString(16)).slice(-2)}).join('')==='fa5b21dcecc9a397084c2f7404b949f8ae85554359a29695909a23c5b0b0d3f4'}).catch(function(){return false})}catch(x){return Promise.resolve(false)}}
 function teacherPwModal(){
   return '<button class="btn x" data-act="closeModal">닫기</button><h2>교사 메뉴</h2>'+
     '<p>비밀번호를 입력해 주세요.</p>'+
@@ -2782,8 +2783,10 @@ function act(name,el){
     case 'teacher': S.modal='teacher'; openModal(S.teacherOK?teacherMenu():teacherPwModal()); if(!S.teacherOK){var ip=$('#tPw'); if(ip){ip.focus();}} break;
     case 'teacherPw':
       var tp=$('#tPw');
-      if(tp&&tp.value===TEACHER_PW){S.teacherOK=true; S.modal='teacher'; openModal(teacherMenu());}
+      pinOk(tp&&tp.value).then(function(ok){
+      if(ok){S.teacherOK=true; S.modal='teacher'; openModal(teacherMenu());}
       else{var te=$('#tPwErr'); if(te){te.textContent='비밀번호가 맞지 않아요.';} if(tp){tp.value=''; tp.focus();}}
+      });
       break;
     case 'teacherGo': teacherGo(parseInt(el.dataset.i,10),el.dataset.mode==='paint'); break;
     case 'specialAsk':
@@ -2795,11 +2798,13 @@ function act(name,el){
       break;
     case 'specialPw':
       var sp=$('#sPw');
-      if(sp&&sp.value===TEACHER_PW){
+      pinOk(sp&&sp.value).then(function(ok){
+      if(ok){
         var sidx=WINDOWS.findIndex(function(x){return x.special;});
-        if(sidx<0){closeModal(); break;}
+        if(sidx<0){closeModal(); return;}
         closeModal(); act('start',{dataset:{win:WINDOWS[sidx].id}});
       }else{var spe=$('#sPwErr'); if(spe){spe.textContent='비밀번호가 맞지 않아요.';} if(sp){sp.value=''; sp.focus();}}
+      });
       break;
     case 'hero': S.hero=el.dataset.h==='boy'?'boy':'girl'; try{localStorage.setItem('cc_hero',S.hero);}catch(e){} toneApply(); mountStart(); break;
     case 'dogam': S.modal='dogam'; openModal(dogamModal(),'wide'); break;

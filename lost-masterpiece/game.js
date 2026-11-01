@@ -213,7 +213,7 @@ function vTitle(){
   <div class="cases">
     ${CASE_ORDER.map((id,n)=>`<button class="case-card plate" data-c="${id}"><div class="cc"><span class="eyebrow">사건 ${n+1} · ${CASE_LABEL[id]} · 난이도 ${'★'.repeat(CASE_LEVEL[id])}${'☆'.repeat(4-CASE_LEVEL[id])}</span><h3>${CASES[id].title}</h3><span class="csub">${CASES[id].sub}</span>${done[id]?`<span class="done-tag">해결 완료 · ${done[id]}</span>`:''}</div></button>`).join('')}
   </div>
-  <div class="row" style="margin-top:28px"><button class="btn ghost" id="bBig">${pref.big?'글자 보통으로':'글자 크게 (전자칠판)'}</button><button class="btn ghost" id="bDark">${pref.dark?'밝은 화면으로':'어두운 화면으로'}</button><button class="btn ghost" id="bT2">선생님 안내</button></div>
+  <div class="row" style="margin-top:28px"><button class="btn ghost" id="bBig">${pref.big?'글자 보통으로':'글자 크게 (전자칠판)'}</button><button class="btn ghost" id="bDark">${pref.dark?'밝은 화면으로':'어두운 화면으로'}</button><button class="btn ghost" id="bT2">선생님 안내</button><button class="btn ghost" id="bWipe">기록 지우기 (다음 학생용)</button></div>
   </div>`;
   document.body.classList.toggle('splash',!splashDone);
   $('#bStart').onclick=()=>{splashDone=true;document.body.classList.remove('splash');$('#bStart').hidden=true;const su=$('#setup');su.hidden=false;su.classList.add('rise');requestAnimationFrame(()=>su.scrollIntoView({behavior:'smooth',block:'start'}))};
@@ -224,6 +224,8 @@ function vTitle(){
   $('#bBig').onclick=()=>{setPref({big:!getPref().big});applyScale();vTitle()};
   $('#bDark').onclick=()=>{setPref({dark:!getPref().dark});applyScale();vTitle()};
   $('#bT2').onclick=()=>openTeacher(true);
+  let wipeArm=false;$('#bWipe').onclick=()=>{const b=$('#bWipe');if(!wipeArm){wipeArm=true;b.textContent='한 번 더 누르면 진행 중인 게임과 되찾은 걸작 기록이 모두 지워져요';setTimeout(()=>{if(document.body.contains(b)){wipeArm=false;b.textContent='기록 지우기 (다음 학생용)'}},4000);return}
+    try{localStorage.removeItem(SAVE)}catch(e){}setPref({recovered:[],done:{}});vTitle()};
 }
 
 /* ============ 프롤로그 ============ */
@@ -263,7 +265,8 @@ function vMap(){
 
 /* ============ 전시실 ============ */
 const GEAR_SVG='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3h-4l-.4 2.9a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1L11 21h4l.4-2.9a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5A3.5 3.5 0 1 1 13 8.5a3.5 3.5 0 0 1 0 7z"/></svg>';
-const ADMIN_PIN='0614';
+/* 관리자 비밀번호는 원문 대신 해시로만 비교 (소스를 봐도 비밀번호가 보이지 않음) */
+function pinOk(v){try{const e=new TextEncoder();return crypto.subtle.importKey('raw',e.encode(String(v||'').trim()),'PBKDF2',false,['deriveBits']).then(k=>crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode('joyhanju-admin-v1'),iterations:200000,hash:'SHA-256'},k,256)).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')==='fa5b21dcecc9a397084c2f7404b949f8ae85554359a29695909a23c5b0b0d3f4').catch(()=>false)}catch(x){return Promise.resolve(false)}}
 function vRoom(){
   const c=C(),i=S.room,r=c.rooms[i],maxH=M().hints,admin=['tiles','spot','seal','cctv','escape','laser'].includes(r.type);
   app.innerHTML=`<div class="room-head"><p class="eyebrow">전시실 ${i+1}</p><h2>${r.name}</h2></div>
@@ -283,7 +286,7 @@ function vRoom(){
   if(admin){const adm=$('#adm');
     $('#bGear').onclick=()=>{adm.hidden=!adm.hidden;if(!adm.hidden)$('#admPin').focus()};
     $('#admX').onclick=()=>adm.hidden=true;
-    const tryPin=()=>{const m=$('#admMsg');if($('#admPin').value!==ADMIN_PIN){m.className='msg no';m.textContent='비밀번호가 맞지 않습니다.';return}
+    const tryPin=async()=>{const m=$('#admMsg');if(!(await pinOk($('#admPin').value))){m.className='msg no';m.textContent='비밀번호가 맞지 않습니다.';return}
       m.className='msg ok';m.textContent='퍼즐을 모두 풀었습니다.';if(PUZ&&PUZ.solve)PUZ.solve();setTimeout(()=>{if(document.body.contains(adm))adm.hidden=true},900)};
     $('#admOk').onclick=tryPin;$('#admPin').onkeydown=e=>{if(e.key==='Enter')tryPin()};}
   /* 몽유도원도 안내 데스크: 해설 메모를 기억하라는 안내 */
@@ -440,8 +443,8 @@ function openAdmin(){
   const close=()=>ov.innerHTML='';
   $('#aX').onclick=close;$('#aBg').onclick=e=>{if(e.target.id==='aBg')close()};
   setTimeout(()=>{const p=$('#aPin');if(p)p.focus()},50);
-  $('#aForm').onsubmit=e=>{e.preventDefault();
-    if($('#aPin').value.trim()!==ADMIN_PIN){$('#aBody').innerHTML='<p class="msg no">비밀번호가 맞지 않습니다.</p>';return}
+  $('#aForm').onsubmit=async e=>{e.preventDefault();
+    if(!(await pinOk($('#aPin').value))){$('#aBody').innerHTML='<p class="msg no">비밀번호가 맞지 않습니다.</p>';return}
     $('#aForm').hidden=true;
     const c=C(),cur=S.screen,rm=S.room;
     const btn=(id,label,on)=>`<button class="btn ${on?'primary':''}" data-go="${id}">${label}</button>`;
