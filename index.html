@@ -195,6 +195,7 @@ ul.tips li{margin-bottom:6px}
 .cols .facts{grid-template-columns:repeat(2,auto)}
 .cols .gbody{grid-template-columns:1fr}
 .cols .how{grid-template-columns:1fr}
+.fest-title{margin-top:36px;padding-top:24px;border-top:2px dashed rgba(0,0,0,.15)}
 @media (min-width:1240px){.wrap.wide{max-width:1440px}}
 
 @media (max-width:860px){
@@ -359,6 +360,7 @@ ul.tips li{margin-bottom:6px}
     +'</article>';
   }
   // 휴대폰: 한 줄로 이어서 · 컴퓨터: 손 · 선생님이 여는 게임 · 학생이 여는 게임 · 생각하는 수업 네 줄
+  var FEST_TITLE = '<h3 class="col-title fest-title"><img class="dot" src="img/dot-blue.png" alt="">백마페스티벌 부스용 게임<small>전자칠판용 · 멀티터치가 안 되면 키보드로 해요</small></h3>';
   var mq = window.matchMedia('(min-width:1240px)');
   var listScroll = 0;
   function render(){
@@ -378,16 +380,17 @@ ul.tips li{margin-bottom:6px}
     document.title = baseTitle;
     document.querySelector('.wrap').classList.toggle('wide', mq.matches);
     if(mq.matches){
-      var hand=[], play=[], self=[], ask=[];
-      games.forEach(function(g,i){ (g.type==='question'?ask:g.type==='self'?self:g.offline?hand:play).push(card(g,i)); });
+      var hand=[], play=[], self=[], ask=[], fest=[];
+      games.forEach(function(g,i){ (g.type==='festival'?fest:g.type==='question'?ask:g.type==='self'?self:g.offline?hand:play).push(card(g,i)); });
       list.innerHTML = '<div class="cols">'
         +'<div class="col"><h3 class="col-title"><img class="dot" src="img/dot-blue.png" alt="">손으로 하는 수업<small>직접 만들며 배우는 수업</small></h3>'+hand.join('')+'</div>'
         +'<div class="col"><h3 class="col-title"><img class="dot" src="img/dot-blue.png" alt="">선생님이 여는 게임<small>수업 속에서 함께 하는 게임</small></h3>'+play.join('')+'</div>'
-        +'<div class="col"><h3 class="col-title"><img class="dot" src="img/dot-blue.png" alt="">학생이 여는 게임<small>선생님 도움 없이 바로 시작해요</small></h3>'+self.join('')+'</div>'
+        +'<div class="col"><h3 class="col-title"><img class="dot" src="img/dot-blue.png" alt="">학생이 여는 게임<small>선생님 도움 없이 바로 시작해요</small></h3>'+self.join('')+(fest.length?FEST_TITLE+fest.join(''):'')+'</div>'
         +'<div class="col"><h3 class="col-title"><img class="dot" src="img/dot-blue.png" alt="">생각하는 수업<small>질문하고 이야기 나누는 수업</small></h3>'+ask.join('')+'</div>'
         +'</div>';
     } else {
-      list.innerHTML = games.map(card).join('');
+      var festShown = false;
+      list.innerHTML = games.map(function(g,i){ var h = (g.type==='festival' && !festShown) ? (festShown = true, FEST_TITLE) : ''; return h + card(g,i); }).join('');
     }
   }
   // 목록 카드에 마우스를 올리면 PPT 장면이 차례로 넘어가요 (떼면 첫 사진으로)
