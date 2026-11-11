@@ -230,7 +230,7 @@ function mkPlayer(i, cpu) {
   return { i, cpu, x: i ? 1100 : 500, v: 0, score: 0, disp: 0, hook: { st: 'idle', x: 0, y: HOOK_REST, catch: [], stun: 0 },
     turbo: 0, magnet: 0, net: false, press: 0, held: { l: 0, r: 0 }, pl: 0, pr: 0, eL: 0, eR: 0,
     ai: { t: 0.5, aim: null, mash: 0 }, moved: 0, tut: 0, letters: [0, 0, 0], li: 0, named: true, qual: false, flash: 0,
-    jy: 0, jv: 0, tangle: 0, yankCd: 0, lineCut: 0, fight: null };
+    jy: 0, jv: 0, tangle: 0, yankCd: 0, lineCut: 0, fight: null, bend: 0 };
 }
 function newWorld(si, empty) {
   world = { fish: [], parts: [], pops: [], inks: [], boss: null, tug: null, warn: 0, stage: si, shake: 0,
@@ -270,6 +270,8 @@ const BOAT_SRC = ["data:image/webp;base64,UklGRhamAABXRUJQVlA4WAoAAAAQAAAAGwIAFg
 const BOAT_IMG = BOAT_SRC.map(src => { const im = new Image(); im.src = src; return im; });
 const BOAT_W = 270, BOAT_WL = 0.85;
 const boatReady = i => BOAT_IMG[i].complete && BOAT_IMG[i].naturalWidth > 0;
+// 그림에서 쓰는 낚싯대 끝: 휘는 만큼 앞쪽 아래로 내려가고, 팽팽할 때 떨려요
+const drawTip = p => { const t = rodTip(p), b = p.bend || 0, dir = p.i ? -1 : 1, vib = b > 0.5 ? Math.sin(T * 47 + p.i) * 1.6 * b : 0; return { x: t.x - dir * 30 * b + vib, y: t.y + 52 * b + vib * 0.6 }; };
 const rodTip = p => ({ x: p.x + (p.i ? -112 : 112), y: SURF - 110 + bobOf(p) - p.jy });
 const bobOf = p => Math.sin(T * 2 + p.i * 1.7) * 3 + Math.sin(p.x * 0.02 + T * 2) * 2;
 const other = p => game.players[1 - p.i];
@@ -417,6 +419,13 @@ function updShark(p, dt) {
   const f = h.catch[0];
   if (f) { f.x = h.x - Math.sign(f.vx || 1) * 50; f.y = h.y + 34; }
 }
+const SCREAMS = ['으아악!', '살려줘~', '놔줘어!', '안 돼애!', '엄마아!', '히익!'];
+function scream(f, first) {
+  const d = FT[f.t]; if (d.trash || d.chest || d.haz) return;
+  if (!first && T - (f.scrT || -9) < 1.4) return;
+  f.scrT = T;
+  world.pops.push({ x: clamp(f.x + 46, 140, W - 140), y: f.y - 34, txt: pick(SCREAMS), col: '#ffffff', size: first ? 26 : 22, life: 0.9 });
+}
 function hitFish(f, x, y, pad) {
   const d = FT[f.t]; pad = pad || 10;
   return Math.abs(f.x - x) < d.len * 0.5 + pad && Math.abs(f.y - y) < d.ht * 0.5 + pad;
@@ -445,7 +454,7 @@ function hookCollide(p) {
       }
       pop(h.x, h.y - 30, '그물로 ' + h.catch.length + '마리!', '#ffe27a', 28);
     }
-    if (!(game.demo)) sfx('hook');
+    if (!game.demo) { sfx('hook'); scream(f, true); }
     bubbleBurst(h.x, h.y, 6);
     return;
   }
@@ -468,6 +477,11 @@ function land(p, silent) {
 }
 function updHook(p, dt) {
   const h = p.hook, tip = rodTip(p);
+  // 물고기가 걸리면 낚싯대가 무게만큼 휘어요 (상어·대왕 잉어는 끝까지)
+  let tb = 0;
+  if (h.st === 'shark' || h.st === 'tug') tb = 1;
+  else if (h.st === 'up' && h.catch.length) tb = clamp(0.35 + h.catch.reduce((a, f) => a + (FT[f.t].w || 1), 0) * 0.25, 0.45, 0.95);
+  p.bend += (tb - p.bend) * Math.min(1, dt * (tb > p.bend ? 9 : 4));
   if (h.st === 'tug') { const b = world.boss; if (b) { h.x = b.x + (p.i ? 40 : -40); h.y = b.y - 30; } return; }
   if (h.st === 'shark') { if (p.fight) updShark(p, dt); return; }
   if (p.lineCut > 0) { p.lineCut -= dt; h.x = tip.x; h.y = HOOK_REST - p.jy; return; }
@@ -485,6 +499,7 @@ function updHook(p, dt) {
       if (p.turbo > 0) spd *= 2;
       h.y -= spd * dt;
       if (Math.random() < dt * 8) world.parts.push({ k: 'bub', x: h.x + rand(-6, 6), y: h.y, vy: -rand(40, 80), r: rand(2, 4), life: 1.2 });
+      if (!game.demo && h.catch.length && Math.random() < dt * 1.2) scream(pick(h.catch));
       if (h.y <= HOOK_REST) land(p);
     }
   }
@@ -973,7 +988,9 @@ function drawFish(f) {
     if (f.t === 'jelly' && world.stage === 2) glow(f.x, f.y, 60, 'rgba(160,230,255,0.22)');
     const sy = ['jelly', 'puffer', 'octopus'].includes(f.t) ? 1 + Math.sin(T * (hooked ? 7 : 2.2) + f.ph) * 0.05 : 1;
     const hx = hooked && !rot ? Math.sin(T * 10 + f.ph) * 3 : 0;
-    drawSpr(sk, f.x + hx, f.y, SPR_W[sk], dir < 0, amp, rot, T * speed + f.ph * 3, sy);
+    const rj = hooked && rot && f.t !== 'shark' ? Math.sin(T * 16 + f.ph) * 0.14 : 0;
+    const key = hooked && sprReady(sk + '_hook') ? sk + '_hook' : sk;
+    drawSpr(key, f.x + hx, f.y, SPR_W[sk], dir < 0, amp, rot + rj, T * speed + f.ph * 3, sy);
     if (!f.hooked && (f.t === 'goldcarp' || f.t === 'chest') && game.state !== 'title') text(f.t === 'chest' ? '아이템' : '300', f.x, f.y - d.ht / 2 - 26, 20, '#fff6c8', FD, 'center', 'rgba(60,30,0,0.7)', 4);
     return;
   }
@@ -1091,7 +1108,7 @@ function drawBoss(b) {
 
 // ───────── 배와 낚싯줄 ─────────
 function drawLine(p) {
-  const tip = rodTip(p), h = p.hook;
+  const tip = drawTip(p), h = p.hook;
   if (p.lineCut > 0) {
     g.strokeStyle = 'rgba(255,255,255,0.8)'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(tip.x, tip.y);
     g.quadraticCurveTo(tip.x + 10, tip.y + 30, tip.x + Math.sin(T * 6) * 6, tip.y + 46); g.stroke();
@@ -1112,8 +1129,9 @@ function drawLine(p) {
     g.fillStyle = 'rgba(255,255,255,0.2)'; rr(bx, by, 140, 14, 7); g.fill();
     g.fillStyle = fg.hp > 0.6 ? '#7dffb0' : fg.hp > 0.35 ? '#ffd25e' : '#ff5b5b'; rr(bx, by, Math.max(4, 140 * fg.hp), 14, 7); g.fill();
   } else {
-  g.strokeStyle = 'rgba(255,255,255,0.8)'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(tip.x, tip.y);
-  g.quadraticCurveTo(tip.x + (h.x - tip.x) * 0.3, (tip.y + h.y) / 2, h.x, h.y - 10); g.stroke();
+  const b = p.bend || 0, sag = 1 - b;
+  g.strokeStyle = b > 0.4 ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.8)'; g.lineWidth = 1.6 + b * 0.8; g.beginPath(); g.moveTo(tip.x, tip.y);
+  g.quadraticCurveTo(tip.x + (h.x - tip.x) * (0.3 + 0.2 * b), (tip.y + h.y) / 2 + (h.y - tip.y) * 0.0 * sag, h.x, h.y - 10); g.stroke();
   }
   if (world.stage === 2) glow(h.x, h.y, 70, 'rgba(255,255,220,0.18)');
   if (p.magnet > 0 && h.st === 'down') { g.strokeStyle = 'rgba(120,220,255,' + (0.4 + 0.3 * Math.sin(T * 10)) + ')'; g.lineWidth = 3; g.beginPath(); g.arc(h.x, h.y, 40 + Math.sin(T * 8) * 6, 0, 7); g.stroke(); }
@@ -1143,9 +1161,12 @@ function drawBoat(p) {
       for (let k = 0; k < 7; k++) { const x0 = -110 + k * 36; g.beginPath(); g.moveTo(x0, 10); g.bezierCurveTo(x0 + 22, -30, x0 - 22, -70 + Math.sin(T * 8 + k) * 8, x0 + 12, -110); g.stroke(); }
       g.restore();
     }
-    const tip = rodTip(p), fx = p.x + dir * 22, fy = wy - 82;
-    g.strokeStyle = '#3a2614'; g.lineWidth = 5; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(fx - dir * 14, fy + 6); g.quadraticCurveTo((fx + tip.x) / 2, tip.y + 6, tip.x, tip.y); g.stroke();
+    const base = rodTip(p), tip = drawTip(p), fx = p.x + dir * 22, fy = wy - 82, b = p.bend || 0;
+    const sx = fx - dir * 14, sy = fy + 6;
+    const cx = (sx + base.x) / 2 + (base.x - dir * 6 - (sx + base.x) / 2) * b, cy = (base.y + 6) + (base.y - 22 - (base.y + 6)) * b;
+    g.lineCap = 'round'; g.strokeStyle = '#3a2614';
+    g.lineWidth = 6; g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(cx, cy, (sx + tip.x) / 2 + (cx - (sx + tip.x) / 2) * 0.55, (sy + tip.y) / 2 + (cy - (sy + tip.y) / 2) * 0.55); g.stroke();
+    g.lineWidth = 3.6; g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(cx, cy, tip.x, tip.y); g.stroke();
     g.fillStyle = '#c9a36a'; g.beginPath(); g.arc(fx - dir * 4, fy + 2, 5, 0, 7); g.fill();
     g.fillStyle = c; rr(p.x - 30, SURF + 34, 60, 26, 13); g.fill();
     text(pname(p), p.x, SURF + 48, 16, '#fff', FN);
@@ -1162,12 +1183,52 @@ function drawBoat(p) {
   }
   if (p.tangle > 0) text('꼼짝 못 해!', p.x, SURF - 150, 26, '#d8ffcf', FD, 'center', '#0d3a12', 6);
 }
+// 해초 괴물 그림에서 주황색 눈 두 개의 자리를 찾아 둬요 (깜빡일 때 눈꺼풀을 덮으려고)
+let MON_EYES = null;
+function findMonEyes() {
+  MON_EYES = [];
+  try {
+    const im = SPR.monster, c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+    const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height).data, pts = [];
+    for (let yy = 0; yy < c.height; yy += 2) for (let xx = 0; xx < c.width; xx += 2) {
+      const k = (yy * c.width + xx) * 4;
+      if (d[k + 3] > 200 && d[k] > 185 && d[k + 1] > 45 && d[k + 1] < 140 && d[k + 2] < 90) pts.push([xx, yy]);
+    }
+    if (pts.length < 6) return;
+    pts.sort((a, b) => a[0] - b[0]);
+    let gi = 1, gap = 0;
+    for (let k = 1; k < pts.length; k++) if (pts[k][0] - pts[k - 1][0] > gap) { gap = pts[k][0] - pts[k - 1][0]; gi = k; }
+    for (const grp of [pts.slice(0, gi), pts.slice(gi)]) {
+      if (!grp.length) continue;
+      const mx = grp.reduce((a, q) => a + q[0], 0) / grp.length, my = grp.reduce((a, q) => a + q[1], 0) / grp.length;
+      MON_EYES.push({ x: mx, y: my, r: Math.sqrt(grp.length * 4 / Math.PI) });
+    }
+  } catch (e) { MON_EYES = []; }
+}
 function drawMonster(m) {
   if (m.warn > 0) return;
   if (sprReady('monster')) {
-    const im = SPR.monster, w = SPR_W.monster, h = w * im.naturalHeight / im.naturalWidth;
-    g.save(); g.translate(m.x, SURF + 30 + Math.sin(T * 7) * 5); g.rotate(Math.sin(T * 5) * 0.04); g.scale(m.dir, 1);
-    g.drawImage(im, -w / 2, -h, w, h); g.restore();
+    const im = SPR.monster, iw = im.naturalWidth, ih = im.naturalHeight, w = SPR_W.monster, h = w * ih / iw;
+    g.save(); g.translate(m.x, SURF + 30 + Math.abs(Math.sin(T * 6)) * -10); g.rotate(Math.sin(T * 5) * 0.04); g.scale(m.dir, 1);
+    // 그림을 바둑판처럼 잘라 오른쪽 위(팔) 부분만 출렁이게 그려요
+    const NX = 24, NY = 12, sw = iw / NX, sh = ih / NY, dw = w / NX, dh = h / NY, ov = 3;
+    const sm = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+    for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+      const u = (i + 0.5) / NX, v = (j + 0.5) / NY, mk = sm(0.52, 0.85, u) * (1 - sm(0.45, 0.78, v));
+      const oy = Math.sin(T * 10 - u * 7) * 22 * mk, ox = Math.cos(T * 8 - u * 5) * 9 * mk;
+      const ssw = Math.min(sw + ov * iw / w, iw - i * sw), ssh = Math.min(sh + ov * ih / h, ih - j * sh);
+      g.drawImage(im, i * sw, j * sh, ssw, ssh, -w / 2 + i * dw + ox, -h + j * dh + oy, ssw * w / iw, ssh * h / ih);
+    }
+    // 눈 깜빡임
+    if (!MON_EYES) findMonEyes();
+    const cyc = T % 2.4, closed = cyc < 0.12 || (cyc > 0.3 && cyc < 0.4);
+    if (closed && MON_EYES && MON_EYES.length) for (const e of MON_EYES) {
+      const ex = -w / 2 + e.x * w / iw, ey = -h + e.y * h / ih, er = e.r * w / iw * 1.45;
+      g.fillStyle = '#4f6b3a'; g.beginPath(); g.ellipse(ex, ey, er, er * 0.95, 0, 0, 7); g.fill();
+      g.strokeStyle = '#1e2a12'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(ex - er, ey + 1); g.quadraticCurveTo(ex, ey + er * 0.7, ex + er, ey + 1); g.stroke();
+    }
+    g.restore();
     return;
   }
   const x = m.x, d = m.dir, t = T;
@@ -1678,7 +1739,7 @@ function frame(ts) {
 toTitle();
 if (document.fonts && document.fonts.load) { ['160px "Black Han Sans"', '30px "Do Hyeon"', '20px "Press Start 2P"', '122px "Ultra"', '40px "IM Fell English SC"'].forEach(f => document.fonts.load(f).catch(() => {})); }
 requestAnimationFrame(frame);
-window.__dc = { game, get world() { return world; }, startGame, startStage, update, render, settings, toTitle };
+window.__dc = { get eyes() { return MON_EYES; }, game, get world() { return world; }, startGame, startStage, update, render, settings, toTitle };
 })();
 </script>
 
