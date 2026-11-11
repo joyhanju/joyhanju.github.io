@@ -1256,20 +1256,20 @@ function button(x, y, w, h, label, sub, col, fn, when) {
   g.fillStyle = col; rr(x, y, w, h, 24); g.fill();
   g.fillStyle = 'rgba(255,255,255,0.16)'; rr(x + 6, y + 6, w - 12, h * 0.42, 18); g.fill();
   g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 4; rr(x, y, w, h, 24); g.stroke();
-  text(label, x + w / 2, y + (sub ? h * 0.4 : h / 2), sub ? 44 : 36, '#fff', FD, 'center', 'rgba(0,0,0,0.35)', 6);
-  if (sub) text(sub, x + w / 2, y + h * 0.75, 24, 'rgba(255,255,255,0.92)', FB);
+  text(label, x + w / 2, y + (sub ? h * 0.4 : h / 2), sub ? Math.min(44, h * 0.38) : 36, '#fff', FD, 'center', 'rgba(0,0,0,0.35)', 6);
+  if (sub) text(sub, x + w / 2, y + h * 0.76, Math.min(24, h * 0.23), 'rgba(255,255,255,0.92)', FB);
   g.globalAlpha = 1;
   uiRects.push({ x, y, w, h, fn, when });
 }
 function dim(a) { g.fillStyle = 'rgba(3,8,22,' + a + ')'; g.fillRect(0, 0, W, H); }
 
 function drawTitle() {
-  dim(0.38);
+  g.fillStyle = 'rgba(3,8,22,0.06)'; g.fillRect(0, 0, W, SURF); g.fillStyle = 'rgba(3,8,22,0.34)'; g.fillRect(0, SURF, W, H - SURF);
   const wob = Math.sin(T * 1.6) * 3;
   const SLAB = '"Ultra","Rockwell Extra Bold","Rockwell","Georgia",serif', FELL = '"IM Fell English SC","Georgia",serif';
   const brown = '#4a2a16', cream = '#f5eedc', ink = '#2a170b';
   // 리본 띠: MYEONGJI
-  g.save(); g.translate(800, 112 + wob);
+  g.save(); g.translate(800, 362 + wob);
   g.fillStyle = '#c94a1f';
   for (const s2 of [-1, 1]) { g.beginPath(); g.moveTo(s2 * 200, -22); g.lineTo(s2 * 262, -22); g.lineTo(s2 * 240, 4); g.lineTo(s2 * 262, 30); g.lineTo(s2 * 200, 30); g.closePath(); g.fill(); g.strokeStyle = ink; g.lineWidth = 3; g.stroke(); }
   g.fillStyle = '#e2541f'; rr(-215, -34, 430, 58, 6); g.fill(); g.strokeStyle = ink; g.lineWidth = 3; rr(-215, -34, 430, 58, 6); g.stroke();
@@ -1277,44 +1277,40 @@ function drawTitle() {
   g.font = '40px ' + FELL; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = cream; g.fillText('MYONGJI', 0, -4);
   g.restore();
   // 큰 제목: FISHING KING (포스터처럼 갈색 글자 + 크림 테두리 + 그림자)
-  g.save(); g.translate(800, 214 + wob); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
-  g.font = '122px ' + SLAB;
+  g.save(); g.translate(800, 452 + wob); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+  g.font = '112px ' + SLAB;
   g.fillStyle = 'rgba(20,10,4,0.55)'; g.fillText('FISHING KING', 9, 11);
   g.strokeStyle = ink; g.lineWidth = 26; g.strokeText('FISHING KING', 0, 0);
   g.strokeStyle = cream; g.lineWidth = 16; g.strokeText('FISHING KING', 0, 0);
   g.fillStyle = brown; g.fillText('FISHING KING', 0, 0);
-  g.globalCompositeOperation = 'source-atop';
-  g.globalAlpha = 0.25; g.strokeStyle = '#e2541f'; g.lineWidth = 3;
-  for (let k = -560; k < 560; k += 9) { g.beginPath(); g.moveTo(k, 8); g.lineTo(k + 40, 60); g.stroke(); }
   g.restore();
   // 한글 제목과 포스터 문구
-  g.save(); g.translate(800, 312 + wob);
-  g.strokeStyle = ink; g.lineWidth = 2; g.beginPath(); g.moveTo(-330, 0); g.lineTo(-200, 0); g.moveTo(200, 0); g.lineTo(330, 0); g.stroke();
+  g.save(); g.translate(800, 530 + wob);
+  g.strokeStyle = cream; g.lineWidth = 2; g.beginPath(); g.moveTo(-330, 0); g.lineTo(-200, 0); g.moveTo(200, 0); g.lineTo(330, 0); g.stroke();
   g.restore();
-  text('명지 낚시왕', 800, 312 + wob, 48, brown, FD, 'center', cream, 9);
-  text('물고기 물고기 잡기! · 3학년 10반 2인 낚시 대결', 800, 372, 28, '#fff', FD, 'center', '#0a1a3c', 7);
-  button(330, 430, 440, 150, '1인 플레이', 'CPU와 대결', '#d93a52', () => startGame(1));
-  button(830, 430, 440, 150, '2인 대결', '친구와 나란히 서서', '#1f7fd6', () => startGame(2));
-  if (Math.floor(T * 1.6) % 2) text('버튼을 터치해서 시작!', 800, 622, 30, '#fff6c8', FD, 'center', '#0a1a3c', 6);
+  text('명지 낚시왕', 800, 530 + wob, 42, brown, FD, 'center', cream, 9);
+  text('물고기 물고기 잡기! · 3학년 10반 2인 낚시 대결', 800, 572, 24, '#fff', FD, 'center', '#0a1a3c', 6);
+  button(500, 600, 280, 78, '1인 플레이', 'CPU와 대결', '#d93a52', () => startGame(1));
+  button(820, 600, 280, 78, '2인 대결', '친구와 나란히 서서', '#1f7fd6', () => startGame(2));
   // 점수표
-  g.fillStyle = 'rgba(6,12,30,0.72)'; rr(40, 660, 700, 220, 20); g.fill();
-  text('물고기 점수표', 70, 692, 26, '#ffd25e', FD, 'left');
-  text('해초 괴물이 오면 ● 점프!', 712, 692, 22, '#9dff8a', FD, 'right');
+  g.fillStyle = 'rgba(6,12,30,0.72)'; rr(40, 700, 700, 184, 20); g.fill();
+  text('물고기 점수표', 70, 728, 24, '#ffd25e', FD, 'left');
+  text('해초 괴물이 오면 ● 점프!', 712, 728, 20, '#9dff8a', FD, 'right');
   const list = [['anchovy', 10], ['mackerel', 30], ['puffer', 50], ['tuna', 80], ['octopus', 100], ['angler', 150], ['goldcarp', 300], ['chest', 0]];
   list.forEach(([k, pts], n) => {
-    const cx = 100 + (n % 4) * 168, cy = 752 + Math.floor(n / 4) * 82;
+    const cx = 100 + (n % 4) * 168, cy = 782 + Math.floor(n / 4) * 62;
     const f = mkFish(k, cx, cy - 6, 1); f.ph = n;
-    const s = Math.min(1, 52 / FT[k].len);
+    const s = Math.min(1, 46 / FT[k].len);
     g.save(); g.translate(cx, cy - 6); g.scale(s, s); g.translate(-cx, -cy + 6); drawFish(f); g.restore();
-    text(FT[k].name, cx + 38, cy - 14, 21, '#fff', FB, 'left');
-    text(k === 'chest' ? '아이템' : pts + '점', cx + 38, cy + 12, 19, '#ffd25e', FB, 'left');
+    text(FT[k].name, cx + 36, cy - 16, 19, '#fff', FB, 'left');
+    text(k === 'chest' ? '아이템' : pts + '점', cx + 36, cy + 6, 17, '#ffd25e', FB, 'left');
   });
   // 명예의 전당
-  g.fillStyle = 'rgba(6,12,30,0.72)'; rr(860, 660, 700, 220, 20); g.fill();
-  text('명예의 전당 (오늘 최고 점수)', 890, 692, 26, '#ffd25e', FD, 'left');
-  if (!hof.length) text('아직 기록이 없어요. 첫 번째 주인공이 되어 보세요!', 1210, 790, 24, '#cfe8ff', FB);
+  g.fillStyle = 'rgba(6,12,30,0.72)'; rr(860, 700, 700, 184, 20); g.fill();
+  text('명예의 전당 (오늘 최고 점수)', 890, 728, 24, '#ffd25e', FD, 'left');
+  if (!hof.length) text('아직 기록이 없어요. 첫 번째 주인공이 되어 보세요!', 1210, 806, 22, '#cfe8ff', FB);
   hof.forEach((r, k) => {
-    const y = 732 + k * 32;
+    const y = 764 + k * 25;
     text((k + 1) + '', 900, y, 18, k ? '#cfe8ff' : '#ffd25e', FN, 'left');
     text(r.n, 960, y, 20, '#fff', FN, 'left');
     text(r.m === 1 ? '1인' : '2인', 1110, y, 22, '#9fc3e6', FB, 'left');
