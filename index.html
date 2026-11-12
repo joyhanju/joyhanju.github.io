@@ -193,15 +193,15 @@ ul.tips li{margin-bottom:6px}
 @media (prefers-reduced-motion:reduce){.new{animation:none}}
 /* 목록: 위쪽 탭 + 묶음별 카드 그리드 */
 .dtop{position:sticky;top:0;z-index:5;background:#fff;margin:0 0 6px;border-bottom:2px dashed var(--line)}
-.dbar{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
-.dtabs{display:flex;gap:2px;overflow-x:auto;min-width:0;flex:1 1 auto;scrollbar-width:none}
+.dbar{display:flex;align-items:flex-end;gap:12px}
+.dtabs{display:flex;gap:2px;overflow-x:auto;min-width:0;flex:1 1 0;scrollbar-width:none}
 .dtabs::-webkit-scrollbar{display:none}
 .dtabs button{flex:none;font:inherit;font-family:"Jua","Noto Sans KR",sans-serif;font-size:22px;border:0;background:none;color:var(--mute);padding:10px 14px 10px;border-bottom:4px solid transparent;cursor:pointer;white-space:nowrap}
 .dtabs button small{font-family:"Noto Sans KR",sans-serif;font-size:13px;margin-left:5px;font-variant-numeric:tabular-nums}
 .dtabs button:hover{color:var(--title)}
 .dtabs button[aria-pressed="true"]{color:var(--title);border-bottom-color:var(--title)}
 .dtabs button:focus-visible,.dsub button:focus-visible,.dmore:focus-visible{outline:4px solid var(--warm-line);outline-offset:-2px;border-radius:8px}
-.dsrch{flex:0 1 240px;min-width:160px;margin:0 0 10px auto;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:999px;padding:7px 16px;background:var(--soft);color:var(--ink)}
+.dsrch{flex:0 1 240px;min-width:150px;margin:0 0 10px auto;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:999px;padding:7px 16px;background:var(--soft);color:var(--ink)}
 .dsrch:focus{outline:4px solid var(--warm-line);outline-offset:1px;border-color:var(--title)}
 .dsub{padding:0 0 12px}
 .dsub .sm{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:4px;align-items:center;position:relative;padding:12px 0 0}
@@ -220,8 +220,14 @@ ul.tips li{margin-bottom:6px}
 .dgrid .game.compact .gt .tt{white-space:normal;word-break:keep-all}
 .dgrid .game.compact .gt .rel{margin-top:4px}
 .dgrid .game.compact .btn{font-size:16px;padding:0 14px}
+.dside{display:flex;flex-wrap:wrap;gap:0 34px;align-items:flex-start}
+.dside .dsec{flex:0 1 auto;width:calc(var(--n,1) * 290px + (var(--n,1) - 1) * 22px);max-width:100%}
+.dside .dgrid{grid-template-columns:repeat(auto-fill,290px)}
+.dside .dhead{flex-wrap:nowrap;white-space:nowrap}
+@media (max-width:640px){.dside .dsec{width:100%}.dside .dgrid{grid-template-columns:1fr}}
 .dempty{padding:30px 0;text-align:center;color:var(--mute)}
-@media (max-width:640px){.dtop{display:flex;flex-direction:column}.dbar{display:contents}.dtabs{order:1}.dsub{order:2}.dsrch{order:3;flex:none;width:100%;margin:6px 0 12px}.dsub .sm button{font-size:15px;padding:4px 8px}.dtabs button{font-size:19px;padding:8px 10px}.dgrid{grid-template-columns:1fr}}
+@media (max-width:1100px){.dtabs button{font-size:20px;padding:10px 10px}.dsrch{flex-basis:190px;min-width:130px}}
+@media (max-width:640px){.dtop{display:flex;flex-direction:column}.dbar{display:contents}.dtabs{order:1;flex:none}.dsub{order:2}.dsrch{order:3;flex:none;width:100%;margin:6px 0 12px}.dsub .sm button{font-size:15px;padding:4px 8px}.dtabs button{font-size:19px;padding:8px 10px}.dgrid{grid-template-columns:1fr}}
 /* (예전) 네 줄 배치 */
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;align-items:start}
 .col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
@@ -457,8 +463,10 @@ ul.tips li{margin-bottom:6px}
         if(view.sub && view.sub!==s[0]) return;
         var list = games.filter(function(g){ return kindOf(g)==='self' && subOf(g)===s[0] && match(g); });
         if(!list.length) return; any = true;
-        html += '<div class="dsec">'+(view.sub?'':head(s[1], list.length, true, '', s[0]))+'<div class="dgrid">'+idx(list)+'</div></div>';
+        html += '<div class="dsec" style="--n:'+list.length+'">'+(view.sub?'':head(s[1], list.length, false))+'<div class="dgrid">'+idx(list)+'</div></div>';
       });
+      // '모두'에서는 두 묶음을 한 줄에 나란히 두고, 카드가 많아져 한 줄에 안 들어가면 아랫줄로 내려가요
+      if(!view.sub) html = '<div class="dside">'+html+'</div>';
     } else {
       CATS.forEach(function(c){
         if(view.k && view.k!==c[0]) return;
@@ -488,7 +496,7 @@ ul.tips li{margin-bottom:6px}
     document.querySelector('.wrap').classList.toggle('wide', mq.matches);
     if(!document.getElementById('dbody')){
       list.innerHTML = '<div class="dtop"><div class="dbar"><div class="dtabs" id="dtabs" role="group" aria-label="자료 묶음"></div>'
-        +'<input class="dsrch" id="dq" type="search" placeholder="자료 찾기 (예: 투시, 김홍도)" aria-label="자료 찾기" autocomplete="off"></div>'
+        +'<input class="dsrch" id="dq" type="search" placeholder="자료 찾기 (예: 투시)" aria-label="자료 찾기" autocomplete="off"></div>'
         +'<div class="dsub" id="dsub" hidden></div></div><div id="dbody"></div>';
       var q = document.getElementById('dq'); q.value = view.q;
       q.addEventListener('input', function(){ view.q = q.value; drawBody(); });
