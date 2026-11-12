@@ -38,8 +38,9 @@ const cv = document.getElementById('c');
 const g = cv.getContext('2d');
 let dpr = 1, sc = 1, ox = 0, oy = 0;
 function resize() {
-  dpr = Math.min(2, window.devicePixelRatio || 1);
   const w = window.innerWidth || W, h = window.innerHeight || H;
+  // 4K 전자칠판에서도 가볍게: 그리는 해상도는 가로 2400픽셀까지만 (그림이 흐려지지 않는 선)
+  dpr = Math.min(2, window.devicePixelRatio || 1, 2400 / Math.max(1, w));
   cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
   sc = Math.min(w / W, h / H); ox = (w - W * sc) / 2; oy = (h - H * sc) / 2;
 }
@@ -60,6 +61,8 @@ const store = {
 };
 const settings = Object.assign({ pace: 'normal', cpu: 'normal', vol: 2 }, store.get('dc_settings', {}));
 let hof = store.get('dc_hof', []); if (!Array.isArray(hof)) hof = [];
+const TODAY = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+hof = hof.filter(e => e && e.d === TODAY);   // 명예의 전당은 오늘 기록만 (어제 리허설 기록은 저절로 사라져요)
 const PACE = { busy: { t: 45, boss: 22, label: '혼잡', sub: '해역당 45초' }, normal: { t: 60, boss: 30, label: '보통', sub: '해역당 60초' }, relaxed: { t: 85, boss: 30, label: '여유', sub: '해역당 85초' } };
 const CPU = {
   easy: { react: 0.95, err: 70, spd: 0.6, mash: 3.6, steal: 0, top: 5, miss: 0.45, yank: 0.2, label: '쉬움' },
@@ -339,7 +342,7 @@ function saveName(p) {
   if (p.named) return;
   p.named = true;
   const n = p.letters.map(i => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]).join('');
-  hof.push({ n, s: p.score, m: game.mode });
+  hof.push({ n, s: p.score, m: game.mode, d: TODAY });
   hof.sort((x, y) => y.s - x.s); hof = hof.slice(0, 5); store.set('dc_hof', hof);
   sfx('item');
 }

@@ -38,8 +38,9 @@ const cv = document.getElementById('c');
 const g = cv.getContext('2d');
 let dpr = 1, sc = 1, ox = 0, oy = 0;
 function resize() {
-  dpr = Math.min(2, window.devicePixelRatio || 1);
   const w = window.innerWidth || W, h = window.innerHeight || H;
+  // 4K 전자칠판에서도 가볍게: 그리는 해상도는 가로 2400픽셀까지만 (그림이 흐려지지 않는 선)
+  dpr = Math.min(2, window.devicePixelRatio || 1, 2400 / Math.max(1, w));
   cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
   sc = Math.min(w / W, h / H); ox = (w - W * sc) / 2; oy = (h - H * sc) / 2;
 }
@@ -101,6 +102,8 @@ const store = {
 };
 const settings = Object.assign({ pace: 'normal', diff: 'normal', cpu: 'normal', vol: 2, jump: 'button' }, store.get('mtj_settings', {}));
 let hof = store.get('mtj_hof', []); if (!Array.isArray(hof)) hof = [];
+const TODAY = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+hof = hof.filter(e => e && e.d === TODAY);   // 명예의 전당은 오늘 기록만 (어제 리허설 기록은 저절로 사라져요)
 const saveSettings = () => store.set('mtj_settings', settings);
 // 판 길이(낚시왕과 같은 혼잡·보통·여유): 구간 나무 높이(px)와 구간 제한 시간(초) × 3구간
 const PACE = { busy: { h: 3600, t: 50, label: '혼잡' }, normal: { h: 5000, t: 70, label: '보통' }, relaxed: { h: 6800, t: 95, label: '여유' } };
@@ -378,6 +381,8 @@ function newDemo() {
 function toTitle() { game.state = 'title'; game.players = []; game.st = 0; parts = []; pops = []; newDemo(); }
 function startGame(mode) {
   sfx('select');
+  // 게임 중에 화면이 꺼지지 않게
+  try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {}
   game.mode = mode; game.seed = Math.floor(Math.random() * 1e9); game.si = 0; game.winner = -1; game.st = 0;
   // 1인 플레이: 학생은 오른쪽, CPU는 왼쪽
   game.players = [mkPlayer(0, mode === 1), mkPlayer(1, false)];
@@ -412,7 +417,7 @@ function endGame() {
 }
 function saveName(p) {
   if (!p.qual || p.saved) return; p.saved = true;
-  hof.push({ n: p.letters.map(k => String.fromCharCode(65 + k)).join(''), s: p.score, st: p.stars, d: new Date().toISOString().slice(0, 10) });
+  hof.push({ n: p.letters.map(k => String.fromCharCode(65 + k)).join(''), s: p.score, st: p.stars, d: TODAY });
   hof.sort((a, b) => b.s - a.s); hof = hof.slice(0, 5); store.set('mtj_hof', hof);
 }
 
@@ -1116,7 +1121,7 @@ function drawMenu() {
       menu.rects.push({ x, y: y - 36, w: bw, h: 72, fn: () => { set(o.v); saveSettings(); } });
     });
   };
-  row(186, '판 길이', Object.keys(PACE).map(k => ({ v: k, l: PACE[k].label, s: '구간당 ' + PACE[k].t + '초 · 한 판 ' + fmtRun(runSec(k)) })), settings.pace, v => (settings.pace = v));
+  row(186, '판 길이', Object.keys(PACE).map(k => ({ v: k, l: PACE[k].label, s: '구간당 ' + PACE[k].t + '초 · 한 판 최대 ' + fmtRun(runSec(k)).replace('약 ', '') })), settings.pace, v => (settings.pace = v));
   row(272, '난이도', Object.keys(DIFF).map(k => ({ v: k, l: DIFF[k].label, s: DIFF[k].sub })), settings.diff, v => (settings.diff = v));
   row(358, 'CPU 실력', Object.keys(CPU).map(k => ({ v: k, l: CPU[k].label })), settings.cpu, v => (settings.cpu = v));
   row(444, '점프', [{ v: 'button', l: '버튼으로', s: '◀ ▶ + 점프, 두 손' }, { v: 'auto', l: '자동 점프', s: '◀ ▶만, 한 손' }], settings.jump, v => (settings.jump = v));

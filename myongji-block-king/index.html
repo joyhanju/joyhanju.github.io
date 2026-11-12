@@ -36,8 +36,9 @@ const cv = document.getElementById('c');
 const g = cv.getContext('2d');
 let dpr = 1, sc = 1, ox = 0, oy = 0;
 function resize() {
-  dpr = Math.min(2, window.devicePixelRatio || 1);
   const w = window.innerWidth || W, h = window.innerHeight || H;
+  // 4K 전자칠판에서도 가볍게: 그리는 해상도는 가로 2400픽셀까지만 (그림이 흐려지지 않는 선)
+  dpr = Math.min(2, window.devicePixelRatio || 1, 2400 / Math.max(1, w));
   cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
   sc = Math.min(w / W, h / H); ox = (w - W * sc) / 2; oy = (h - H * sc) / 2;
 }
@@ -58,6 +59,8 @@ const store = {
 };
 const settings = Object.assign({ pace: 'normal', speed: 'normal', cpu: 'normal', vol: 2 }, store.get('bk_settings', {}));
 let hof = store.get('bk_hof', []); if (!Array.isArray(hof)) hof = [];
+const TODAY = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+hof = hof.filter(e => e && e.d === TODAY);   // 명예의 전당은 오늘 기록만 (어제 리허설 기록은 저절로 사라져요)
 const saveSettings = () => store.set('bk_settings', settings);
 // 판 길이(낚시왕과 같은 혼잡·보통·여유) — 한 판 전체 시간은 안내·카운트다운·결과 화면 약 40초를 더한 값
 const PACE = { busy: { t: 80, label: '혼잡' }, normal: { t: 110, label: '보통' }, relaxed: { t: 160, label: '여유' } };
@@ -388,6 +391,8 @@ function newDemo() { demo = { players: [mkPlayer(0, true, true), mkPlayer(1, tru
 function toTitle() { game.state = 'title'; game.players = []; game.st = 0; game.fever = false; parts = []; pops = []; beams = []; newDemo(); }
 function startGame(mode) {
   sfx('select');
+  // 게임 중에 화면이 꺼지지 않게
+  try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {}
   game.mode = mode; game.seq = []; game.st = 0; game.fever = false; game.winner = -1; game.lastTick = -1; game.lvShown = 1; game.flash = 0;
   // 1인 플레이: 학생은 오른쪽, CPU는 왼쪽
   game.players = [mkPlayer(0, mode === 1), mkPlayer(1, false)];
@@ -408,7 +413,7 @@ function endGame() {
 }
 function saveName(p) {
   if (!p.qual || p.saved) return; p.saved = true;
-  hof.push({ n: p.letters.map(k => String.fromCharCode(65 + k)).join(''), s: p.score, d: new Date().toISOString().slice(0, 10) });
+  hof.push({ n: p.letters.map(k => String.fromCharCode(65 + k)).join(''), s: p.score, d: TODAY });
   hof.sort((a, b) => b.s - a.s); hof = hof.slice(0, 5); store.set('bk_hof', hof);
 }
 
