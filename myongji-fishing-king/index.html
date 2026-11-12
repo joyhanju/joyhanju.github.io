@@ -1164,9 +1164,14 @@ function drawBoat(p) {
     const base = rodTip(p), tip = drawTip(p), fx = p.x + dir * 22, fy = wy - 82, b = p.bend || 0;
     const sx = fx - dir * 14, sy = fy + 6;
     const cx = (sx + base.x) / 2 + (base.x - dir * 6 - (sx + base.x) / 2) * b, cy = (base.y + 6) + (base.y - 22 - (base.y + 6)) * b;
+    // 하나의 곡선을 따라 밑동은 굵고 끝은 가늘게 그려요
     g.lineCap = 'round'; g.strokeStyle = '#3a2614';
-    g.lineWidth = 6; g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(cx, cy, (sx + tip.x) / 2 + (cx - (sx + tip.x) / 2) * 0.55, (sy + tip.y) / 2 + (cy - (sy + tip.y) / 2) * 0.55); g.stroke();
-    g.lineWidth = 3.6; g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(cx, cy, tip.x, tip.y); g.stroke();
+    const N = 18; let px = sx, py = sy;
+    for (let k = 1; k <= N; k++) {
+      const t = k / N, q = 1 - t, qx = q * q * sx + 2 * q * t * cx + t * t * tip.x, qy = q * q * sy + 2 * q * t * cy + t * t * tip.y;
+      g.lineWidth = 6.5 - 4 * t; g.beginPath(); g.moveTo(px, py); g.lineTo(qx, qy); g.stroke();
+      px = qx; py = qy;
+    }
     g.fillStyle = '#c9a36a'; g.beginPath(); g.arc(fx - dir * 4, fy + 2, 5, 0, 7); g.fill();
     g.fillStyle = c; rr(p.x - 30, SURF + 34, 60, 26, 13); g.fill();
     text(pname(p), p.x, SURF + 48, 16, '#fff', FN);
