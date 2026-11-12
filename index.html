@@ -72,6 +72,17 @@ h1,h2,h3,.jua{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;letter
 .sum{margin:0 0 14px}
 .facts{display:grid;grid-template-columns:repeat(4,auto);gap:6px 18px;justify-content:start;margin:0 0 14px;padding:12px 16px;background:var(--soft);border-radius:12px;font-size:16px}
 .facts div{display:flex;flex-direction:column}
+.keys{margin:0 0 14px;padding:12px 16px;background:var(--soft);border-radius:12px}
+.keys>b{display:block;word-break:keep-all;font-size:14px;color:var(--mute);font-weight:500;margin-bottom:8px}
+.keys-scroll{overflow-x:auto;max-width:100%}
+.game.detail>div{min-width:0}
+.keys table{border-collapse:collapse;font-size:15px}
+.keys th,.keys td{padding:6px 14px 6px 0;text-align:left;white-space:nowrap}
+.keys th{word-break:keep-all}
+@media (max-width:480px){.keys{padding:12px 12px}.keys table{font-size:14px}.keys th,.keys td{padding-right:8px}.keys tr th:first-child{white-space:normal;max-width:96px}.keys kbd{min-width:24px;padding:2px 6px;font-size:14px}}
+.keys tr+tr th,.keys tr+tr td{border-top:1px solid rgba(0,0,0,.08)}
+.keys tr:first-child th{font-size:13px;color:var(--mute);font-weight:600}
+.keys kbd{display:inline-block;min-width:28px;padding:2px 8px;border:1px solid rgba(0,0,0,.25);border-bottom-width:3px;border-radius:6px;background:#fff;font:700 15px/1.4 system-ui,sans-serif;text-align:center}
 .facts b{font-size:13px;color:var(--mute);font-weight:500}
 .facts span{font-weight:700}
 .rel{display:inline-block;margin:0 0 6px;padding:2px 10px;border-radius:999px;background:var(--gc,#333);color:#fff;font-size:14px;font-weight:700}
@@ -309,6 +320,7 @@ ul.tips li{margin-bottom:6px}
         +'<div class="gs">'+esc(g.subtitle)+'</div>'
         +'<p class="sum">'+esc(g.summary)+'</p>'
         +'<div class="facts">'+(g.facts||[]).map(function(f){return '<div><b>'+esc(f[0])+'</b><span>'+esc(f[1])+'</span></div>';}).join('')+'</div>'
+        +(g.keys?'<div class="keys"><b>키보드로 할 때 · 키보드 하나를 두 사람이 나눠 써요</b><div class="keys-scroll"><table>'+g.keys.map(function(r,ri){return '<tr>'+r.map(function(c,ci){return (ri===0||ci===0)?'<th>'+esc(c)+'</th>':'<td>'+c.split(/\s*[·,]\s*/).map(function(k){return '<kbd>'+esc(k)+'</kbd>';}).join(' ')+'</td>';}).join('')+'</tr>';}).join('')+'</table></div></div>':'')
         +'<ul class="tags" aria-label="배우는 내용">'+(g.learn||[]).map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>'
         +(g.url
           ?'<div class="btns">'
