@@ -347,7 +347,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202611130730"></script>
+<script src="games.js?v=202611130740"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
@@ -444,8 +444,8 @@ ul.tips li{margin-bottom:6px}
     ['ask','감상·토의 수업','물음표 시리즈 · 작품을 깊이 보고 질문하며 이야기 나누는 수업이에요.']
   ];
   var SUBS = [
-    ['trans','전환기 수업용 게임','미술 선생님이 아니어도 틀어 주기만 하면 학생들이 혼자 풀어 가는 게임이에요.'],
-    ['fest','학교 축제용 부스 게임','학교 축제 부스용 · 전자칠판용이에요. 멀티터치가 안 되면 키보드로 해요.']
+    ['trans','전환기','미술 선생님이 아니어도 틀어 주기만 하면 학생들이 혼자 풀어 가는 게임이에요.'],
+    ['fest','축제용 게임','학교 축제 부스용 · 전자칠판용이에요. 멀티터치가 안 되면 키보드로 해요.']
   ];
   function kindOf(g){ return g.type==='question'?'ask':(g.type==='self'||g.type==='festival')?'self':g.offline?'hand':'play'; }
   function subOf(g){ return g.type==='festival'?'fest':'trans'; }
