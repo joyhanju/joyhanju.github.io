@@ -390,7 +390,7 @@ function startShark(p, f) {
   f.hooked = p; h.catch = [f]; h.st = 'shark';
   p.fight = { hp: 1, chomp: 0.5, t: 0 };
   world.shake = 8; bubbleBurst(h.x, h.y, 14);
-  if (!game.demo) { pop(h.x, h.y - 60, '상어가 걸렸다! ● 마구 눌러!', COL[p.i], 34); sfx('shark'); }
+  if (!game.demo) { pop(h.x, h.y - 60, K(p.i, '상어가 걸렸다! ● 마구 눌러!'), COL[p.i], 34); sfx('shark'); }
 }
 function reelShark(p) {
   const h = p.hook;
@@ -865,6 +865,7 @@ cv.addEventListener('pointerdown', e => {
   for (const r of uiRects) if (inRect(p.x, p.y, r) && (!r.when || r.when())) { r.fn(); return; }
   if (!padsActive()) return;
   const h = padHit(p.x, p.y);
+  if (h) kbMode = false;
   if (h) { info.pad = h; if (h.k === 'A') game.players[h.i].press++; }
 });
 cv.addEventListener('pointermove', e => {
@@ -876,6 +877,10 @@ cv.addEventListener('pointermove', e => {
 const ptrEnd = e => ptrs.delete(e.pointerId);
 cv.addEventListener('pointerup', ptrEnd); cv.addEventListener('pointercancel', ptrEnd); cv.addEventListener('lostpointercapture', ptrEnd);
 cv.addEventListener('contextmenu', e => e.preventDefault());
+// 키보드를 누르면 키보드 안내로, 화면 조작판을 터치하면 터치 안내로 자동 전환
+let kbMode = false;
+const K = (i, s) => kbMode ? s.replace(/●/g, i ? '↓' : 'S').replace(/◀ ▶/g, i ? '← →' : 'A D') : s;
+const KB = s => kbMode ? s.replace(/● 버튼을/g, 'S·↓ 키를').replace(/●/g, 'S·↓') : s;
 const KEYMAP = { KeyA: [0, 'l'], KeyD: [0, 'r'], ArrowLeft: [1, 'l'], ArrowRight: [1, 'r'] };
 window.addEventListener('keydown', e => {
   audioInit();
@@ -883,11 +888,12 @@ window.addEventListener('keydown', e => {
   if (menu.keyTest) { e.preventDefault(); if (e.code === 'Escape') { menu.keyTest = false; menu.open = true; } return; }
   if (e.code === 'Escape' || e.code === 'KeyM') { menu.open ? (menu.open = false) : openMenu(); return; }
   if (menu.open) return;
-  if (game.state === 'title') { if (e.code === 'Digit1') startGame(1); if (e.code === 'Digit2') startGame(2); return; }
+  if (game.state === 'title') { if (e.code === 'Digit1' || e.code === 'Digit2') kbMode = true; if (e.code === 'Digit1') startGame(1); if (e.code === 'Digit2') startGame(2); return; }
   if (game.state === 'result' && e.code === 'KeyH' && game.st > 4) { for (const p of game.players) saveName(p); toTitle(); return; }
   const m = KEYMAP[e.code];
-  if (m) { keyHeld[m[0]][m[1]] = 1; e.preventDefault(); return; }
+  if (m) { kbMode = true; keyHeld[m[0]][m[1]] = 1; e.preventDefault(); return; }
   if (e.repeat) return;
+  if (['KeyS', 'KeyW', 'Space', 'ArrowDown', 'ArrowUp', 'Enter'].includes(e.code)) kbMode = true;
   if (['KeyS', 'KeyW', 'Space'].includes(e.code) && game.players[0] && !game.players[0].cpu) { game.players[0].press++; e.preventDefault(); }
   if (['ArrowDown', 'ArrowUp', 'Enter'].includes(e.code) && game.players[1] && !game.players[1].cpu) { game.players[1].press++; e.preventDefault(); }
   if (game.state === 'tutorial' && e.code === 'Tab') { e.preventDefault(); startStage(0); }
@@ -1286,7 +1292,7 @@ function drawMonWarn() {
     g.globalAlpha = 0.9 + 0.1 * Math.sin(T * 12);
     g.fillStyle = 'rgba(20,70,25,0.92)'; rr(470, 392, 660, 70, 20); g.fill();
     g.strokeStyle = '#9dff8a'; g.lineWidth = 3; rr(470, 392, 660, 70, 20); g.stroke();
-    text('해초 괴물이 온다! ● 눌러 점프!', 800, 428, 38, '#eaffd9', FD, 'center', '#0b2a10', 6);
+    text(KB('해초 괴물이 온다! ● 눌러 점프!'), 800, 428, 38, '#eaffd9', FD, 'center', '#0b2a10', 6);
     g.globalAlpha = 1;
   }
 }
@@ -1378,6 +1384,7 @@ function drawPads() {
     g.fillStyle = 'rgba(4,10,26,0.42)'; rr(bx, byy, bw, bh, 26); g.fill();
     g.strokeStyle = COL[i]; g.globalAlpha = 0.7; g.lineWidth = 3; rr(bx, byy, bw, bh, 26); g.stroke(); g.globalAlpha = 1;
     text(pname(p), bx + 20, byy + 22, 16, COL[i], FN, 'left');
+    if (kbMode) { drawKeyPad(p, i); continue; }
     for (const k of ['L', 'R', 'A']) {
       const b = P[k];
       const on = k === 'A' ? p.flash > 0 || [...ptrs.values()].some(pi => pi.pad && pi.pad.i === i && pi.pad.k === 'A') : (k === 'L' ? p.held.l : p.held.r);
@@ -1411,7 +1418,27 @@ function drawPads() {
     }
   }
 }
+// 키보드로 할 때: 조작판 자리에 실제 키 모양을 그려요
+function drawKeyPad(p, i) {
+  const P = PADS[i];
+  const codes = i ? { L: ['ArrowLeft'], R: ['ArrowRight'], A: ['ArrowDown', 'ArrowUp', 'Enter'] } : { L: ['KeyA'], R: ['KeyD'], A: ['KeyS', 'KeyW', 'Space'] };
+  const caps = i ? { L: '←', R: '→', A: '↓' } : { L: 'A', R: 'D', A: 'S' };
+  const h = p.hook;
+  const aLabel = h.st === 'shark' ? '연타!' : (h.st === 'up' && h.catch.length && !monActiveFor(p)) ? (p.yankCd > 0 ? Math.ceil(p.yankCd) + '초' : '확 당기기') : monActiveFor(p) ? '점프' : '낚시';
+  const aCol = h.st === 'shark' ? '#ff9b9b' : aLabel === '점프' ? '#9dff8a' : aLabel === '확 당기기' ? '#ffd25e' : '#fff';
+  for (const k of ['L', 'R', 'A']) {
+    const b = P[k], on = codes[k].some(c => keysDown.has(c)) || (k === 'A' && p.flash > 0);
+    const sz = k === 'A' ? 104 : 88, x = b.x - sz / 2, y = b.y - sz / 2 - 10;
+    g.fillStyle = 'rgba(0,0,0,0.35)'; rr(x, y + 7, sz, sz, 16); g.fill();
+    g.fillStyle = on ? COL[i] : '#f5eedc'; rr(x, y + (on ? 5 : 0), sz, sz, 16); g.fill();
+    g.strokeStyle = '#2a170b'; g.lineWidth = 3; rr(x, y + (on ? 5 : 0), sz, sz, 16); g.stroke();
+    text(caps[k], b.x, b.y - 10 + (on ? 5 : 0), k === 'A' ? 52 : 44, on ? '#fff' : '#2a170b', FD);
+    const lab = k === 'A' ? aLabel : k === 'L' ? '왼쪽' : '오른쪽';
+    text(lab, b.x, b.y + sz / 2 + 12, 20, k === 'A' ? aCol : '#cfe8ff', FD, 'center', 'rgba(0,0,0,0.75)', 5);
+  }
+}
 function hintBubble(i, msg, target) {
+  msg = K(i, msg);
   const b = PADS[i][target], y = b.y - b.r - 58, bob = Math.sin(T * 6) * 6;
   g.font = '30px ' + FD; const w = g.measureText(msg).width + 44;
   const x = clamp(b.x, w / 2 + 12, W - w / 2 - 12);
@@ -1461,10 +1488,11 @@ function drawTitle() {
   text('물고기 물고기 잡기! · 3학년 10반 2인 낚시 대결', 800, 572, 24, '#fff', FD, 'center', '#0a1a3c', 6);
   button(500, 600, 280, 78, '1인 플레이', 'CPU와 대결', '#d93a52', () => startGame(1));
   button(820, 600, 280, 78, '2인 대결', '친구와 나란히 서서', '#1f7fd6', () => startGame(2));
+  if (kbMode) text('키보드: 1 = 1인 · 2 = 2인', 800, 690, 18, '#fff6c8', FD, 'center', '#0a1a3c', 5);
   // 점수표
   g.fillStyle = 'rgba(6,12,30,0.72)'; rr(40, 700, 700, 184, 20); g.fill();
   text('물고기 점수표', 70, 728, 24, '#ffd25e', FD, 'left');
-  text('상어 200점 · 해초 괴물은 ● 점프!', 712, 728, 20, '#9dff8a', FD, 'right');
+  text(KB('상어 200점 · 해초 괴물은 ● 점프!'), 712, 728, 20, '#9dff8a', FD, 'right');
   const list = [['anchovy', 10], ['mackerel', 30], ['puffer', 50], ['tuna', 80], ['octopus', 100], ['angler', 150], ['goldcarp', 300], ['chest', 0]];
   list.forEach(([k, pts], n) => {
     const cx = 100 + (n % 4) * 168, cy = 782 + Math.floor(n / 4) * 62;
@@ -1508,7 +1536,7 @@ function drawBanner() {
   g.globalAlpha = a;
   text('해역 ' + (game.si + 1), 800, 330, 44, '#ffd25e', FN, 'center', '#0a1a3c', 10);
   text(st.name, 800, 420, 96, '#fff', FD, 'center', '#0a1a3c', 14);
-  text(st.sub, 800, 500, 34, '#cfe8ff', FB, 'center', '#0a1a3c', 7);
+  text(KB(st.sub), 800, 500, 34, '#cfe8ff', FB, 'center', '#0a1a3c', 7);
   if (game.bonus && game.si > 0) text('역전 찬스! ' + pname(game.players[game.bonus.i]) + '에게 ' + ITEMS[game.bonus.item], 800, 570, 34, '#ffe27a', FD, 'center', '#0a1a3c', 7);
   if (k > 1.3) text('START!', 800, 650, 60, '#7dffb0', FN, 'center', '#0a1a3c', 10);
   g.globalAlpha = 1;
@@ -1563,7 +1591,7 @@ function drawResult() {
         g.fillStyle = j === p.li ? COL[k] : 'rgba(255,255,255,0.12)'; rr(lx - 44, ly - 50, 88, 100, 14); g.fill();
         text('ABCDEFGHIJKLMNOPQRSTUVWXYZ'[p.letters[j]], lx, ly + 2, 52, '#fff', FN);
       }
-      text('◀ ▶ 글자 바꾸기   ● 다음', x, y0 + 310, 30, '#fff', FD);
+      text(K(k, '◀ ▶ 글자 바꾸기   ● 다음'), x, y0 + 310, 30, '#fff', FD);
       text('이니셜 3글자', x, y0 + 352, 24, '#9fc3e6', FB);
     }
   });
@@ -1577,7 +1605,7 @@ function drawTugUI() {
   g.fillStyle = 'rgba(6,12,30,0.85)'; rr(380, 104, 840, 124, 20); g.fill();
   g.strokeStyle = '#ffd25e'; g.lineWidth = 3; rr(380, 104, 840, 124, 20); g.stroke();
   if (!tg.over) {
-    text('대왕 잉어 줄다리기! ● 버튼을 마구 눌러라!', 800, 136, 32, '#ffd25e', FD);
+    text(KB('대왕 잉어 줄다리기! ● 버튼을 마구 눌러라!'), 800, 136, 32, '#ffd25e', FD);
     const bx = 440, bw = 720, by = 178;
     g.fillStyle = COL[0]; rr(bx, by - 14, bw / 2, 28, 14); g.fill();
     g.fillStyle = COL[1]; rr(bx + bw / 2, by - 14, bw / 2, 28, 14); g.fill();
