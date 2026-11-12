@@ -228,6 +228,34 @@ ul.tips li{margin-bottom:6px}
 .dempty{padding:30px 0;text-align:center;color:var(--mute)}
 @media (max-width:1100px){.dtabs button{font-size:20px;padding:10px 10px}.dsrch{flex-basis:190px;min-width:130px}}
 @media (max-width:640px){.dtop{display:flex;flex-direction:column}.dbar{display:contents}.dtabs{order:1;flex:none}.dsub{order:2}.dsrch{order:3;flex:none;width:100%;margin:6px 0 12px}.dsub .sm button{font-size:15px;padding:4px 8px}.dtabs button{font-size:19px;padding:8px 10px}.dgrid{grid-template-columns:1fr}}
+/* 휴대폰: 옆으로 밀지 않아도 탭과 자료가 한눈에 보이게 */
+@media (max-width:640px){
+  .wrap{padding-left:max(10px, env(safe-area-inset-left, 0px));padding-right:max(10px, env(safe-area-inset-right, 0px))}
+  .book{padding:18px 12px}
+  .dtabs{display:flex;flex-wrap:wrap;gap:6px;overflow:visible;margin-bottom:2px}
+  .dtabs button{font-size:15px;padding:6px 11px;border:1.5px solid var(--line);border-radius:999px;line-height:1.3}
+  .dtabs button small{font-size:11px;margin-left:4px}
+  .dtabs button[aria-pressed="true"]{background:var(--title);border-color:var(--title);color:#fff}
+  .dsrch{margin:8px 0 8px;padding:6px 14px;font-size:15px}
+  .dsub{padding:0 0 6px}
+  .dsub .sm{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:4px;padding-top:6px}
+  .dsub .sm::before{display:none}
+  .dgrid,.dside .dgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .dgrid .game{padding:7px;gap:6px;border-radius:14px;border-width:2px}
+  .dgrid .game .pic{border-radius:9px}
+  .dgrid .game.compact .gt{font-size:15.5px;gap:3px;flex-wrap:wrap;line-height:1.25}
+  .dgrid .game.compact .gt .tt{white-space:normal}
+  .dgrid .game.compact .gt .rel{font-size:10px;padding:0 6px;margin:0}
+  .dgrid .game.compact .gs{font-size:12px;line-height:1.4;min-height:2.8em;margin:2px 0 6px}
+  .dgrid .game.compact .btn{font-size:0;padding:0;min-height:34px;height:34px;gap:0}
+  .dgrid .game.compact .btn::after{content:"자세히 보기";font-size:13px;font-weight:700}
+  .dgrid .game.compact .btn svg{width:14px;height:14px;margin-right:4px}
+  .dhead h3,.dhead .col-title{font-size:20px;margin-bottom:8px}
+  .dhead .dmore{font-size:13px}
+  .dhint{margin:4px 0 8px;font-size:13px}
+  .dsec{margin:0 0 18px}
+  .dgrid .new{font-size:11px;padding:2px 7px;top:5px;right:5px;letter-spacing:.5px}
+}
 /* (예전) 네 줄 배치 */
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;align-items:start}
 .col-title{margin:0 0 14px;font-size:24px;color:var(--title)}
@@ -319,7 +347,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202611130720"></script>
+<script src="games.js?v=202611130730"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
