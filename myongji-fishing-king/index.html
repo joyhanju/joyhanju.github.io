@@ -292,7 +292,8 @@ function toTitle() {
 function startGame(mode) {
   audioInit(); sfx('select');
   game.mode = mode; game.demo = false; game.bonus = null;
-  game.players = [mkPlayer(0, false), mkPlayer(1, mode === 1)];
+  // 1인 플레이: 학생은 오른쪽, CPU는 왼쪽
+  game.players = [mkPlayer(0, mode === 1), mkPlayer(1, false)];
   game.state = 'tutorial'; game.st = 0; newWorld(0, true);
   for (const p of game.players) if (p.cpu) p.tut = 2;
   playSong('title');
@@ -611,7 +612,7 @@ function spawnBoss() {
 function startTug(p) {
   world.tug = { first: p.i, pos: p.i ? 0.15 : -0.15, t: 8, over: false, winner: -1, endT: 0 };
   p.hook.st = 'tug';
-  pop(W / 2, 300, (game.players[p.i].cpu ? 'CPU' : 'P' + (p.i + 1)) + ' 대왕 잉어에 걸었다!', COL[p.i], 34);
+  pop(W / 2, 300, pname(game.players[p.i]) + ' 대왕 잉어에 걸었다!', COL[p.i], 34);
   sfx('hook');
 }
 function updTug(dt) {
@@ -882,6 +883,8 @@ let kbMode = false;
 const K = (i, s) => kbMode ? s.replace(/●/g, i ? '↓' : 'S').replace(/◀ ▶/g, i ? '← →' : 'A D') : s;
 const KB = s => kbMode ? s.replace(/● 버튼을/g, 'S·↓ 키를').replace(/●/g, 'S·↓') : s;
 const KEYMAP = { KeyA: [0, 'l'], KeyD: [0, 'r'], ArrowLeft: [1, 'l'], ArrowRight: [1, 'r'] };
+// 1인 플레이에서는 어느 쪽 키를 눌러도 사람 쪽(오른쪽)으로 가요
+const kTo = i => (game.players[i] && game.players[i].cpu) ? 1 - i : i;
 window.addEventListener('keydown', e => {
   audioInit();
   keysDown.add(e.code);
@@ -891,15 +894,15 @@ window.addEventListener('keydown', e => {
   if (game.state === 'title') { if (e.code === 'Digit1' || e.code === 'Digit2') kbMode = true; if (e.code === 'Digit1') startGame(1); if (e.code === 'Digit2') startGame(2); return; }
   if (game.state === 'result' && e.code === 'KeyH' && game.st > 4) { for (const p of game.players) saveName(p); toTitle(); return; }
   const m = KEYMAP[e.code];
-  if (m) { kbMode = true; keyHeld[m[0]][m[1]] = 1; e.preventDefault(); return; }
+  if (m) { kbMode = true; keyHeld[kTo(m[0])][m[1]] = 1; e.preventDefault(); return; }
   if (e.repeat) return;
   if (['KeyS', 'KeyW', 'Space', 'ArrowDown', 'ArrowUp', 'Enter'].includes(e.code)) kbMode = true;
-  if (['KeyS', 'KeyW', 'Space'].includes(e.code) && game.players[0] && !game.players[0].cpu) { game.players[0].press++; e.preventDefault(); }
-  if (['ArrowDown', 'ArrowUp', 'Enter'].includes(e.code) && game.players[1] && !game.players[1].cpu) { game.players[1].press++; e.preventDefault(); }
+  if (['KeyS', 'KeyW', 'Space'].includes(e.code)) { const q = game.players[kTo(0)]; if (q && !q.cpu) { q.press++; e.preventDefault(); } }
+  if (['ArrowDown', 'ArrowUp', 'Enter'].includes(e.code)) { const q = game.players[kTo(1)]; if (q && !q.cpu) { q.press++; e.preventDefault(); } }
   if (game.state === 'tutorial' && e.code === 'Tab') { e.preventDefault(); startStage(0); }
 });
 window.addEventListener('blur', () => { keysDown.clear(); keyHeld.forEach(k => { k.l = 0; k.r = 0; }); });
-window.addEventListener('keyup', e => { keysDown.delete(e.code); const m = KEYMAP[e.code]; if (m) keyHeld[m[0]][m[1]] = 0; });
+window.addEventListener('keyup', e => { keysDown.delete(e.code); const m = KEYMAP[e.code]; if (m) { keyHeld[m[0]][m[1]] = 0; keyHeld[kTo(m[0])][m[1]] = 0; } });
 
 // ───────── 운영자 메뉴 ─────────
 function openMenu() { menu.open = true; menu.clearArm = 0; ptrs.clear(); sfx('select'); }
@@ -916,7 +919,7 @@ function text(s, x, y, size, col, font, align, stroke, sw) {
 }
 const fmtRun = sec => { sec = Math.round(sec / 10) * 10; const m = Math.floor(sec / 60), r = sec % 60; return '약 ' + m + '분' + (r ? ' ' + r + '초' : ''); };
 const fmtTime = s => { s = Math.max(0, Math.ceil(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
-const pname = p => p.cpu ? 'CPU' : 'P' + (p.i + 1);
+const pname = p => p.cpu ? 'CPU' : game.mode === 1 && !p.demo ? 'P1' : 'P' + (p.i + 1);
 
 // ───────── 배경 ─────────
 function drawSky(st) {
@@ -1565,9 +1568,10 @@ function drawResult() {
   dim(0.6);
   const [a, b] = game.players, w = game.winner;
   let head;
-  if (game.mode === 1) head = w === 0 ? 'CPU를 이겼다!' : w === 1 ? 'CPU 승리... 아쉬워요!' : '무승부! 둘 다 잘했어요';
+  const hi = game.players.findIndex(p => !p.cpu);
+  if (game.mode === 1) head = w === hi ? 'CPU를 이겼다!' : w === 1 - hi ? 'CPU 승리... 아쉬워요!' : '무승부! 둘 다 잘했어요';
   else head = w === -1 ? '무승부!' : 'P' + (w + 1) + ' 승리!';
-  text(head, 800, 130, 92, w === -1 ? '#ffd25e' : (game.mode === 1 && w === 1 ? '#cfe8ff' : '#fff'), FD, 'center', w >= 0 ? COL[w] : '#0a1a3c', 14);
+  text(head, 800, 130, 92, w === -1 ? '#ffd25e' : (game.mode === 1 && w !== hi ? '#cfe8ff' : '#fff'), FD, 'center', w >= 0 ? COL[w] : '#0a1a3c', 14);
   [a, b].forEach((p, k) => {
     const x = k ? 1060 : 540, y0 = 230;
     g.fillStyle = 'rgba(6,12,30,0.8)'; rr(x - 230, y0, 460, 400, 24); g.fill();

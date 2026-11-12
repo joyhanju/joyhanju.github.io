@@ -319,7 +319,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202611122130"></script>
+<script src="games.js?v=202611130700"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
@@ -417,7 +417,7 @@ ul.tips li{margin-bottom:6px}
   ];
   var SUBS = [
     ['trans','전환기 수업용 게임','미술 선생님이 아니어도 틀어 주기만 하면 학생들이 혼자 풀어 가는 게임이에요.'],
-    ['fest','축제 부스용 게임','백마페스티벌 부스용 · 전자칠판용이에요. 멀티터치가 안 되면 키보드로 해요.']
+    ['fest','학교 축제용 부스 게임','학교 축제 부스용 · 전자칠판용이에요. 멀티터치가 안 되면 키보드로 해요.']
   ];
   function kindOf(g){ return g.type==='question'?'ask':(g.type==='self'||g.type==='festival')?'self':g.offline?'hand':'play'; }
   function subOf(g){ return g.type==='festival'?'fest':'trans'; }
