@@ -319,7 +319,7 @@ ul.tips li{margin-bottom:6px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="lib/qrcode.js"></script>
-<script src="games.js?v=202611130700"></script>
+<script src="games.js?v=202611130720"></script>
 <script>
 (function(){
   var games = (window.GAMES || []).slice().sort(function(a,b){return String(b.sort||b.release||'').localeCompare(String(a.sort||a.release||''));});
@@ -374,11 +374,11 @@ ul.tips li{margin-bottom:6px}
               var t=m[2]==='교사용';
               if(m[2]==='예정') return '<span class="mat s" aria-disabled="true">'+ICO.clock+'<span>'+esc(m[0])+'</span><em>'+esc(m[3]||'공개 예정')+'</em></span>';
               return t?'<button type="button" class="mat t" data-lock="'+i+'-'+k+'">'+ICO.lock+'<span>'+esc(m[0])+'</span><em>비밀번호</em></button>'
-                      :'<a class="mat" data-dl="'+i+'-'+k+'" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>'+(isPpt(m)?'PPT':'PDF')+'</em></a>';
+                      :'<a class="mat" data-dl="'+i+'-'+k+'" href="'+esc(m[1])+'" download>'+ICO.doc+'<span>'+esc(m[0])+'</span><em>'+(isPpt(m)?'PPT':/\.zip$/i.test(m[1])?'ZIP':'PDF')+'</em></a>';
             };
             var top='', rest='';
             g.materials.forEach(function(m,k){ if(isTop(m)) top+=btn(m,k); else rest+=btn(m,k); });
-            return '<div class="mats"><div class="mhead"><div class="mt">수업 자료 받기</div>'+top+'</div>'
+            return '<div class="mats"><div class="mhead"><div class="mt">'+(g.type==='festival'?'게임 내려받기':'수업 자료 받기')+'</div>'+top+'</div>'
               +(rest?'<div class="ml">'+rest+'</div>':'')+'</div>';
           })():'')
       +'</div>'

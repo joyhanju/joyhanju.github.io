@@ -866,6 +866,7 @@ cv.addEventListener('pointerdown', e => {
     return;
   }
   if (menu.open) { menuClick(p.x, p.y); return; }
+  if (Math.hypot(p.x - FSB.x, p.y - FSB.y) < 34) { toggleFull(); sfx('select'); return; }
   if (Math.hypot(p.x - GEAR.x, p.y - GEAR.y) < 44) { info.gear = true; return; }
   for (const r of uiRects) if (inRect(p.x, p.y, r) && (!r.when || r.when())) { r.fn(); return; }
   if (!padsActive()) return;
@@ -1368,7 +1369,28 @@ function drawHUD() {
   text(fmtTime(game.timeLeft), 800, 70, 30, low && Math.floor(T * 4) % 2 ? '#ff6b6b' : '#fff', FN);
   for (let k = 0; k < 3; k++) { g.fillStyle = k < game.si ? '#ffd25e' : k === game.si ? '#ffffff' : 'rgba(255,255,255,0.25)'; g.beginPath(); g.arc(600 + k * 18, 70, 6, 0, 7); g.fill(); }
 }
+// 전체 화면 버튼 (톱니바퀴 왼쪽) · 키보드 F11도 돼요
+const FSB = { x: 1504, y: 44, r: 24 };
+const isFull = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function toggleFull() {
+  try {
+    if (isFull()) { const x = document.exitFullscreen || document.webkitExitFullscreen; if (x) { const r = x.call(document); if (r && r.catch) r.catch(() => {}); } }
+    else { const d = document.documentElement, q = d.requestFullscreen || d.webkitRequestFullscreen; if (q) { const r = q.call(d); if (r && r.catch) r.catch(() => {}); } }
+  } catch (e) {}
+}
+function drawFsBtn() {
+  const { x, y, r } = FSB, full = isFull(), a = 9, b = 17;
+  g.fillStyle = 'rgba(6,6,30,0.55)'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 3; g.lineCap = 'round';
+  for (const [sx2, sy2] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+    g.beginPath();
+    if (!full) { g.moveTo(x + sx2 * b, y + sy2 * a); g.lineTo(x + sx2 * b, y + sy2 * b); g.lineTo(x + sx2 * a, y + sy2 * b); }
+    else { g.moveTo(x + sx2 * a * 0.6, y + sy2 * b * 0.75); g.lineTo(x + sx2 * a * 0.6, y + sy2 * a * 0.6); g.lineTo(x + sx2 * b * 0.75, y + sy2 * a * 0.6); }
+    g.stroke();
+  }
+}
 function drawGear() {
+  drawFsBtn();
   const held = [...ptrs.values()].find(pi => pi.gear);
   g.fillStyle = 'rgba(6,12,30,0.55)'; g.beginPath(); g.arc(GEAR.x, GEAR.y, GEAR.r, 0, 7); g.fill();
   g.strokeStyle = 'rgba(255,255,255,0.55)'; g.lineWidth = 3;

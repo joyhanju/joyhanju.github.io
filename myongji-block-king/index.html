@@ -389,8 +389,9 @@ function toTitle() { game.state = 'title'; game.players = []; game.st = 0; game.
 function startGame(mode) {
   sfx('select');
   game.mode = mode; game.seq = []; game.st = 0; game.fever = false; game.winner = -1; game.lastTick = -1; game.lvShown = 1; game.flash = 0;
-  game.players = [mkPlayer(0, false), mkPlayer(1, mode === 1)];
-  game.players[1].ready = mode === 1;
+  // 1인 플레이: 학생은 오른쪽, CPU는 왼쪽
+  game.players = [mkPlayer(0, mode === 1), mkPlayer(1, false)];
+  game.players[0].ready = mode === 1;
   game.total = PACE[settings.pace].t; game.timeLeft = game.total;
   game.state = 'guide'; parts = []; pops = []; beams = [];
 }
@@ -512,6 +513,7 @@ cv.addEventListener('pointerdown', e => {
     return;
   }
   if (menu.open) { menuClick(p.x, p.y); return; }
+  if (Math.hypot(p.x - FSB.x, p.y - FSB.y) < 34) { toggleFull(); sfx('select'); return; }
   if (Math.hypot(p.x - GEAR.x, p.y - GEAR.y) < 44) { info.gear = true; return; }
   for (const r of uiRects) if (inRect(p.x, p.y, r)) { r.fn(); return; }
   if (!padsActive()) return;
@@ -534,6 +536,8 @@ cv.addEventListener('pointerup', ptrEnd); cv.addEventListener('pointercancel', p
 cv.addEventListener('contextmenu', e => e.preventDefault());
 const KEYMAP = { KeyA: [0, 'l'], KeyD: [0, 'r'], KeyS: [0, 's'], ArrowLeft: [1, 'l'], ArrowRight: [1, 'r'], ArrowDown: [1, 's'] };
 const ROTKEYS = { KeyW: 0, ArrowUp: 1 };
+// 1인 플레이에서는 어느 쪽 키를 눌러도 사람 쪽(오른쪽)으로 가요
+const kTo = i => (game.players[i] && game.players[i].cpu) ? 1 - i : i;
 const DROPKEYS = { Space: 0, KeyF: 0, Enter: 1, NumpadEnter: 1, Numpad0: 1 };
 window.addEventListener('keydown', e => {
   audioInit();
@@ -548,16 +552,16 @@ window.addEventListener('keydown', e => {
   if (game.state === 'guide' && e.code === 'Tab') { startCount(); return; }
   const m = KEYMAP[e.code];
   if (m) {
-    kbMode = true; const p = game.players[m[0]];
-    if (!keyHeld[m[0]][m[1]] && p && !p.cpu) { if (m[1] === 'l') p.press.l++; if (m[1] === 'r') p.press.r++; }
-    keyHeld[m[0]][m[1]] = 1; return;
+    kbMode = true; const ki = kTo(m[0]), p = game.players[ki];
+    if (!keyHeld[ki][m[1]] && p && !p.cpu) { if (m[1] === 'l') p.press.l++; if (m[1] === 'r') p.press.r++; }
+    keyHeld[ki][m[1]] = 1; return;
   }
   if (e.repeat) return;
-  if (e.code in ROTKEYS) { kbMode = true; const p = game.players[ROTKEYS[e.code]]; if (p && !p.cpu) p.press.rot++; }
-  if (e.code in DROPKEYS) { kbMode = true; const p = game.players[DROPKEYS[e.code]]; if (p && !p.cpu) p.press.drop++; }
+  if (e.code in ROTKEYS) { kbMode = true; const p = game.players[kTo(ROTKEYS[e.code])]; if (p && !p.cpu) p.press.rot++; }
+  if (e.code in DROPKEYS) { kbMode = true; const p = game.players[kTo(DROPKEYS[e.code])]; if (p && !p.cpu) p.press.drop++; }
 });
 window.addEventListener('blur', () => { keysDown.clear(); keyHeld.forEach(k => { k.l = k.r = k.s = 0; }); });
-window.addEventListener('keyup', e => { keysDown.delete(e.code); const m = KEYMAP[e.code]; if (m) keyHeld[m[0]][m[1]] = 0; });
+window.addEventListener('keyup', e => { keysDown.delete(e.code); const m = KEYMAP[e.code]; if (m) { keyHeld[m[0]][m[1]] = 0; keyHeld[kTo(m[0])][m[1]] = 0; } });
 
 // ───────── 운영자 메뉴 ─────────
 function openMenu() { menu.open = true; menu.clearArm = 0; menu.sel = 0; ptrs.clear(); sfx('select'); }
@@ -588,7 +592,7 @@ function text(s, x, y, size, col, font, align, stroke, sw) {
 }
 const fmtRun = sec => { sec = Math.round(sec / 10) * 10; const m = Math.floor(sec / 60), r = sec % 60; return '약 ' + m + '분' + (r ? ' ' + r + '초' : ''); };
 const fmtTime = s => { s = Math.max(0, Math.ceil(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
-const pname = p => p.cpu ? 'CPU' : 'P' + (p.i + 1);
+const pname = p => p.cpu ? 'CPU' : game.mode === 1 && !p.demo ? 'P1' : 'P' + (p.i + 1);
 function cell(x, y, s, c, a) {
   g.globalAlpha = a == null ? 1 : a;
   g.fillStyle = PC[c]; g.fillRect(x + 1, y + 1, s - 2, s - 2);
@@ -748,7 +752,28 @@ function drawEffects() {
   for (const q of pops) { const a = q.t < 1 ? 1 : 1 - (q.t - 1) / 0.3, s = q.size * (q.t < 0.12 ? 0.6 + q.t * 3.3 : 1); g.globalAlpha = clamp(a, 0, 1); text(q.s, q.x, q.y, s, q.c, FD, 'center', '#1a0b33', Math.max(6, s * 0.14)); }
   g.globalAlpha = 1;
 }
+// 전체 화면 버튼 (톱니바퀴 왼쪽) · 키보드 F11도 돼요
+const FSB = { x: 1504, y: 44, r: 24 };
+const isFull = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function toggleFull() {
+  try {
+    if (isFull()) { const x = document.exitFullscreen || document.webkitExitFullscreen; if (x) { const r = x.call(document); if (r && r.catch) r.catch(() => {}); } }
+    else { const d = document.documentElement, q = d.requestFullscreen || d.webkitRequestFullscreen; if (q) { const r = q.call(d); if (r && r.catch) r.catch(() => {}); } }
+  } catch (e) {}
+}
+function drawFsBtn() {
+  const { x, y, r } = FSB, full = isFull(), a = 9, b = 17;
+  g.fillStyle = 'rgba(6,6,30,0.55)'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 3; g.lineCap = 'round';
+  for (const [sx2, sy2] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+    g.beginPath();
+    if (!full) { g.moveTo(x + sx2 * b, y + sy2 * a); g.lineTo(x + sx2 * b, y + sy2 * b); g.lineTo(x + sx2 * a, y + sy2 * b); }
+    else { g.moveTo(x + sx2 * a * 0.6, y + sy2 * b * 0.75); g.lineTo(x + sx2 * a * 0.6, y + sy2 * a * 0.6); g.lineTo(x + sx2 * b * 0.75, y + sy2 * a * 0.6); }
+    g.stroke();
+  }
+}
 function drawGear() {
+  drawFsBtn();
   const held = [...ptrs.values()].find(pi => pi.gear);
   g.fillStyle = 'rgba(6,6,30,0.55)'; g.beginPath(); g.arc(GEAR.x, GEAR.y, GEAR.r, 0, 7); g.fill();
   g.strokeStyle = 'rgba(255,255,255,0.75)'; g.lineWidth = 3;
