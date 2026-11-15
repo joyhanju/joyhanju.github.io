@@ -213,7 +213,6 @@ window.GAMES = [
   {
     id: "lost-masterpiece",
     type: "self",
-    isNew: true,
     release: "2026-11",
     title: "사라진 걸작을 찾아라",
     subtitle: "사라진 작품을 찾아 전시실 다섯 곳의 수수께끼를 푸는 미술 추리 게임",
@@ -289,7 +288,6 @@ window.GAMES = [
     id: "myongji-jump-king",
     type: "festival",
     sort: "0000-02",
-    isNew: true,
     title: "명지 점프왕",
     subtitle: "학교 축제 부스용 · 전자칠판을 반으로 나눠 가지를 밟고 덩굴을 타며 꼭대기까지 오르는 2인 점프 대결",
     images: [
@@ -334,7 +332,6 @@ window.GAMES = [
     id: "myongji-block-king",
     type: "festival",
     sort: "0000-01",
-    isNew: true,
     title: "명지 블록왕",
     subtitle: "학교 축제 부스용 · 전자칠판 양쪽에 서서 하는 2인 블록 쌓기(테트리스식) 대결 게임",
     images: [
@@ -381,6 +378,7 @@ window.GAMES = [
     id: "myongji-fishing-king",
     type: "festival",
     sort: "0000-03",
+    isNew: true,
     title: "명지 낚시왕",
     subtitle: "2026 백마페스티벌 3학년 10반 부스용 · 전자칠판 앞에 나란히 서서 하는 2인 낚시 대결 게임",
     images: [
