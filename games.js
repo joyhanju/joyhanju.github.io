@@ -24,7 +24,7 @@ window.GAMES = [
     release: "2026-11",
     isNew: true,
     title: "아트타임 어드벤처 2",
-    subtitle: "사라진 화첩과 조선의 여섯 화가 · 안견부터 장승업까지 만나는 한국 미술사 게임",
+    subtitle: "조선의 6명의 화가를 만나서 문제를 푸는 한국 미술사 게임",
     images: [
       ["img/art-time-adventure2-start.jpg", ""],
       ["img/art-time-adventure2-saimdang.jpg", "게임 화면 · 오죽헌에서 신사임당을 만나는 장면"],
