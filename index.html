@@ -565,6 +565,18 @@ ul.tips li{margin-bottom:6px}
   var baseTitle = document.title;
   render();
   if(mq.addEventListener) mq.addEventListener('change', render); else if(mq.addListener) mq.addListener(render);
+  /* 방문 통계(GoatCounter): 상세 화면을 열면 '/#/자료id'로 따로 기록 */
+  function countView(tries){
+    var m=/^#\/([^\/?]+)/.exec(location.hash); if(!m) return;
+    var id=decodeURIComponent(m[1]), g=null;
+    for(var i=0;i<games.length;i++){ if(games[i].id===id){ g=games[i]; break; } }
+    if(!g) return;
+    if(window.goatcounter && window.goatcounter.count){
+      try{ window.goatcounter.count({path:'/#/'+id, title:g.title}); }catch(x){}
+    } else if((tries||0)<20){ setTimeout(function(){ countView((tries||0)+1); }, 500); }
+  }
+  countView(0);
+  window.addEventListener('hashchange', function(){ countView(0); });
   window.addEventListener('hashchange', function(){
     var wasDetail = document.getElementById('list').closest('section').classList.contains('in-detail');
     if(!/^#\/./.test(location.hash) && wasDetail){ render(); window.scrollTo(0, listScroll); }
