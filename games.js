@@ -384,7 +384,8 @@ window.GAMES = [
     subtitle: "2026 백마페스티벌 3학년 10반 부스용 · 전자칠판 앞에 나란히 서서 하는 2인 낚시 대결 게임",
     images: [
       ["img/myongji-fishing-king-start.jpg", ""],
-      ["img/myongji-fishing-king-game.jpg", "게임 화면 · 왼쪽 P1, 오른쪽 P2가 같은 바다에서 겨뤄요"]
+      ["img/myongji-fishing-king-game.jpg", "게임 화면 · 왼쪽 P1, 오른쪽 P2가 같은 바다에서 겨뤄요"],
+      ["img/myongji-fishing-king-play.jpg", "실제 부스 · 전자칠판 앞에 나란히 서서 대결하는 모습"]
     ],
     materials: [
       ["인터넷 없이 하기 (설명서 포함)", "downloads/myongji-fishing-king-offline.zip", "학생용"]
