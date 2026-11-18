@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>폰트 편의점</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!-- 만드는 동안은 구글 폰트 링크. 공개 전 다듬기 단계에서 fonts/ 의 서브셋 woff2로 바꾼다 (CLAUDE.md 4절) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gugi&family=Jua&family=Nanum+Brush+Script&family=Nanum+Gothic+Coding&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+KR:wght@400&display=swap">
+<style>
+:root{
+  --ink:#17171a; --ink2:#3a3a40; --paper:#fbf6e9; --dlgink:#2a1d12;
+  --bg:#ece7da; --lime:#c6ff00; --pink:#ff2e88; --yellow:#ffe500; --bad:#c4001d;
+  --ui:'Noto Sans KR', system-ui, sans-serif;
+  --mono:'Nanum Gothic Coding', 'Noto Sans KR', monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{position:fixed;inset:0;overflow:hidden;background:#1d1d21;font-family:var(--ui);color:var(--ink);-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1200px;transform-origin:0 0;overflow:hidden;background:var(--bg)}
+button{font-family:var(--ui);color:inherit;cursor:pointer}
+[hidden]{display:none !important}
+.scr{position:absolute;inset:0}
+
+/* ---------- 버튼 (계기판 공통 규칙) ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:84px;min-width:240px;padding:0 36px;
+  font-size:36px;font-weight:700;background:#fff;color:var(--ink);border:5px solid var(--ink);border-radius:12px;
+  box-shadow:0 8px 0 var(--ink);transition:transform .05s}
+.btn:active{transform:translateY(6px);box-shadow:0 2px 0 var(--ink)}
+.btn.pri{background:var(--lime)}
+.btn.dark{background:var(--ink);color:#fff;box-shadow:0 8px 0 #000}
+.btn.sm{min-height:72px;min-width:0;font-size:30px;padding:0 24px}
+.btn:disabled{background:#d6d3cb;color:#55524c;box-shadow:0 8px 0 #8d8a83;border-color:#8d8a83;cursor:default}
+.btn:disabled:active{transform:none}
+
+/* ---------- 타이틀 (장면 화면) ---------- */
+#sTitle{background:#141416;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sign{position:relative;border:10px solid var(--ink);background:#202024;border-radius:18px;padding:56px 110px 48px;box-shadow:0 0 0 6px var(--lime),0 0 80px rgba(198,255,0,.25);text-align:center}
+.sign .t{font-family:'Black Han Sans',var(--ui);font-size:190px;line-height:1;color:var(--lime);letter-spacing:-4px}
+.sign .h24{position:absolute;right:-46px;top:-46px;background:var(--pink);color:#fff;font-family:'Black Han Sans';font-size:56px;padding:10px 22px;border:6px solid var(--ink);transform:rotate(8deg)}
+.sign .s{margin-top:22px;font-size:40px;color:#f1efe8}
+#sTitle .row{margin-top:90px;display:flex;gap:28px}
+.ph-note{position:absolute;left:24px;bottom:18px;font-size:24px;color:#9a978f}
+
+/* ---------- 정보 입력 ---------- */
+#sInfo{background:var(--bg);display:flex;align-items:center;justify-content:center}
+.card{background:#fff;border:6px solid var(--ink);border-radius:16px;box-shadow:0 12px 0 var(--ink);padding:56px 72px;width:1180px}
+.card h2{margin:0 0 12px;font-size:56px}
+.card p{margin:0 0 36px;font-size:32px;color:var(--ink2)}
+.fields{display:grid;grid-template-columns:repeat(3,1fr) 2fr;gap:24px}
+.fields label{display:flex;flex-direction:column;gap:10px;font-size:28px;font-weight:700}
+.fields input{font-family:system-ui,sans-serif;font-size:40px;height:92px;padding:0 20px;border:5px solid var(--ink);border-radius:10px;background:#fffef8;color:var(--ink);width:100%}
+.fields input:focus{outline:6px solid var(--pink);outline-offset:2px}
+.err{min-height:46px;margin:18px 0 10px;font-size:30px;color:var(--bad);font-weight:700}
+.card .row{display:flex;gap:24px;align-items:center}
+
+/* ---------- 장면 (안내·일차 카드) ---------- */
+#sScene{background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#sScene .pic{width:980px;height:440px;border:5px dashed #6c6a64;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#a3a098;margin-bottom:48px}
+#sScene .big{font-family:'Black Han Sans',var(--ui);font-size:120px;color:var(--lime);line-height:1.05}
+#sScene h1{margin:0;font-size:64px;line-height:1.25}
+#sScene p{margin:22px 0 0;font-size:40px;line-height:1.5;color:#f1efe8;max-width:1500px}
+#sScene .row{margin-top:56px;display:flex;gap:28px}
+
+/* ---------- 작업 화면 ---------- */
+#bar{position:absolute;left:0;top:0;width:1920px;height:96px;background:var(--ink);color:#fff;display:flex;align-items:center;gap:22px;padding:0 200px 0 28px}
+#bar .logo{font-family:'Black Han Sans',var(--ui);font-size:40px;color:var(--lime);margin-right:10px}
+.pill{font-size:28px;font-weight:700;padding:8px 18px;border:3px solid #55555c;border-radius:10px;white-space:nowrap}
+.pill b{color:var(--yellow)}
+#fontCount.over{background:var(--bad);border-color:#fff}
+#tipBtn{margin-left:auto;min-height:72px;font-size:28px;font-weight:700;background:#2b2b31;color:#fff;border:3px solid #7a7a82;border-radius:10px;padding:0 22px}
+#menuBtn{position:absolute;right:24px;top:12px;height:72px;min-width:150px;font-size:30px;font-weight:700;background:var(--yellow);color:var(--ink);border:4px solid #fff;border-radius:10px;z-index:20}
+#menuBtn:active{transform:translateY(3px)}
+
+#rcpt{position:absolute;left:24px;top:112px;width:456px;height:816px;background:#fffdf7;border:4px solid var(--ink);border-radius:6px;padding:22px 26px;font-family:var(--mono);font-size:30px;line-height:1.4;color:var(--ink);overflow:hidden;box-shadow:0 8px 0 rgba(0,0,0,.18)}
+#rcpt .hd{font-family:var(--mono);font-size:26px;display:flex;justify-content:space-between;color:var(--ink2)}
+#rcpt hr{border:0;border-top:3px dashed #8a877e;margin:14px 0}
+#rcpt .who,#rcpt .ctl{font-family:var(--ui);font-weight:700}
+#rcpt .q{margin-top:6px}
+#rcpt .k{font-size:26px;color:var(--ink2)}
+#rcpt .ln{display:flex;gap:10px}
+#rcpt .ln i{font-family:var(--ui);font-style:normal;font-size:24px;font-weight:700;background:var(--ink);color:#fff;padding:0 8px;border-radius:4px;height:36px;margin-top:3px;white-space:nowrap}
+#rcpt .bar{height:56px;margin-top:16px;background:repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 7px,var(--ink) 7px 12px,transparent 12px 14px,var(--ink) 14px 15px,transparent 15px 19px)}
+#rcpt.cmp{background:#2b2b31;color:#fff;display:flex;flex-direction:column;align-items:center;font-family:var(--ui)}
+#rcpt.cmp .ct{font-size:30px;font-weight:700;margin:6px 0 18px;color:var(--yellow)}
+
+#pbox{position:absolute;left:504px;top:112px;width:740px;height:816px}
+#pwrap{position:absolute;left:120px;top:0;transition:transform .25s,filter .25s;transform-origin:50% 40%}
+#pwrap.far{transform:scale(.38);filter:blur(1.3px)}
+#holdBtn{position:absolute;left:90px;width:560px;top:736px;min-height:76px;font-size:30px;white-space:nowrap}
+.poster{position:relative;background:#fff;box-shadow:0 10px 0 rgba(0,0,0,.2),0 0 0 3px var(--ink);overflow:hidden}
+.poster .pin{position:absolute;inset:40px;display:flex;flex-direction:column;justify-content:center;gap:18px;text-align:center}
+.pl{line-height:1.25;color:#141414;word-break:keep-all;overflow-wrap:anywhere;border-radius:6px;padding:4px 6px}
+.pl.uncast{color:#77746c;outline:3px dashed #b7b3a8}
+.pl.sel{outline:5px dashed var(--pink);outline-offset:4px;position:relative}
+.pl.sel::before{content:'선택';position:absolute;left:-6px;top:-40px;font:700 24px/1 var(--ui);background:var(--pink);color:#fff;padding:6px 10px;border-radius:6px}
+.clickable .pl{cursor:pointer}
+.scan{position:absolute;left:0;right:0;top:0;height:8px;background:#ff2b2b;box-shadow:0 0 18px #ff2b2b;opacity:0}
+.scan.go{animation:scan .55s linear}
+@keyframes scan{0%{opacity:1;top:0}100%{opacity:1;top:100%}}
+
+#ctrl{position:absolute;left:1268px;top:112px;width:628px;height:816px}
+#tabs{display:flex;gap:12px;height:76px}
+#tabs button{flex:1;font-size:30px;font-weight:700;border:4px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink)}
+#tabs button[aria-selected=true]{background:var(--ink);color:#fff;text-decoration:underline;text-underline-offset:8px;text-decoration-thickness:4px}
+#cbody{position:absolute;left:0;right:0;top:88px;height:620px;background:#fff;border:4px solid var(--ink);border-radius:10px;padding:14px}
+#deliver{position:absolute;left:0;right:0;bottom:0;width:100%;min-height:92px;font-size:40px}
+.chead{font-size:26px;font-weight:700;color:var(--ink2);height:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fcard{height:136px;border:4px solid var(--ink);border-radius:10px;background:#fbfaf6;text-align:left;padding:6px 14px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+.fcard .r{font-size:26px;font-weight:700;line-height:1.2}
+.fcard .smp{font-size:50px;line-height:1.1;white-space:nowrap}
+.fcard .ps{font-size:24px;color:#45433e;line-height:1.2}
+.fcard.on{border-color:var(--pink);border-width:6px;background:#fff0f6}
+.fcard.on::after{content:'✓ 이 줄 담당';position:absolute;right:8px;top:6px;font-size:24px;font-weight:700;background:var(--pink);color:#fff;padding:2px 8px;border-radius:6px}
+.srow{display:flex;align-items:center;gap:8px;height:116px;border-bottom:3px dashed #cfcbc0}
+.srow:last-child{border-bottom:0}
+.srow.on{background:#fff0f6}
+.srow .lb{width:190px;flex:none;overflow:hidden;cursor:pointer}
+.srow .lb b{display:block;font-size:24px}
+.srow .lb span{display:block;font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sz{width:72px;height:72px;flex:none;font-size:30px;font-weight:700;border:4px solid var(--ink);border-radius:10px;background:#fff}
+.sz[aria-pressed=true]{background:var(--ink);color:#fff}
+.shint{display:flex;justify-content:space-between;font-size:24px;font-weight:700;color:var(--ink2);padding-left:198px;padding-right:8px}
+
+.score{display:flex;flex-direction:column;gap:10px}
+.score .tot{font-size:56px;font-weight:700;text-align:center;margin:4px 0 6px}
+.srow2{display:flex;align-items:center;gap:16px;font-size:30px;height:78px;padding:0 14px;border:3px solid #d8d4c9;border-radius:10px;opacity:0;transform:scale(1.4)}
+.srow2.in{opacity:1;transform:none;transition:all .18s}
+.srow2 .st{font-size:46px;width:52px;text-align:center}
+.srow2 .nm{flex:1;font-weight:700}
+.srow2 .ok{font-weight:700}
+.srow2.pass .st{color:#b98a00}
+.srow2.fail{background:#f4f2ec}
+.srow2.fail .ok{color:var(--bad)}
+.after{display:flex;gap:12px;position:absolute;left:0;right:0;bottom:0}
+.after .btn{flex:1;min-width:0;padding:0 12px;font-size:32px}
+
+/* ---------- 대사 패널 ---------- */
+#dlg{position:absolute;left:24px;right:24px;top:944px;height:236px;background:var(--paper);border:6px solid var(--ink);border-radius:14px;color:var(--dlgink)}
+#dPort{position:absolute;left:16px;bottom:12px;width:200px;height:206px;border-radius:10px;background:#e2dccb;overflow:hidden}
+#dPort svg{position:absolute;left:0;bottom:0;width:200px;height:200px}
+#dPort .md{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:24px;font-weight:700;color:#4a453a}
+#dName{position:absolute;left:236px;top:-30px;font-size:30px;font-weight:700;background:var(--ink);color:#fff;padding:6px 18px;border-radius:8px}
+#dName.narr{background:#5c5850}
+#dText{position:absolute;left:240px;right:40px;top:30px;font-size:40px;line-height:1.45;word-break:keep-all}
+#dNext{position:absolute;right:24px;bottom:12px;font-size:26px;font-weight:700;color:#6a5a48}
+#dlg.wait{cursor:pointer}
+
+/* ---------- 창(모달) ---------- */
+.ov{position:absolute;inset:0;background:rgba(10,10,12,.72);display:flex;align-items:center;justify-content:center;z-index:50}
+.mbox{position:relative;background:#fff;border:6px solid var(--ink);border-radius:16px;box-shadow:0 12px 0 var(--ink);padding:44px 52px;min-width:640px;max-width:1500px;max-height:1100px;overflow:auto}
+.mbox h2{margin:0 0 24px;font-size:48px}
+.mbox p{font-size:32px;line-height:1.5;margin:0 0 20px}
+.mbox .row{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+.mx{position:absolute;right:16px;top:16px;width:72px;height:72px;font-size:40px;border:4px solid var(--ink);border-radius:10px;background:#fff}
+.mlist{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:30px}
+.mlist .btn{width:100%}
+.gear{position:absolute;left:16px;bottom:16px;width:72px;height:72px;border:0;background:transparent;padding:12px}
+.gear svg{width:48px;height:48px;fill:#8d8a83}
+.pinin{font-size:44px;width:320px;height:92px;padding:0 20px;border:5px solid var(--ink);border-radius:10px;font-family:system-ui,sans-serif;letter-spacing:8px}
+.pinin.bad{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+.cred{font-size:28px;line-height:1.55;margin:0 0 20px;padding-left:1.2em}
+.cred li{margin-bottom:6px}
+.mbox h3{font-size:34px;margin:24px 0 10px}
+.foot{font-size:26px;color:var(--ink2);border-top:3px dashed #cfcbc0;padding-top:16px;margin-top:10px}
+.tips{list-style:none;padding:0;margin:0 0 10px;font-size:32px;line-height:1.4}
+.tips li{padding:14px 18px;border:3px solid var(--ink);border-radius:10px;margin-bottom:10px;background:#fffbe0}
+.tips li.lock{background:#eeebe4;color:#5c5850}
+.tipbig{font-size:48px;font-weight:700;background:var(--yellow);border:5px solid var(--ink);border-radius:12px;padding:28px 34px;margin:6px 0 30px}
+.jday{margin-bottom:24px}
+.jday h3{margin:0 0 12px;font-size:32px}
+.jday .row .btn{min-width:300px;font-size:28px}
+#loading{position:absolute;inset:0;background:rgba(23,23,26,.85);color:#fff;font-size:48px;font-weight:700;display:flex;flex-direction:column;gap:30px;align-items:center;justify-content:center;z-index:60}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- 타이틀 -->
+  <section id="sTitle" class="scr">
+    <div class="sign"><div class="h24">24H</div><div class="t">폰트 편의점</div><div class="s">서체 직원 8명 대기 중 · 포스터 납품 전문</div></div>
+    <div class="row" id="titleBtns"></div>
+    <div class="ph-note">간판 그림 자리 (images/ 에 그림이 올라오면 바꿈)</div>
+  </section>
+
+  <!-- 정보 입력 -->
+  <section id="sInfo" class="scr" hidden>
+    <form class="card" id="infoForm" autocomplete="off" novalidate>
+      <h2>점장 등록</h2>
+      <p>결과 영수증에 들어갈 정보야. 이 기기 안에만 남아.</p>
+      <div class="fields">
+        <label>학년<input id="iG" inputmode="numeric" maxlength="1" autocomplete="off"></label>
+        <label>반<input id="iC" inputmode="numeric" maxlength="2" autocomplete="off"></label>
+        <label>번호<input id="iN" inputmode="numeric" maxlength="2" autocomplete="off"></label>
+        <label>이름<input id="iName" maxlength="10" autocomplete="off"></label>
+      </div>
+      <div class="err" id="infoErr" role="alert"></div>
+      <div class="row">
+        <button class="btn pri" type="submit">가게 열기 ▶</button>
+        <button class="btn sm" type="button" id="credBtn">작품 출처</button>
+        <button class="btn sm" type="button" id="infoBack" style="margin-left:auto">◀ 처음 화면</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- 장면 -->
+  <section id="sScene" class="scr" hidden></section>
+
+  <!-- 작업 화면 -->
+  <section id="sWork" class="scr" hidden>
+    <div id="bar">
+      <span class="logo">폰트 편의점</span>
+      <span class="pill" id="dayPill"></span>
+      <span class="pill" id="fontCount"></span>
+      <span class="pill" id="starPill"></span>
+      <button id="tipBtn" type="button"></button>
+    </div>
+    <div id="rcpt"></div>
+    <div id="pbox">
+      <div id="pwrap"></div>
+      <button class="btn sm" id="holdBtn" type="button">👀 세 걸음 뒤에서 보기 (꾹 누르기)</button>
+    </div>
+    <div id="ctrl">
+      <div id="tabs" role="tablist"></div>
+      <div id="cbody"></div>
+      <button class="btn pri" id="deliver" type="button">납품하기 ▶</button>
+    </div>
+    <div id="dlg">
+      <div id="dPort"></div>
+      <div id="dName"></div>
+      <div id="dText"></div>
+      <div id="dNext"></div>
+    </div>
+  </section>
+
+  <button id="menuBtn" type="button" hidden>메뉴</button>
+  <div id="ov" class="ov" hidden></div>
+  <div id="loading" hidden>준비하는 중…</div>
+</div>
+
+<script>
+'use strict';
+/* =========================================================
+   폰트 편의점 — 1단위: 뼈대 + 1일차 손님 3명
+   기획서: docs/font-store-plan.md
+   ========================================================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- 화면 맞춤: 1920×1200 무대를 통째로 줄이고 늘린다 ---------- */
+const stage=$('#stage');
+let fitPaused=false;
+function fit(){
+  if(fitPaused)return;
+  const s=Math.min(innerWidth/1920,innerHeight/1200);
+  stage.style.transform=`translate(${(innerWidth-1920*s)/2}px,${(innerHeight-1200*s)/2}px) scale(${s})`;
+}
+addEventListener('resize',fit);
+addEventListener('orientationchange',()=>setTimeout(fit,200));
+fit();
+// 입력 중에는 화면 맞춤을 멈춘다 (키보드가 올라와도 무대가 쪼그라들지 않게)
+document.addEventListener('focusin',e=>{if(e.target.tagName==='INPUT')fitPaused=true});
+document.addEventListener('focusout',e=>{if(e.target.tagName==='INPUT'){fitPaused=false;setTimeout(fit,350)}});
+
+/* ---------- 기기 저장 (fontstore_ 접두사, 실패해도 게임은 돈다) ---------- */
+const store={
+  get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const SAVE_KEY='fontstore_save', SET_KEY='fontstore_settings';
+const SET=Object.assign({sound:true},store.get(SET_KEY)||{});
+
+/* ---------- 소리 (Web Audio 합성, 파일 없음) ---------- */
+let AC=null;
+function ac(){
+  if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}
+  if(AC.state==='suspended'){try{AC.resume()}catch(e){}}
+  return AC;
+}
+function tone(f,t0,d,type,v){
+  if(!SET.sound)return;const a=ac();if(!a)return;
+  try{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+t0;
+    o.type=type||'square';o.frequency.value=f;g.gain.setValueAtTime(v||.07,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.03);}catch(e){}
+}
+const SFX={
+  beep(){tone(1760,0,.07);tone(1760,.12,.11)},
+  stamp(){tone(150,0,.14,'triangle',.3);tone(1100,0,.03,'square',.04)},
+  miss(){tone(220,0,.12,'sawtooth',.05)},
+  tip(){tone(880,0,.12,'sine',.12);tone(1320,.11,.2,'sine',.12)},
+  tap(){tone(700,0,.025,'square',.03)}
+};
+
+/* ---------- 서체 직원 8명 ---------- */
+const FONTS=[
+  {id:'sans', role:'공문서 담당', kind:'고딕',       css:"'Noto Sans KR'",       ps:'깔끔하고 정확함',   name:'Noto Sans KR',       maker:'Google'},
+  {id:'serif',role:'의전 담당',   kind:'명조',       css:"'Noto Serif KR'",      ps:'점잖고 믿음직함',   name:'Noto Serif KR',      maker:'Google'},
+  {id:'bold', role:'확성기 담당', kind:'굵은 제목체', css:"'Black Han Sans'",     ps:'목소리가 크고 셈',  name:'Black Han Sans',     maker:'Zess Type'},
+  {id:'round',role:'키즈 담당',   kind:'둥근체',     css:"'Jua'",                ps:'친근하고 발랄함',   name:'Jua',                maker:'Woowahan Brothers'},
+  {id:'pen',  role:'감성 담당',   kind:'손글씨체',   css:"'Nanum Pen Script'",   ps:'따뜻하고 다정함',   name:'Nanum Pen Script',   maker:'Sandoll Communication'},
+  {id:'brush',role:'전통 담당',   kind:'붓글씨체',   css:"'Nanum Brush Script'", ps:'전통적이고 힘있음', name:'Nanum Brush Script', maker:'Sandoll Communication'},
+  {id:'deco', role:'축제 담당',   kind:'장식체',     css:"'Gugi'",               ps:'화려하고 개성 강함',name:'Gugi',               maker:'TAE System & Typefaces'},
+  {id:'mono', role:'영수증 담당', kind:'고정폭체',   css:"'Nanum Gothic Coding'",ps:'기계적이고 정직함', name:'Nanum Gothic Coding',maker:'Sandoll Communication'}
+];
+const F={};FONTS.forEach(f=>F[f.id]=f);
+const CARD_SAMPLE='가나다 Aa';
+const SIZE_PX=[0,22,30,42,58,78];          // 크기 1~5단계 (포스터 500px 폭 기준)
+const SIZE_NAME=['','아주 작게','작게','보통','크게','아주 크게'];
+const UNREADABLE_BODY=['pen','brush','deco']; // 본문에 쓰면 가독성에서 깎이는 서체
+
+/* ---------- 꿀팁 9개 ---------- */
+const TIPS=[
+  {id:'fonts',   t:'서체는 한 포스터에 두 개까지'},
+  {id:'title',   t:'제목은 본문보다 확실하게 크게'},
+  {id:'small',   t:'작은 종이일수록 가장 중요한 하나만 크게'},
+  {id:'align',   t:'정렬은 한 포스터에 한 가지로'},
+  {id:'margin',  t:'가장자리는 비워 두기'},
+  {id:'leading', t:'긴 글은 행간을 넉넉하게'},
+  {id:'tracking',t:'자간은 극단으로 가지 않기, 큰 제목만 살짝 좁게'},
+  {id:'contrast',t:'배경과 글자는 밝기 차이를 크게'},
+  {id:'less',    t:'덜어낼수록 잘 보인다'}
+];
+
+/* ---------- 일차·구간 ---------- */
+const DAYS=[
+  null,
+  {n:1, ctl:['font','size'], ctlName:'서체 · 크기'},
+  {n:2, ctl:['font','size','weight','align','margin'], ctlName:'서체 · 크기 · 굵기 · 정렬 · 여백'},
+  {n:3, ctl:['font','size','weight','align','margin','tracking','leading','color'], ctlName:'전부 (자간 · 행간 · 색 추가)'}
+];
+// 손님 9명 자리 (교사 구간 이동 목록용). ready=false 는 아직 만들지 않은 손님.
+const SLOTS=[
+  {day:1,name:'문구점 사장님'},{day:1,name:'장례식장 직원'},{day:1,name:'키즈카페 사장님'},
+  {day:2,name:'약국 약사님'},{day:2,name:'한식당 사장님'},{day:2,name:'수선: 학생회장 후보'},
+  {day:3,name:'수선: 동네 카페 사장님'},{day:3,name:'초보 유튜버'},{day:3,name:'축제 준비위원장'}
+];
+
+/* ---------- 손님 (대사는 초안: 기획 확정 때 선생님이 다듬기) ----------
+   lines.role: key = 가장 중요한 줄, sub = 두 번째로 중요한 줄, body = 정보·본문
+   판정 범위 (1일차, 크기 1~5단계):
+     ① 서체 인상: key 서체가 good 안에 있고, 어느 줄도 bad 서체가 아님
+     ② 위계: key가 body보다 2단계 이상 크고, sub보다 1단계 이상 큼
+     ③ 가독성: body가 2단계 이상이고 손글씨·붓글씨·장식체가 아님
+     ④ 정돈: 서체 2개 이하 (1일차는 서체 수만 봄)
+     ⑤ 손님별 특기: spec.test
+*/
+const CUST=[
+  { id:'stationery', day:1, name:'문구점 사장님', who:'동네 문구점 사장님',
+    order:'연말 대방출! 세일 전단지 크게요.',
+    greet:['어서 와요, 새 점장님이죠? 앞집 문구점이에요.','연말 대방출 세일을 하거든요. 전단지, 크게! 눈에 확 띄게 부탁해요.'],
+    lines:[
+      {t:'연말 대방출!',role:'key',lb:'제목'},
+      {t:'전 품목 최대 50%',role:'sub',lb:'할인'},
+      {t:'12월 20일(토) ~ 24일(수)',role:'body',lb:'날짜'},
+      {t:'명지문구 · 학교 정문 앞',role:'body',lb:'장소'}],
+    good:['bold','deco'], bad:['pen','serif','brush'],
+    spec:{nm:'할인 문구 살리기', test:D=>D[1].size<D[0].size && D[1].size>Math.max(D[2].size,D[3].size)},
+    sample:[['bold',5],['bold',4],['sans',2],['sans',2]],
+    re:{
+      perfect:'이거죠! 길 건너에서도 「대방출」이 보이고, 「50%」도 바로 눈에 들어와요. 문 열자마자 손님이 줄을 섰어요!',
+      font:{
+        pen:'세일하는 줄 아무도 모르고, 다들 손편지인 줄 알았대요.',
+        serif:'다들 문구점이 문 닫는 줄 알고 작별 인사를 하고 갔어요…',
+        brush:'한약방 개업 현수막인 줄 알았대요. 세일하는 느낌이 안 나요.',
+        round:'키즈카페 초대장인 줄 알고 꼬마 손님들만 왔어요. 귀엽긴 한데…',
+        sans:'공지문처럼 얌전해서 세일하는 줄 몰랐대요. 목소리 큰 직원 없어요?',
+        mono:'가격표인 줄 알고 아무도 안 읽었대요. 제목은 더 크게 외쳐야죠!'
+      },
+      hier:'「대방출」이랑 다른 줄이 크기가 비슷해서, 다들 날짜가 가게 이름인 줄 알았대요.',
+      read:'날짜랑 장소가 너무 작거나 흘려 써져서, 언제 어디로 오라는 건지 몰랐대요.',
+      tidy:'서체가 너무 많아서 전단지가 서커스 포스터 같대요.',
+      spec:'「50%」가 묻혀서 다들 정가에 사 갔어요… 할인 문구는 날짜보다 크게, 제목보다는 작게요!'
+    },
+    thanks:'세일 첫날 문구점 앞에 줄이 생겼대요'
+  },
+  { id:'funeral', day:1, name:'장례식장 직원', who:'명지장례식장 직원',
+    order:'조문객 안내문을 부탁드려요.',
+    greet:['안녕하세요. 장례식장에서 왔습니다.','조문 오시는 분들이 보실 안내문이에요. 차분하고 정중하게 부탁드립니다.'],
+    lines:[
+      {t:'조문 안내',role:'key',lb:'제목'},
+      {t:'빈소: 3호실',role:'body',lb:'빈소'},
+      {t:'발인: 12월 21일 오전 7시',role:'body',lb:'발인'},
+      {t:'주차는 지하 1층을 이용해 주십시오',role:'body',lb:'주차'}],
+    good:['serif','sans'], bad:['round','deco','pen','bold'],
+    spec:{nm:'차분한 크기', test:D=>D[0].size<=4},
+    sample:[['serif',4],['serif',2],['serif',2],['serif',2]],
+    re:{
+      perfect:'조용하고 정중해서 좋네요. 조문 오신 분들이 안내문을 보고 차분히 길을 찾으셨어요.',
+      font:{
+        round:'조문객분들이 웃음을 참고 계세요… 다시 부탁드려요.',
+        deco:'놀이공원 입구인 줄 아신 분이 계셨어요… 이 자리에는 너무 화려해요.',
+        pen:'개인 쪽지처럼 보여서, 공식 안내문인지 다들 헷갈려하셨어요.',
+        bold:'글자가 소리를 지르는 것 같아서 다들 깜짝 놀라셨어요.',
+        brush:'붓글씨가 너무 힘이 넘쳐서 개업 현수막 같다고 하셨어요.',
+        mono:'영수증처럼 보여서 계산서인 줄 아셨대요. 조금 더 정중한 직원이면 좋겠어요.'
+      },
+      hier:'「조문 안내」가 다른 줄과 크기가 비슷해서, 무슨 안내문인지 한참 읽으셔야 했어요.',
+      read:'안내 글씨가 너무 작거나 흘림체라서, 어르신들이 가까이 다가가 읽으셨어요.',
+      tidy:'서체가 여러 개라 어수선해 보여요. 이런 자리일수록 정돈된 느낌이 중요해요.',
+      spec:'제목이 너무 커서 안내문이 소리치는 것 같아요. 한 단계만 낮춰 주시겠어요?'
+    },
+    thanks:'조문객들이 차분히 길을 찾으셨대요'
+  },
+  { id:'kids', day:1, name:'키즈카페 사장님', who:'꿈나무 키즈카페 사장님',
+    order:'다섯 살 생일파티 초대장이에요.',
+    greet:['안녕하세요! 키즈카페예요.','이번 주에 다섯 살 지우 생일파티가 있어요. 친구들한테 줄 초대장 부탁해요!'],
+    lines:[
+      {t:'지우의 다섯 번째 생일파티!',role:'key',lb:'제목'},
+      {t:'12월 13일(토) 오후 2시',role:'body',lb:'시간'},
+      {t:'꿈나무 키즈카페 2층',role:'body',lb:'장소'},
+      {t:'선물은 마음만 가져와!',role:'body',lb:'한마디'}],
+    good:['round','deco','pen'], bad:['serif','brush','mono'],
+    spec:{nm:'시간이 잘 보이게', test:D=>D[1].size>=Math.max(D[2].size,D[3].size)},
+    sample:[['round',5],['sans',3],['sans',2],['sans',2]],
+    re:{
+      perfect:'지우가 초대장을 들고 방방 뛰어다녀요! 부모님들도 시간이랑 장소를 바로 아셨대요.',
+      font:{
+        serif:'부모님들이 결혼식 청첩장인 줄 아셨대요. 다섯 살 파티인데…',
+        brush:'붓글씨라 무슨 도장 찍는 행사인 줄 알았대요. 아이들이 무서워해요.',
+        mono:'영수증인 줄 알고 버릴 뻔했대요! 생일파티 느낌이 하나도 안 나요.',
+        sans:'깔끔하긴 한데 학원 공지문 같대요. 파티 느낌이 좀 더 났으면 해요.',
+        bold:'너무 우렁차서 마트 세일 전단지 같대요. 조금 더 귀엽게요!'
+      },
+      hier:'제목이 다른 줄보다 별로 크지 않아서, 누구 파티인지 한참 찾았대요.',
+      read:'시간이랑 장소가 너무 작거나 흘림체라서, 부모님들이 몇 번이나 전화하셨어요.',
+      tidy:'서체가 너무 많아서 초대장이 장난감 상자를 쏟은 것 같대요.',
+      spec:'시간이 제일 안 보여서 친구들이 다 늦게 왔어요! 시간은 다른 정보보다 작지 않게요.'
+    },
+    thanks:'지우의 친구들이 시간 맞춰 다 왔대요'
+  }
+];
+
+/* ---------- 나눠 받기: 단계별 목록 (그림이 들어오면 여기에 진행 순서대로 적는다) ---------- */
+const STAGES={day1:[],day2:[],day3:[],result:[]};
+const Pre={keep:[],queue:[],running:0,done:{}};
+function loadImg(src,ms){
+  return new Promise(res=>{
+    const im=new Image();let fin=false;
+    const end=ok=>{if(fin)return;fin=true;clearTimeout(t);res(ok?im:null)};
+    const t=setTimeout(()=>end(false),ms||10000);
+    im.onload=()=>end(true);im.onerror=()=>end(false);
+    im.src=src;Pre.keep.push(im);
+  });
+}
+function pump(){
+  while(Pre.running<2&&Pre.queue.length){
+    const job=Pre.queue.shift();Pre.running++;
+    loadImg(job.src).then(r=>{Pre.running--;job.res(r);setTimeout(pump,40)});
+  }
+}
+function fetchImg(src){return new Promise(res=>{Pre.queue.push({src,res});pump()})}
+function dayText(d){return CUST.filter(c=>c.day===d).map(c=>c.lines.map(l=>l.t).join('')).join('')+CARD_SAMPLE}
+// 단계 준비: 그 단계 그림 + 그 단계 글자의 서체 조각. 실패하거나 10초가 지나도 끝난 것으로 본다.
+function prepare(key){
+  if(Pre.done[key])return Pre.done[key];
+  const d=+key.replace('day','')||0;
+  const txt=d?dayText(d):'';
+  const jobs=(STAGES[key]||[]).map(fetchImg);
+  if(txt&&document.fonts&&document.fonts.load)FONTS.forEach(f=>jobs.push(document.fonts.load('40px '+f.css,txt).catch(()=>null)));
+  return Pre.done[key]=Promise.race([Promise.all(jobs),wait(10000)]);
+}
+async function ready(key){
+  let shown=false;const t=setTimeout(()=>{shown=true;$('#loading').hidden=false},300);
+  await prepare(key);clearTimeout(t);if(shown)$('#loading').hidden=true;
+}
+
+/* ---------- 상태 ---------- */
+let S=null;   // 저장되는 진행 상태
+let R=null;   // 지금 손님 한 명의 작업 상태
+function fresh(){return{v:1,info:null,cur:0,best:Array(9).fill(null),tips:[],designs:{}}}
+function save(){if(S&&S.info)store.set(SAVE_KEY,S)}
+function totalStars(){return S.best.reduce((a,b)=>a+(b||0),0)}
+
+/* ---------- 화면 전환 ---------- */
+function show(id){
+  ['sTitle','sInfo','sScene','sWork'].forEach(k=>$('#'+k).hidden=(k!==id));
+  $('#menuBtn').hidden=(id==='sTitle'||id==='sInfo');
+}
+
+/* ---------- 타이틀 ---------- */
+function toTitle(){
+  closeModal();
+  const sv=store.get(SAVE_KEY);
+  const has=sv&&sv.info&&sv.v===1;
+  $('#titleBtns').innerHTML=has
+    ?`<button class="btn pri" id="tCont">이어서 하기 ▶</button><button class="btn" id="tNew">처음부터</button>`
+    :`<button class="btn pri" id="tStart">영업 시작 ▶</button>`;
+  show('sTitle');
+  if(has){
+    $('#tCont').onclick=()=>{ac();S=sv;resume()};
+    $('#tNew').onclick=()=>confirmReset();
+  }else $('#tStart').onclick=()=>{ac();S=fresh();toInfo()};
+}
+
+/* ---------- 정보 입력 ---------- */
+function toInfo(){
+  show('sInfo');$('#infoErr').textContent='';
+  ['iG','iC','iN','iName'].forEach(id=>$('#'+id).value='');
+}
+$('#infoForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const g=$('#iG').value.trim(),c=$('#iC').value.trim(),n=$('#iN').value.trim(),nm=$('#iName').value.trim();
+  const err=!g?'학년을 적어 줘.':!c?'반을 적어 줘.':!n?'번호를 적어 줘.':!nm?'이름을 적어 줘.':
+    (!/^\d+$/.test(g+c+n))?'학년·반·번호는 숫자로 적어 줘.':'';
+  if(err){$('#infoErr').textContent=err;return}
+  document.activeElement&&document.activeElement.blur();
+  S.info={g,c,n,name:nm};save();
+  intro();
+});
+$('#infoBack').onclick=toTitle;
+$('#credBtn').onclick=credits;
+
+/* ---------- 장면 화면 ---------- */
+function scene(html,btns){
+  $('#sScene').innerHTML=html+`<div class="row">${btns.map((b,i)=>`<button class="btn ${b.cls||''}" data-i="${i}">${b.t}</button>`).join('')}</div>`;
+  $('#sScene').querySelectorAll('.row .btn').forEach(el=>el.onclick=()=>{SFX.tap();btns[+el.dataset.i].f()});
+  show('sScene');
+}
+function intro(){
+  prepare('day1');
+  scene(`<div class="pic">가게 안 그림 자리</div>
+    <h1>오늘부터 네가 이 가게 점장이야.</h1>
+    <p>손님 주문서를 보고 서체 직원을 골라 포스터를 만들어 납품해.<br>손님이 별을 다섯 개까지 줘. 별이 깎이면 손님 말 속에 이유가 있어.</p>`,
+    [{t:'1일차 시작 ▶',cls:'pri',f:()=>dayCard(1)}]);
+}
+function dayCard(d){
+  scene(`<div class="big">${d}일차</div>
+    <h1 style="margin-top:30px">오늘 쓸 수 있는 것: ${DAYS[d].ctlName}</h1>
+    <p>손님 3명이 와.</p>`,
+    [{t:'영업 시작 ▶',cls:'pri',f:async()=>{await ready('day'+d);startCustomer(firstOfDay(d))}}]);
+}
+const firstOfDay=d=>SLOTS.findIndex(s=>s.day===d);
+function resume(){
+  if(S.cur>=CUST.length){dayEnd(SLOTS[S.cur-1].day);return}
+  scene(`<div class="big">다시 열었어</div><h1 style="margin-top:30px">${esc(S.info.name)} 점장님, 어서 와.</h1>
+    <p>${SLOTS[S.cur].day}일차 · ${esc(SLOTS[S.cur].name)} 차례부터 이어서 해.</p>`,
+    [{t:'계속하기 ▶',cls:'pri',f:async()=>{await ready('day'+SLOTS[S.cur].day);startCustomer(S.cur)}}]);
+}
+function dayEnd(d){
+  const idx=SLOTS.map((s,i)=>i).filter(i=>SLOTS[i].day===d);
+  const got=idx.reduce((a,i)=>a+(S.best[i]||0),0);
+  const nextReady=CUST.some(c=>c.day===d+1);
+  scene(`<div class="big">${d}일차 영업 끝!</div>
+    <h1 style="margin-top:30px">오늘 받은 별 ${got} / ${idx.length*5}</h1>
+    <p>${nextReady?`내일은 쓸 수 있는 도구가 늘어나.`:`${d+1}일차 가게는 아직 공사 중이야. 곧 열릴 거야.`}</p>`,
+    nextReady?[{t:`${d+1}일차 열기 ▶`,cls:'pri',f:async()=>{await ready('day'+(d+1));dayCard(d+1)}}]
+             :[{t:'처음 화면으로',f:toTitle}]);
+}
+
+/* ---------- 대사 패널 ---------- */
+const D={who:'',narr:false,pages:[],i:0,done:null,mood:''};
+const SIL='<svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="74" r="40" fill="#8f8877"/><path d="M28 200 C30 140 62 122 100 122 C138 122 170 140 172 200 Z" fill="#8f8877"/></svg>';
+function say(who,pages,done,opt){
+  opt=opt||{};
+  D.who=who;D.narr=!!opt.narr;D.pages=pages;D.i=0;D.done=done||null;
+  if(opt.mood!==undefined)D.mood=opt.mood;
+  renderDlg();
+}
+function renderDlg(){
+  $('#dName').textContent=D.who;$('#dName').className=D.narr?'narr':'';
+  $('#dText').textContent=D.pages[D.i]||'';
+  const more=D.i<D.pages.length-1||!!D.done;
+  $('#dNext').textContent=more?'눌러서 계속 ▶':'';
+  $('#dlg').classList.toggle('wait',more);
+  // 손님 그림 자리 (그림이 오면 images/ 의 표정 3종으로 바꿈: 만족·당황·감동)
+  $('#dPort').innerHTML=SIL+(D.mood?`<div class="md">(${D.mood})</div>`:'');
+}
+$('#dlg').addEventListener('click',()=>{
+  if(D.i<D.pages.length-1){D.i++;SFX.tap();renderDlg();return}
+  if(D.done){const f=D.done;D.done=null;SFX.tap();renderDlg();f()}
+});
+
+/* ---------- 손님 한 명 ---------- */
+function startCustomer(i){
+  const c=CUST[i];
+  if(!c){dayEnd(SLOTS[i-1]?SLOTS[i-1].day:1);return}
+  S.cur=i;save();
+  R={i,c,day:DAYS[c.day],lines:c.lines.map(()=>({font:null,size:3})),sel:0,tab:'font',tries:0,phase:'order'};
+  show('sWork');
+  renderBar();renderReceipt();renderPoster();renderCtrl();
+  say(c.name,c.greet,()=>{
+    R.phase='work';renderCtrl();renderPoster();hint();
+  },{mood:'보통'});
+  // 첫 화면이 그려진 뒤, 다음 단계만 뒤에서 미리 받는다
+  setTimeout(()=>prepare('day'+(c.day+1)),600);
+}
+function hint(){
+  const first=R.i===0&&R.tries===0;
+  const msg=R.tab==='font'
+    ?(first?'포스터에서 줄을 누르고, 오른쪽에서 그 줄을 맡을 서체 직원을 골라 봐.':'줄을 누르고 서체 직원을 골라 봐. 줄마다 따로 정할 수 있어.')
+    :(first?'이제 줄마다 크기를 정해 봐. 다 됐으면 「납품하기」!':'줄마다 크기를 정해 봐. 다 됐으면 「납품하기」!');
+  say('안내',[msg],null,{narr:true});
+}
+function usedFonts(){return [...new Set(R.lines.map(l=>l.font).filter(Boolean))]}
+
+function renderBar(){
+  const slots=SLOTS.filter(s=>s.day===R.c.day);
+  const k=slots.indexOf(SLOTS[R.i])+1;
+  $('#dayPill').innerHTML=`${R.c.day}일차 · 손님 <b>${k}</b>/${slots.length}`;
+  const n=usedFonts().length;
+  const fc=$('#fontCount');fc.classList.toggle('over',n>=3);
+  fc.innerHTML=`서체 계산대 <b>${n}</b>${n>=3?' 초과!':''}`;
+  $('#starPill').innerHTML=`별 <b>★ ${totalStars()}</b>`;
+  $('#tipBtn').textContent=`꿀팁 노트 ${S.tips.length}/9`;
+}
+function renderReceipt(){
+  const c=R.c,el=$('#rcpt');el.className='';
+  el.innerHTML=`<div class="hd"><span>FONT STORE 24H</span><span>No.${String(R.i+1).padStart(3,'0')}</span></div>
+    <hr><div class="k">손님</div><div class="who">${esc(c.who)}</div>
+    <div class="q">"${esc(c.order)}"</div>
+    <hr><div class="k">들어갈 글</div>
+    ${c.lines.map(l=>`<div class="ln"><i>${esc(l.lb)}</i><span>${esc(l.t)}</span></div>`).join('')}
+    <hr><div class="k">오늘 쓸 수 있는 것</div><div class="ctl">${esc(R.day.ctlName)}</div>
+    <div class="bar" aria-hidden="true"></div>`;
+}
+function posterHTML(c,lines,sel){
+  return `<div class="poster" style="width:500px;height:707px"><div class="pin">`+
+    c.lines.map((l,j)=>{const d=lines[j];
+      return `<div class="pl${d.font?'':' uncast'}${j===sel?' sel':''}" data-line="${j}" style="font-family:${d.font?F[d.font].css:'system-ui,sans-serif'};font-size:${SIZE_PX[d.size]}px">${esc(l.t)}</div>`}).join('')+
+    `</div><div class="scan"></div></div>`;
+}
+function renderPoster(){
+  const w=$('#pwrap');
+  w.innerHTML=posterHTML(R.c,R.lines,R.phase==='work'?R.sel:-1);
+  w.classList.toggle('clickable',R.phase==='work');
+}
+$('#pwrap').addEventListener('click',e=>{
+  const el=e.target.closest('.pl');if(!el||!R||R.phase!=='work')return;
+  R.sel=+el.dataset.line;SFX.tap();renderPoster();renderCtrl();
+});
+// 세 걸음 뒤에서 보기: 누르고 있는 동안만
+(function(){
+  const b=$('#holdBtn'),w=$('#pwrap');
+  const on=e=>{e.preventDefault();w.classList.add('far')},off=()=>w.classList.remove('far');
+  b.addEventListener('pointerdown',on);['pointerup','pointerleave','pointercancel','blur'].forEach(t=>b.addEventListener(t,off));
+  b.addEventListener('contextmenu',e=>e.preventDefault());
+})();
+
+function renderCtrl(){
+  const tabs=$('#tabs'),body=$('#cbody'),dv=$('#deliver');
+  if(R.phase==='react'){return}
+  const T=[{id:'font',t:'① 서체 직원'},{id:'size',t:'② 크기'}].filter(t=>R.day.ctl.includes(t.id));
+  tabs.hidden=false;dv.hidden=false;
+  tabs.innerHTML=T.map(t=>`<button role="tab" aria-selected="${R.tab===t.id}" data-tab="${t.id}">${t.t}</button>`).join('');
+  tabs.querySelectorAll('button').forEach(b=>b.onclick=()=>{if(R.phase!=='work')return;R.tab=b.dataset.tab;SFX.tap();renderCtrl();hint()});
+  const lock=R.phase!=='work';
+  if(R.tab==='font'){
+    const cur=R.lines[R.sel].font;
+    body.innerHTML=`<div class="chead">선택한 줄 ▸ ${esc(R.c.lines[R.sel].t)}</div><div class="fgrid">`+
+      FONTS.map(f=>`<button class="fcard${cur===f.id?' on':''}" data-f="${f.id}" ${lock?'disabled':''} aria-pressed="${cur===f.id}">
+        <span class="r">${f.role}</span><span class="smp" style="font-family:${f.css}">${CARD_SAMPLE}</span><span class="ps">${f.ps}</span></button>`).join('')+`</div>`;
+    body.querySelectorAll('.fcard').forEach(b=>b.onclick=()=>castFont(b.dataset.f));
+  }else{
+    body.innerHTML=`<div class="shint"><span>◀ 작게</span><span>크게 ▶</span></div>`+
+      R.c.lines.map((l,j)=>`<div class="srow${j===R.sel?' on':''}"><div class="lb" data-line="${j}"><b>${esc(l.lb)}</b><span>${esc(l.t)}</span></div>`+
+        [1,2,3,4,5].map(s=>`<button class="sz" data-line="${j}" data-s="${s}" aria-pressed="${R.lines[j].size===s}" aria-label="${esc(l.lb)} ${SIZE_NAME[s]}" ${lock?'disabled':''}>${s}</button>`).join('')+`</div>`).join('');
+    body.querySelectorAll('.sz').forEach(b=>b.onclick=()=>{
+      const j=+b.dataset.line;R.lines[j].size=+b.dataset.s;R.sel=j;SFX.tap();renderPoster();renderCtrl();});
+    body.querySelectorAll('.lb').forEach(b=>b.onclick=()=>{R.sel=+b.dataset.line;renderPoster();renderCtrl()});
+  }
+  dv.disabled=lock;
+  dv.textContent=R.tries?'다시 납품하기 ▶':'납품하기 ▶';
+}
+function castFont(id){
+  if(R.phase!=='work')return;
+  R.lines[R.sel].font=id;SFX.tap();
+  // 서체가 없는 다음 줄로 선택을 옮겨 준다
+  const nx=R.lines.findIndex(l=>!l.font);
+  if(nx>=0)R.sel=nx;
+  renderBar();renderPoster();renderCtrl();
+  if(nx<0&&R.tries===0&&R.day.ctl.includes('size')&&!R.saidSize){R.saidSize=true;say('안내',['모든 줄에 직원을 정했어. 이제 「② 크기」 탭으로 가 봐.'],null,{narr:true})}
+}
+$('#deliver').onclick=()=>{
+  if(!R||R.phase!=='work')return;
+  const nx=R.lines.findIndex(l=>!l.font);
+  if(nx>=0){R.sel=nx;R.tab='font';renderPoster();renderCtrl();SFX.miss();
+    say('안내',['아직 서체 직원이 없는 줄이 있어. 점선으로 표시된 줄을 먼저 맡겨 줘.'],null,{narr:true});return}
+  deliver();
+};
+
+/* ---------- 채점 ---------- */
+function judge(c,L){
+  const k=c.lines.findIndex(l=>l.role==='key');
+  const nFonts=new Set(L.map(l=>l.font)).size;
+  const badLine=L.findIndex(l=>c.bad.includes(l.font));
+  const imp=c.good.includes(L[k].font)&&badLine<0;
+  const hier=c.lines.every((l,j)=>j===k||(l.role==='body'?L[k].size>=L[j].size+2:L[k].size>L[j].size));
+  const read=c.lines.every((l,j)=>l.role!=='body'||(L[j].size>=2&&!UNREADABLE_BODY.includes(L[j].font)));
+  const tidy=nFonts<=2;
+  const spec=!!c.spec.test(L);
+  // 서체 인상 반응: 나쁜 서체가 있으면 그 서체, 아니면 제목 서체
+  const impFont=badLine>=0?L[badLine].font:L[k].font;
+  const rows=[
+    {id:'imp',nm:'서체 인상',ok:imp},
+    {id:'hier',nm:'위계 (제목이 확실히 크게)',ok:hier},
+    {id:'read',nm:'가독성 (본문이 읽히게)',ok:read},
+    {id:'tidy',nm:'정돈 (서체 2개 이하)',ok:tidy},
+    {id:'spec',nm:'손님 특기: '+c.spec.nm,ok:spec}];
+  return {rows,stars:rows.filter(r=>r.ok).length,impFont,nFonts};
+}
+function reaction(c,J){
+  if(J.stars===5)return [c.re.perfect];
+  const why=J.rows.filter(r=>!r.ok).map(r=>r.id==='imp'?(c.re.font[J.impFont]||c.re.font.sans):c.re[r.id]);
+  const open=J.stars>=4?'거의 다 좋아요! 그런데…':J.stars>=2?'음… 고마운데요, 사실은…':'저기… 큰일 났어요.';
+  const out=[open+' '+why[0]];
+  if(why[1])out.push('그리고 '+why[1]);
+  if(R.tries===0)out.push(J.stars>=4?'한 번만 더 손봐 주실 수 있어요?':'다시 부탁드려도 될까요?');
+  return out;
+}
+
+async function deliver(){
+  R.phase='react';
+  const c=R.c,J=judge(c,R.lines);
+  renderPoster();
+  $('#tabs').hidden=true;$('#deliver').hidden=true;
+  const body=$('#cbody');
+  body.innerHTML=`<div class="score"><div class="tot" id="tot">삐빅!</div>`+
+    J.rows.map(r=>`<div class="srow2 ${r.ok?'pass':'fail'}"><span class="st" aria-hidden="true">${r.ok?'★':'☆'}</span><span class="nm">${esc(r.nm)}</span><span class="ok">${r.ok?'통과':'아쉬움'}</span></div>`).join('')+
+    `</div>`;
+  body.style.top='0';body.style.height='696px';
+  SFX.beep();
+  const sc=$('#pwrap .scan');if(sc){sc.classList.add('go')}
+  say('안내',['삐빅! 납품 완료. 손님이 포스터를 보는 중…'],null,{narr:true});
+  await wait(700);
+  const rows=body.querySelectorAll('.srow2');
+  for(let i=0;i<rows.length;i++){rows[i].classList.add('in');J.rows[i].ok?SFX.stamp():SFX.miss();await wait(380)}
+  $('#tot').textContent=`★ ${J.stars} / 5`;
+  // 기록: 더 높은 점수를 남긴다
+  const prev=S.best[R.i];
+  S.best[R.i]=Math.max(prev||0,J.stars);
+  S.designs[R.i]={lines:R.lines.map(l=>({...l})),stars:J.stars};
+  // 꿀팁 해금 조건
+  const newTips=[];
+  const unlock=id=>{if(!S.tips.includes(id)&&!newTips.includes(id))newTips.push(id)};
+  if(!J.rows[3].ok&&J.nFonts>=3)unlock('fonts');
+  if(c.id==='stationery'&&J.stars===5)unlock('title');
+  save();renderBar();
+  // 별 3개 이하, 첫 납품이면: 견본을 작게, 잠깐 나란히 보여 준다
+  if(J.stars<=3&&R.tries===0)await showSample(c);
+  const mood=J.stars===5?'감동':J.stars>=4?'만족':'당황';
+  await new Promise(res=>say(c.name,reaction(c,J),res,{mood}));
+  for(const id of newTips){S.tips.push(id);save();renderBar();await tipModal(id)}
+  afterButtons(J);
+}
+async function showSample(c){
+  const el=$('#rcpt');el.className='cmp';
+  const L=c.sample.map(([font,size])=>({font,size}));
+  el.innerHTML=`<div class="ct">이렇게 했으면 별 다섯 개</div><div style="transform:scale(.58);transform-origin:50% 0">${posterHTML(c,L,-1)}</div>`;
+  await wait(2600);
+  renderReceipt();
+}
+function afterButtons(J){
+  const body=$('#cbody');
+  const can=J.stars<5&&R.tries===0;
+  const box=document.createElement('div');box.className='after';
+  box.innerHTML=(can?`<button class="btn" id="aRe">다시 납품 (1번)</button>`:'')+
+    `<button class="btn pri" id="aNext">${R.i+1<SLOTS.length&&SLOTS[R.i+1].day===R.c.day?'다음 손님 ▶':'영업 마감 ▶'}</button>`;
+  body.style.height='696px';
+  $('#ctrl').appendChild(box);
+  if(can)$('#aRe').onclick=()=>{box.remove();body.style.height='';body.style.top='';R.tries=1;R.phase='work';R.tab='font';renderPoster();renderCtrl();
+    say('안내',['손님 말 속에 깎인 이유가 있어. 고쳐서 다시 납품해 봐.'],null,{narr:true})};
+  $('#aNext').onclick=()=>{box.remove();body.style.height='';body.style.top='';nextCustomer()};
+  say('안내',[can?'다시 납품하면 더 높은 점수가 남아. 그냥 다음 손님을 받아도 돼.':J.stars===5?'완벽해! 다음 손님을 받아 봐.':'좋아, 다음 손님을 받아 봐.'],null,{narr:true});
+}
+function nextCustomer(){
+  const i=R.i,d=SLOTS[i].day;
+  S.cur=i+1;save();
+  if(i+1>=SLOTS.length||SLOTS[i+1].day!==d){dayEnd(d);return}
+  startCustomer(i+1);
+}
+
+/* ---------- 창(모달) ---------- */
+let modalDone=null;
+function modal(html,onClose){
+  const ov=$('#ov');ov.innerHTML=`<div class="mbox" role="dialog" aria-modal="true">${html}</div>`;ov.hidden=false;
+  modalDone=onClose||null;
+  const x=ov.querySelector('.mx');if(x)x.onclick=closeModal;
+  return ov.querySelector('.mbox');
+}
+function closeModal(){const ov=$('#ov');if(ov.hidden)return;ov.hidden=true;ov.innerHTML='';const f=modalDone;modalDone=null;if(f)f()}
+
+function tipModal(id){
+  return new Promise(res=>{
+    SFX.tip();
+    const tip=TIPS.find(t=>t.id===id);
+    const m=modal(`<h2>꿀팁 해금!</h2><div class="tipbig">${esc(tip.t)}</div>
+      <p>꿀팁 노트 ${S.tips.length} / 9 · 친구한테 알려 줘도 돼.</p>
+      <div class="row"><button class="btn pri" id="tipOk">노트에 넣기</button></div>`,res);
+    m.querySelector('#tipOk').onclick=closeModal;
+  });
+}
+function tipsNote(){
+  const m=modal(`<button class="mx" aria-label="닫기">✕</button><h2>꿀팁 노트 ${S.tips.length} / 9</h2>
+    <ul class="tips">${TIPS.map(t=>S.tips.includes(t.id)?`<li>💡 ${esc(t.t)}</li>`:`<li class="lock">🔒 아직 못 찾았어</li>`).join('')}</ul>`);
+}
+$('#tipBtn').onclick=tipsNote;
+
+function credits(){
+  modal(`<button class="mx" aria-label="닫기">✕</button><h2>작품 출처</h2>
+    <h3>서체</h3>
+    <ul class="cred">${FONTS.map(f=>`<li>${f.name} (${f.role}) · ${f.maker} · SIL Open Font License 1.1 · Google Fonts</li>`).join('')}</ul>
+    <h3>그림</h3><ul class="cred"><li>준비 중</li></ul>
+    <h3>소리</h3><ul class="cred"><li>효과음은 Web Audio로 직접 합성했습니다 (소리 파일 없음).</li></ul>
+    <div class="foot">© 명지중학교 미술과 · CC BY-NC 4.0 · joyhanju.github.io</div>`);
+}
+
+/* ---------- 메뉴 ---------- */
+const GEAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>';
+function menu(){
+  const m=modal(`<button class="mx" aria-label="닫기">✕</button><h2>메뉴</h2>
+    <div class="mlist">
+      <button class="btn" id="mSnd">소리: ${SET.sound?'켜짐 🔊':'꺼짐 🔇'}</button>
+      <button class="btn" id="mFs">전체화면</button>
+      <button class="btn" id="mTips">꿀팁 노트</button>
+      <button class="btn" id="mCred">작품 출처</button>
+      <button class="btn" id="mReset">처음부터</button>
+      <button class="btn pri" id="mClose">계속하기</button>
+    </div>
+    <button class="gear" id="mGear" aria-label="교사">${GEAR}</button>`);
+  m.querySelector('#mSnd').onclick=()=>{SET.sound=!SET.sound;store.set(SET_KEY,SET);menu()};
+  m.querySelector('#mFs').onclick=()=>{fullscreen();closeModal()};
+  m.querySelector('#mTips').onclick=tipsNote;
+  m.querySelector('#mCred').onclick=credits;
+  m.querySelector('#mReset').onclick=confirmReset;
+  m.querySelector('#mClose').onclick=closeModal;
+  m.querySelector('#mGear').onclick=pinPrompt;
+}
+$('#menuBtn').onclick=menu;
+function fullscreen(){
+  try{const d=document,el=d.documentElement;
+    if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d)}
+    else{const r=(el.requestFullscreen||el.webkitRequestFullscreen).call(el);if(r&&r.catch)r.catch(()=>{})}
+  }catch(e){}
+  setTimeout(fit,300);
+}
+function confirmReset(){
+  const m=modal(`<h2>처음부터 할까?</h2><p>이 기기에 남은 기록(점수, 꿀팁, 이름)이 모두 지워져.</p>
+    <div class="row"><button class="btn" id="rNo">아니, 계속할래</button><button class="btn dark" id="rYes">지우고 처음부터</button></div>`);
+  m.querySelector('#rNo').onclick=closeModal;
+  m.querySelector('#rYes').onclick=()=>{store.del(SAVE_KEY);S=null;R=null;closeModal();toTitle()};
+}
+
+/* ---------- 교사 바로가기 ---------- */
+function pinOk(v){try{const e=new TextEncoder();return crypto.subtle.importKey('raw',e.encode(String(v||'').trim()),'PBKDF2',false,['deriveBits']).then(k=>crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode('joyhanju-admin-v1'),iterations:200000,hash:'SHA-256'},k,256)).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')==='fa5b21dcecc9a397084c2f7404b949f8ae85554359a29695909a23c5b0b0d3f4').catch(()=>false)}catch(x){return Promise.resolve(false)}}
+function pinPrompt(){
+  const m=modal(`<button class="mx" aria-label="닫기">✕</button>
+    <form class="row" id="pinF" style="margin-top:70px"><input class="pinin" id="pinIn" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="번호">
+    <button class="btn sm pri" type="submit" aria-label="확인">▶</button></form>`);
+  const inp=m.querySelector('#pinIn');setTimeout(()=>inp.focus(),50);
+  m.querySelector('#pinF').onsubmit=async e=>{
+    e.preventDefault();
+    if(await pinOk(inp.value)){inp.blur();jumpMenu()}
+    else{inp.value='';inp.classList.remove('bad');void inp.offsetWidth;inp.classList.add('bad')}
+  };
+}
+function jumpMenu(){
+  const days=[1,2,3].map(d=>`<div class="jday"><h3>${d}일차</h3><div class="row">`+
+    SLOTS.map((s,i)=>s.day!==d?'':`<button class="btn" data-j="${i}" ${CUST[i]?'':'disabled'}>손님 ${i+1}. ${esc(s.name)}${CUST[i]?'':' (준비 중)'}</button>`).join('')+`</div></div>`).join('');
+  const m=modal(`<button class="mx" aria-label="닫기">✕</button><h2>구간 이동</h2>
+    <p style="font-size:28px">누르면 그 손님부터 시작합니다. 건너뛴 손님의 별은 0개로 기록됩니다.</p>${days}
+    <div class="jday"><h3>결과</h3><div class="row"><button class="btn" disabled>결과 영수증 (준비 중)</button></div></div>`);
+  m.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>jump(+b.dataset.j));
+}
+async function jump(i){
+  if(!S||!S.info){S=S||fresh();S.info={g:'',c:'',n:'',name:'선생님'}}
+  for(let j=0;j<SLOTS.length;j++){if(j<i){if(S.best[j]==null)S.best[j]=0}else S.best[j]=null}
+  S.cur=i;save();modalDone=null;closeModal();
+  await ready('day'+SLOTS[i].day);startCustomer(i);
+}
+
+/* ---------- 통계: 게임 완료 (결과 화면이 생기면 처음 도착했을 때 부른다) ---------- */
+function gcDone(){
+  const k='gc-done:'+location.pathname;try{if(sessionStorage.getItem(k))return}catch(e){}
+  let n=0;const iv=setInterval(()=>{const g=window.goatcounter;
+    if(g&&g.count){clearInterval(iv);g.count({path:'완료/'+document.title,title:document.title,event:true});try{sessionStorage.setItem(k,'1')}catch(e){}}
+    else if(++n>60)clearInterval(iv)},250);
+}
+
+toTitle();
+</script>
+<script>window.goatcounter={path:function(){return location.pathname;}};</script>
+<script data-goatcounter="https://joyhanju.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>/* QR로 들어온 학생 수 세기: 같은 기기는 새로고침해도 한 번만 */
+(function(){if(!/[?&]qr(=|&|$)/.test(location.search))return;var k='gc-qr:'+location.pathname;try{if(sessionStorage.getItem(k))return;}catch(e){}
+var n=0,iv=setInterval(function(){var g=window.goatcounter;if(g&&g.count){clearInterval(iv);g.count({path:'QR 입장/'+document.title,title:document.title,event:true});try{sessionStorage.setItem(k,'1');}catch(e){}}else if(++n>60)clearInterval(iv);},250);})();
+</script>
+</body>
+</html>
