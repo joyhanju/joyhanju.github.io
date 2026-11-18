@@ -8,10 +8,11 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<!-- 만드는 동안은 구글 폰트 링크. 공개 전 다듬기 단계에서 fonts/ 의 서브셋 woff2로 바꾼다 (CLAUDE.md 4절) -->
+<!-- 만드는 동안은 구글 폰트 링크. 공개 전 다듬기 단계에서 fonts/ 의 서브셋 woff2로 바꾼다 (CLAUDE.md 4절)
+     안내 글꼴 Noto Sans KR은 아래 링크(글자 조각), 포스터 서체 11종은 스크립트의 loadPosterFonts()가 게임 글자만 지정해(text=) 받는다 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gugi&family=Jua&family=Nanum+Brush+Script&family=Nanum+Gothic+Coding&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+KR:wght@400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap">
 <style>
 :root{
   --ink:#17171a; --ink2:#3a3a40; --paper:#fbf6e9; --dlgink:#2a1d12;
@@ -73,6 +74,8 @@ button{font-family:var(--ui);color:inherit;cursor:pointer}
 .pill{font-size:28px;font-weight:700;padding:8px 18px;border:3px solid #55555c;border-radius:10px;white-space:nowrap}
 .pill b{color:var(--yellow)}
 #fontCount.over{background:var(--bad);border-color:#fff}
+#fontCount.warn{background:var(--yellow);color:var(--ink);border-color:var(--yellow)}
+#fontCount.warn b{color:var(--ink)}
 #tipBtn{margin-left:auto;min-height:72px;font-size:28px;font-weight:700;background:#2b2b31;color:#fff;border:3px solid #7a7a82;border-radius:10px;padding:0 22px}
 #menuBtn{position:absolute;right:24px;top:12px;height:72px;min-width:150px;font-size:30px;font-weight:700;background:var(--yellow);color:var(--ink);border:4px solid #fff;border-radius:10px;z-index:20}
 #menuBtn:active{transform:translateY(3px)}
@@ -111,13 +114,13 @@ button{font-family:var(--ui);color:inherit;cursor:pointer}
 #cbody{position:absolute;left:0;right:0;top:88px;height:620px;background:#fff;border:4px solid var(--ink);border-radius:10px;padding:14px}
 #deliver{position:absolute;left:0;right:0;bottom:0;width:100%;min-height:92px;font-size:40px}
 .chead{font-size:26px;font-weight:700;color:var(--ink2);height:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.fcard{height:136px;border:4px solid var(--ink);border-radius:10px;background:#fbfaf6;text-align:left;padding:6px 14px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
-.fcard .r{font-size:26px;font-weight:700;line-height:1.2}
-.fcard .smp{font-size:50px;line-height:1.1;white-space:nowrap}
-.fcard .ps{font-size:24px;color:#45433e;line-height:1.2}
+.fgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.fcard{height:128px;border:4px solid var(--ink);border-radius:10px;background:#fbfaf6;text-align:left;padding:4px 10px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.fcard .r{font-size:24px;font-weight:700;line-height:1.2;white-space:nowrap}
+.fcard .smp{font-size:44px;line-height:1.15;white-space:nowrap}
+.fcard .ps{font-size:24px;color:#45433e;line-height:1.2;white-space:nowrap}
 .fcard.on{border-color:var(--pink);border-width:6px;background:#fff0f6}
-.fcard.on::after{content:'✓ 이 줄 담당';position:absolute;right:8px;top:6px;font-size:24px;font-weight:700;background:var(--pink);color:#fff;padding:2px 8px;border-radius:6px}
+.fcard.on::after{content:'✓';position:absolute;right:6px;top:4px;font-size:28px;font-weight:700;background:var(--pink);color:#fff;padding:2px 8px;border-radius:6px}
 .srow{display:flex;flex-direction:column;gap:6px;padding:6px 6px 8px;border-bottom:3px dashed #cfcbc0}
 .srow:last-child{border-bottom:0}
 .srow.on{background:#fff0f6}
@@ -304,26 +307,32 @@ const SFX={
   tap(){tone(700,0,.025,'square',.03)}
 };
 
-/* ---------- 서체 직원 8명 ---------- */
+/* ---------- 서체 직원 12명 ----------
+   채점은 서체 하나하나가 아니라 계열(fam)로 한다. 같은 계열 안에서는 무엇을 골라도 판정이 같다.
+   계열: gothic 고딕 · serif 명조 · display 굵은 제목체 · round 둥근체 · hand 손글씨 · brush 붓글씨 · deco 장식체 · mono 고정폭 */
 const FONTS=[
-  {id:'sans', role:'공문서 담당', kind:'고딕',       css:"'Noto Sans KR'",       ps:'깔끔하고 정확함',   name:'Noto Sans KR',       maker:'Google'},
-  {id:'serif',role:'의전 담당',   kind:'명조',       css:"'Noto Serif KR'",      ps:'점잖고 믿음직함',   name:'Noto Serif KR',      maker:'Google'},
-  {id:'bold', role:'확성기 담당', kind:'굵은 제목체', css:"'Black Han Sans'",     ps:'목소리가 크고 셈',  name:'Black Han Sans',     maker:'Zess Type'},
-  {id:'round',role:'키즈 담당',   kind:'둥근체',     css:"'Jua'",                ps:'친근하고 발랄함',   name:'Jua',                maker:'Woowahan Brothers'},
-  {id:'pen',  role:'감성 담당',   kind:'손글씨체',   css:"'Nanum Pen Script'",   ps:'따뜻하고 다정함',   name:'Nanum Pen Script',   maker:'Sandoll Communication'},
-  {id:'brush',role:'전통 담당',   kind:'붓글씨체',   css:"'Nanum Brush Script'", ps:'전통적이고 힘있음', name:'Nanum Brush Script', maker:'Sandoll Communication'},
-  {id:'deco', role:'축제 담당',   kind:'장식체',     css:"'Gugi'",               ps:'화려하고 개성 강함',name:'Gugi',               maker:'TAE System & Typefaces'},
-  {id:'mono', role:'영수증 담당', kind:'고정폭체',   css:"'Nanum Gothic Coding'",ps:'기계적이고 정직함', name:'Nanum Gothic Coding',maker:'Sandoll Communication'}
+  {id:'sans',   fam:'gothic', role:'공문서 담당', css:"'Noto Sans KR'",       ps:'깔끔·정확',   name:'Noto Sans KR',       maker:'Google'},
+  {id:'serif',  fam:'serif',  role:'의전 담당',   css:"'Noto Serif KR'",      ps:'점잖·믿음직', name:'Noto Serif KR',      maker:'Google'},
+  {id:'gowun',  fam:'serif',  role:'편지 담당',   css:"'Gowun Batang'",       ps:'부드럽고 단정',name:'Gowun Batang',      maker:'Yanghee Ryu'},
+  {id:'bold',   fam:'display',role:'확성기 담당', css:"'Black Han Sans'",     ps:'크고 우렁참', name:'Black Han Sans',     maker:'Zess Type'},
+  {id:'dohyeon',fam:'display',role:'간판 담당',   css:"'Do Hyeon'",           ps:'굵고 또렷함', name:'Do Hyeon',           maker:'Woowahan Brothers'},
+  {id:'round',  fam:'round',  role:'키즈 담당',   css:"'Jua'",                ps:'친근·발랄',   name:'Jua',                maker:'Woowahan Brothers'},
+  {id:'pen',    fam:'hand',   role:'감성 담당',   css:"'Nanum Pen Script'",   ps:'따뜻·다정',   name:'Nanum Pen Script',   maker:'Sandoll Communication'},
+  {id:'gaegu',  fam:'hand',   role:'낙서 담당',   css:"'Gaegu'",              ps:'장난·편안',   name:'Gaegu',              maker:'JIKJI SOFT'},
+  {id:'brush',  fam:'brush',  role:'전통 담당',   css:"'Nanum Brush Script'", ps:'전통·힘참',   name:'Nanum Brush Script', maker:'Sandoll Communication'},
+  {id:'deco',   fam:'deco',   role:'축제 담당',   css:"'Gugi'",               ps:'화려·개성',   name:'Gugi',               maker:'TAE System & Typefaces'},
+  {id:'bagel',  fam:'deco',   role:'풍선 담당',   css:"'Bagel Fat One'",      ps:'통통·신남',   name:'Bagel Fat One',      maker:'Kyungwon Kim, JAMO'},
+  {id:'mono',   fam:'mono',   role:'영수증 담당', css:"'Nanum Gothic Coding'",ps:'기계적·정직', name:'Nanum Gothic Coding',maker:'Sandoll Communication'}
 ];
 const F={};FONTS.forEach(f=>F[f.id]=f);
-const CARD_SAMPLE='가나다 Aa';
+const fam=id=>id&&F[id]?F[id].fam:null;
+const CARD_SAMPLE='가나다';
 const SIZE_PX=[0,22,30,42,58,78];          // 크기 1~5단계 (포스터 500px 폭 기준)
 const SIZE_NAME=['','아주 작게','작게','보통','크게','아주 크게'];
-const UNREADABLE_BODY=['pen','brush','deco']; // 본문에 쓰면 가독성에서 깎이는 서체
 
 /* ---------- 꿀팁 9개 ---------- */
 const TIPS=[
-  {id:'fonts',   t:'서체는 한 포스터에 두 개까지'},
+  {id:'fonts',   t:'서체는 두 개면 충분, 많아도 세 개까지'},
   {id:'title',   t:'제목은 본문보다 확실하게 크게'},
   {id:'small',   t:'작은 종이일수록 가장 중요한 하나만 크게'},
   {id:'align',   t:'정렬은 한 포스터에 한 가지로'},
@@ -351,11 +360,12 @@ const SLOTS=[
 /* ---------- 손님 (대사는 초안: 기획 확정 때 선생님이 다듬기) ----------
    lines.role: key = 가장 중요한 줄, sub = 두 번째로 중요한 줄, body = 정보·본문
    판정 범위 (1일차, 크기 1~5단계):
-     ① 서체 인상: key 서체가 good 안에 있고, 어느 줄도 bad 서체가 아님
-     ② 위계: key가 body보다 2단계 이상 크고, sub보다 1단계 이상 큼
-     ③ 가독성: body가 2단계 이상이고 손글씨·붓글씨·장식체가 아님
-     ④ 정돈: 서체 2개 이하 (1일차는 서체 수만 봄)
-     ⑤ 손님별 특기: spec.test
+   원칙: 누가 봐도 이상한 것만 별을 깎는다. 무난한 선택은 통과시키고 손님이 한마디만 한다.
+     ① 서체 인상: 어느 줄도 bad 계열이 아니면 통과. key가 good도 bad도 아니면 통과 + 한마디(soso)
+     ② 위계: key가 다른 모든 줄보다 크면 통과 (몇 단계 차이인지는 묻지 않음)
+     ③ 가독성: body가 2단계 이상, 붓글씨·장식체가 아님, 손글씨는 3단계 이상
+     ④ 정돈: 서체 3개 이하면 통과 (3개면 한마디), 4개부터 깎음
+     ⑤ 손님별 특기: spec.test (크기 순서로만 판정)
 */
 const CUST=[
   { id:'stationery', day:1, name:'문구점 사장님', who:'동네 문구점 사장님',
@@ -366,23 +376,20 @@ const CUST=[
       {t:'전 품목 최대 50%',role:'sub',lb:'할인'},
       {t:'12월 20일(토) ~ 24일(수)',role:'body',lb:'날짜'},
       {t:'명지문구 · 학교 정문 앞',role:'body',lb:'장소'}],
-    good:['bold','deco'], bad:['pen','serif','brush'],
-    spec:{nm:'할인 문구 살리기', test:D=>D[1].size<D[0].size && D[1].size>Math.max(D[2].size,D[3].size)},
+    good:['display','deco'], bad:['hand','serif'],
+    spec:{nm:'할인 문구 살리기', test:D=>D[1].size>Math.max(D[2].size,D[3].size)},
     sample:[['bold',5],['bold',4],['sans',2],['sans',2]],
     re:{
       perfect:'이거죠! 길 건너에서도 「대방출」이 보이고, 「50%」도 바로 눈에 들어와요. 문 열자마자 손님이 줄을 섰어요!',
       font:{
-        pen:'세일하는 줄 아무도 모르고, 다들 손편지인 줄 알았대요.',
-        serif:'다들 문구점이 문 닫는 줄 알고 작별 인사를 하고 갔어요…',
-        brush:'한약방 개업 현수막인 줄 알았대요. 세일하는 느낌이 안 나요.',
-        round:'키즈카페 초대장인 줄 알고 꼬마 손님들만 왔어요. 귀엽긴 한데…',
-        sans:'공지문처럼 얌전해서 세일하는 줄 몰랐대요. 목소리 큰 직원 없어요?',
-        mono:'가격표인 줄 알고 아무도 안 읽었대요. 제목은 더 크게 외쳐야죠!'
+        hand:'세일하는 줄 아무도 모르고, 다들 손편지인 줄 알았대요.',
+        serif:'다들 문구점이 문 닫는 줄 알고 작별 인사를 하고 갔어요…'
       },
-      hier:'「대방출」이랑 다른 줄이 크기가 비슷해서, 다들 날짜가 가게 이름인 줄 알았대요.',
+      soso:'괜찮아요! 다만 세일 느낌이 조금만 더 시끄러웠으면 손님이 더 왔을 거예요.',
+      hier:'「대방출」보다 큰 줄이 있어서, 다들 그게 가게 이름인 줄 알았대요.',
       read:'날짜랑 장소가 너무 작거나 흘려 써져서, 언제 어디로 오라는 건지 몰랐대요.',
-      tidy:'서체가 너무 많아서 전단지가 서커스 포스터 같대요.',
-      spec:'「50%」가 묻혀서 다들 정가에 사 갔어요… 할인 문구는 날짜보다 크게, 제목보다는 작게요!'
+      tidy:'서체가 네 개나 돼서 전단지가 서커스 포스터 같대요.',
+      spec:'「50%」가 날짜만큼 작아서 묻혔어요. 다들 정가에 사 갔대요… 할인 문구는 날짜보다 크게요!'
     },
     thanks:'세일 첫날 문구점 앞에 줄이 생겼대요'
   },
@@ -394,23 +401,22 @@ const CUST=[
       {t:'빈소: 3호실',role:'body',lb:'빈소'},
       {t:'발인: 12월 21일 오전 7시',role:'body',lb:'발인'},
       {t:'주차는 지하 1층을 이용해 주십시오',role:'body',lb:'주차'}],
-    good:['serif','sans'], bad:['round','deco','pen','bold'],
-    spec:{nm:'차분한 크기', test:D=>D[0].size<=4},
+    good:['serif','gothic'], bad:['round','deco','hand','display'],
+    spec:{nm:'중요한 안내 먼저', test:D=>D[3].size<=Math.min(D[1].size,D[2].size)},
     sample:[['sans',4],['sans',2],['sans',2],['sans',2]],
     re:{
       perfect:'조용하고 정중해서 좋네요. 조문 오신 분들이 안내문을 보고 차분히 길을 찾으셨어요.',
       font:{
         round:'조문객분들이 웃음을 참고 계세요… 다시 부탁드려요.',
         deco:'놀이공원 입구인 줄 아신 분이 계셨어요… 이 자리에는 너무 화려해요.',
-        pen:'개인 쪽지처럼 보여서, 공식 안내문인지 다들 헷갈려하셨어요.',
-        bold:'글자가 소리를 지르는 것 같아서 다들 깜짝 놀라셨어요.',
-        brush:'붓글씨가 너무 힘이 넘쳐서 개업 현수막 같다고 하셨어요.',
-        mono:'영수증처럼 보여서 계산서인 줄 아셨대요. 조금 더 정중한 직원이면 좋겠어요.'
+        hand:'개인 쪽지처럼 보여서, 공식 안내문인지 다들 헷갈려하셨어요.',
+        display:'글자가 소리를 지르는 것 같아서 다들 깜짝 놀라셨어요.'
       },
-      hier:'「조문 안내」가 다른 줄과 크기가 비슷해서, 무슨 안내문인지 한참 읽으셔야 했어요.',
+      soso:'괜찮습니다. 조금 더 단정한 서체였다면 더 정중해 보였을 것 같아요.',
+      hier:'「조문 안내」가 제일 크지 않아서, 무슨 안내문인지 한참 읽으셔야 했어요.',
       read:'안내 글씨가 너무 작거나 흘림체라서, 어르신들이 가까이 다가가 읽으셨어요.',
       tidy:'서체가 여러 개라 어수선해 보여요. 이런 자리일수록 정돈된 느낌이 중요해요.',
-      spec:'제목이 너무 커서 안내문이 소리치는 것 같아요. 한 단계만 낮춰 주시겠어요?'
+      spec:'주차 안내가 빈소·발인보다 눈에 띄어서, 주차장 안내문인 줄 아신 분이 많았어요.'
     },
     thanks:'조문객들이 차분히 길을 찾으셨대요'
   },
@@ -422,21 +428,19 @@ const CUST=[
       {t:'12월 13일(토) 오후 2시',role:'body',lb:'시간'},
       {t:'꿈나무 키즈카페 2층',role:'body',lb:'장소'},
       {t:'선물은 마음만 가져와!',role:'body',lb:'한마디'}],
-    good:['round','deco','pen'], bad:['serif','brush','mono'],
+    good:['round','deco','hand'], bad:['serif','brush'],
     spec:{nm:'시간이 잘 보이게', test:D=>D[1].size>=Math.max(D[2].size,D[3].size)},
     sample:[['round',5],['sans',3],['sans',2],['sans',2]],
     re:{
       perfect:'지우가 초대장을 들고 방방 뛰어다녀요! 부모님들도 시간이랑 장소를 바로 아셨대요.',
       font:{
         serif:'부모님들이 결혼식 청첩장인 줄 아셨대요. 다섯 살 파티인데…',
-        brush:'붓글씨라 무슨 도장 찍는 행사인 줄 알았대요. 아이들이 무서워해요.',
-        mono:'영수증인 줄 알고 버릴 뻔했대요! 생일파티 느낌이 하나도 안 나요.',
-        sans:'깔끔하긴 한데 학원 공지문 같대요. 파티 느낌이 좀 더 났으면 해요.',
-        bold:'너무 우렁차서 마트 세일 전단지 같대요. 조금 더 귀엽게요!'
+        brush:'붓글씨라 무슨 도장 찍는 행사인 줄 알았대요. 아이들이 무서워해요.'
       },
-      hier:'제목이 다른 줄보다 별로 크지 않아서, 누구 파티인지 한참 찾았대요.',
+      soso:'좋아요! 조금 더 귀엽고 신나는 느낌이었으면 아이들이 더 좋아했을 거예요.',
+      hier:'제목이 제일 크지 않아서, 누구 파티인지 한참 찾았대요.',
       read:'시간이랑 장소가 너무 작거나 흘림체라서, 부모님들이 몇 번이나 전화하셨어요.',
-      tidy:'서체가 너무 많아서 초대장이 장난감 상자를 쏟은 것 같대요.',
+      tidy:'서체가 네 개나 돼서 초대장이 장난감 상자를 쏟은 것 같대요.',
       spec:'시간이 제일 안 보여서 친구들이 다 늦게 왔어요! 시간은 다른 정보보다 작지 않게요.'
     },
     thanks:'지우의 친구들이 시간 맞춰 다 왔대요'
@@ -611,8 +615,8 @@ function renderBar(){
   const k=slots.indexOf(SLOTS[R.i])+1;
   $('#dayPill').innerHTML=`${R.c.day}일차 · 손님 <b>${k}</b>/${slots.length}`;
   const n=usedFonts().length;
-  const fc=$('#fontCount');fc.classList.toggle('over',n>=3);
-  fc.innerHTML=`서체 계산대 <b>${n}</b>${n>=3?' 초과!':''}`;
+  const fc=$('#fontCount');fc.classList.toggle('over',n>=4);fc.classList.toggle('warn',n===3);
+  fc.innerHTML=`서체 계산대 <b>${n}</b>${n>=4?' 초과!':n===3?' 주의':''}`;
   $('#starPill').innerHTML=`별 <b>★ ${totalStars()}</b>`;
   $('#tipBtn').textContent=`꿀팁 노트 ${S.tips.length}/9`;
 }
@@ -695,25 +699,29 @@ $('#deliver').onclick=()=>{
 function judge(c,L){
   const k=c.lines.findIndex(l=>l.role==='key');
   const nFonts=new Set(L.map(l=>l.font)).size;
-  const badLine=L.findIndex(l=>c.bad.includes(l.font));
-  const imp=c.good.includes(L[k].font)&&badLine<0;
-  const hier=c.lines.every((l,j)=>j===k||(l.role==='body'?L[k].size>=L[j].size+2:L[k].size>L[j].size));
-  const read=c.lines.every((l,j)=>l.role!=='body'||(L[j].size>=2&&!UNREADABLE_BODY.includes(L[j].font)));
-  const tidy=nFonts<=2;
+  const badLine=L.findIndex(l=>c.bad.includes(fam(l.font)));
+  const imp=badLine<0;
+  const soso=imp&&!c.good.includes(fam(L[k].font));       // 통과지만 무난한 정도
+  const hier=c.lines.every((l,j)=>j===k||L[k].size>L[j].size);
+  const read=c.lines.every((l,j)=>{if(l.role!=='body')return true;const f=fam(L[j].font);
+    return L[j].size>=2&&f!=='brush'&&f!=='deco'&&!(f==='hand'&&L[j].size<3)});
+  const tidy=nFonts<=3;
   const spec=!!c.spec.test(L);
-  // 서체 인상 반응: 나쁜 서체가 있으면 그 서체, 아니면 제목 서체
-  const impFont=badLine>=0?L[badLine].font:L[k].font;
   const rows=[
-    {id:'imp',nm:'서체 인상',ok:imp},
-    {id:'hier',nm:'위계 (제목이 확실히 크게)',ok:hier},
+    {id:'imp',nm:'서체 인상',ok:imp,soso},
+    {id:'hier',nm:'위계 (제목이 가장 크게)',ok:hier},
     {id:'read',nm:'가독성 (본문이 읽히게)',ok:read},
-    {id:'tidy',nm:'정돈 (서체 2개 이하)',ok:tidy},
+    {id:'tidy',nm:'정돈 (서체 3개 이하)',ok:tidy,soso:nFonts===3},
     {id:'spec',nm:'손님 특기: '+c.spec.nm,ok:spec}];
-  return {rows,stars:rows.filter(r=>r.ok).length,impFont,nFonts};
+  return {rows,stars:rows.filter(r=>r.ok).length,badFam:badLine>=0?fam(L[badLine].font):null,nFonts,soso};
 }
 function reaction(c,J){
-  if(J.stars===5)return [c.re.perfect];
-  const why=J.rows.filter(r=>!r.ok).map(r=>r.id==='imp'?(c.re.font[J.impFont]||c.re.font.sans):c.re[r.id]);
+  // 한마디: 별은 그대로 주고 덧붙이는 말
+  const notes=[];
+  if(J.soso&&c.re.soso)notes.push(c.re.soso);
+  if(J.nFonts===3)notes.push('서체가 세 개라 살짝 바빠 보여요. 두 개였으면 더 깔끔했을 거예요.');
+  if(J.stars===5)return [c.re.perfect].concat(notes.length?['하나만 덧붙이면, '+notes[0]]:[]);
+  const why=J.rows.filter(r=>!r.ok).map(r=>r.id==='imp'?(c.re.font[J.badFam]||c.re.font.def||''):c.re[r.id]);
   const open=J.stars>=4?'거의 다 좋아요! 그런데…':J.stars>=2?'음… 고마운데요, 사실은…':'저기… 큰일 났어요.';
   const out=[open+' '+why[0]];
   if(why[1])out.push('그리고 '+why[1]);
@@ -728,7 +736,7 @@ async function deliver(){
   $('#tabs').hidden=true;$('#deliver').hidden=true;
   const body=$('#cbody');
   body.innerHTML=`<div class="score"><div class="tot" id="tot">삐빅!</div>`+
-    J.rows.map(r=>`<div class="srow2 ${r.ok?'pass':'fail'}"><span class="st" aria-hidden="true">${r.ok?'★':'☆'}</span><span class="nm">${esc(r.nm)}</span><span class="ok">${r.ok?'통과':'아쉬움'}</span></div>`).join('')+
+    J.rows.map(r=>`<div class="srow2 ${r.ok?'pass':'fail'}"><span class="st" aria-hidden="true">${r.ok?'★':'☆'}</span><span class="nm">${esc(r.nm)}</span><span class="ok">${r.ok?(r.soso?'통과 · 무난':'통과'):'아쉬움'}</span></div>`).join('')+
     `</div>`;
   body.style.top='0';body.style.height='696px';
   SFX.beep();
@@ -745,7 +753,7 @@ async function deliver(){
   // 꿀팁 해금 조건
   const newTips=[];
   const unlock=id=>{if(!S.tips.includes(id)&&!newTips.includes(id))newTips.push(id)};
-  if(!J.rows[3].ok&&J.nFonts>=3)unlock('fonts');
+  if(J.nFonts>=3)unlock('fonts');
   if(c.id==='stationery'&&J.stars===5)unlock('title');
   save();renderBar();
   // 별 3개 이하, 첫 납품이면: 견본을 작게, 잠깐 나란히 보여 준다
@@ -889,6 +897,17 @@ function gcDone(){
     else if(++n>60)clearInterval(iv)},250);
 }
 
+/* ---------- 포스터 서체 받기: 게임 글자만 지정 (text=). 글을 고치면 주소가 저절로 바뀐다 ---------- */
+function loadPosterFonts(){
+  const fixed='폰트편의점24H일차영업끝!다시열었어FONTSTORE No.0123456789손님들어갈글오늘쓸수있는것"·:~()%,.?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const all=fixed+CARD_SAMPLE+CUST.map(c=>[c.who,c.order].concat(c.lines.map(l=>l.t)).join('')).join('');
+  const txt=[...new Set(all.replace(/\s/g,''))].sort().join('')+' ';
+  const fams=FONTS.filter(f=>f.id!=='sans').map(f=>'family='+f.name.replace(/ /g,'+'));
+  const l=document.createElement('link');l.rel='stylesheet';
+  l.href='https://fonts.googleapis.com/css2?'+fams.join('&')+'&text='+encodeURIComponent(txt)+'&display=swap';
+  document.head.appendChild(l);
+}
+loadPosterFonts();
 toTitle();
 </script>
 <script>window.goatcounter={path:function(){return location.pathname;}};</script>
